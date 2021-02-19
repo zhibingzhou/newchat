@@ -1,0 +1,36 @@
+[newchat]2021/02/19 - 13:18:27.782	[34minfo[0m	d:/zhou/src/chat/server/initialize/gorm.go:63	register table success
+[newchat]2021/02/19 - 13:18:27.799	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:22	use middleware logger
+[newchat]2021/02/19 - 13:18:27.800	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:25	use middleware cors
+[newchat]2021/02/19 - 13:18:27.800	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:27	register swagger handler
+[newchat]2021/02/19 - 13:18:27.807	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:55	router register success
+[newchat]2021/02/19 - 13:18:27.809	[34minfo[0m	d:/zhou/src/chat/server/core/server.go:29	server run success on 	{"address": ":8888"}
+[newchat]2021/02/19 - 13:32:49.066	[34minfo[0m	d:/zhou/src/chat/server/initialize/gorm.go:63	register table success
+[newchat]2021/02/19 - 13:32:49.086	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:22	use middleware logger
+[newchat]2021/02/19 - 13:32:49.086	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:25	use middleware cors
+[newchat]2021/02/19 - 13:32:49.086	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:27	register swagger handler
+[newchat]2021/02/19 - 13:32:49.095	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:55	router register success
+[newchat]2021/02/19 - 13:32:49.096	[34minfo[0m	d:/zhou/src/chat/server/core/server.go:29	server run success on 	{"address": ":8888"}
+[newchat]2021/02/19 - 13:42:22.693	[34minfo[0m	d:/zhou/src/chat/server/initialize/gorm.go:63	register table success
+[newchat]2021/02/19 - 13:42:22.720	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:22	use middleware logger
+[newchat]2021/02/19 - 13:42:22.722	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:25	use middleware cors
+[newchat]2021/02/19 - 13:42:22.722	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:27	register swagger handler
+[newchat]2021/02/19 - 13:42:22.729	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:55	router register success
+[newchat]2021/02/19 - 13:42:22.730	[34minfo[0m	d:/zhou/src/chat/server/core/server.go:29	server run success on 	{"address": ":8888"}
+[newchat]2021/02/19 - 13:44:45.202	[34minfo[0m	d:/zhou/src/chat/server/initialize/gorm.go:63	register table success
+[newchat]2021/02/19 - 13:44:45.219	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:22	use middleware logger
+[newchat]2021/02/19 - 13:44:45.220	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:25	use middleware cors
+[newchat]2021/02/19 - 13:44:45.220	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:27	register swagger handler
+[newchat]2021/02/19 - 13:44:45.228	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:55	router register success
+[newchat]2021/02/19 - 13:44:45.229	[34minfo[0m	d:/zhou/src/chat/server/core/server.go:29	server run success on 	{"address": ":8888"}
+[newchat]2021/02/19 - 19:13:35.638	[34minfo[0m	d:/zhou/src/chat/server/initialize/gorm.go:63	register table success
+[newchat]2021/02/19 - 19:13:35.652	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:22	use middleware logger
+[newchat]2021/02/19 - 19:13:35.653	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:25	use middleware cors
+[newchat]2021/02/19 - 19:13:35.653	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:27	register swagger handler
+[newchat]2021/02/19 - 19:13:35.659	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:55	router register success
+[newchat]2021/02/19 - 19:13:35.661	[34minfo[0m	d:/zhou/src/chat/server/core/server.go:29	server run success on 	{"address": ":8888"}
+[newchat]2021/02/19 - 19:41:17.653	[34minfo[0m	d:/zhou/src/chat/server/initialize/gorm.go:63	register table success
+[newchat]2021/02/19 - 19:41:17.671	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:22	use middleware logger
+[newchat]2021/02/19 - 19:41:17.671	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:25	use middleware cors
+[newchat]2021/02/19 - 19:41:17.671	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:27	register swagger handler
+[newchat]2021/02/19 - 19:41:17.677	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:55	router register success
+[newchat]2021/02/19 - 19:41:17.679	[34minfo[0m	d:/zhou/src/chat/server/core/server.go:29	server run success on 	{"address": ":8888"}

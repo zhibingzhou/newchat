@@ -1,0 +1,31 @@
+DROP TABLE IF EXISTS `sys_users`;
+
+//用户列表
+CREATE TABLE `sys_users` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `gender` tinyint DEFAULT '1' COMMENT '状态:1=男，0=女',
+  `nickname` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户昵称',
+  `email` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户邮箱',
+  `motto` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '个性签名',
+  `avatar` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'http://img.wxcha.com/m00/b0/2b/65252be5c6e7e8ace4458e517cb5ad08.jpg' COMMENT '用户头像',
+  `mobile` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户手机号',
+  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '登录密码',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `index_mobile` (`mobile`),
+  KEY `idx_users_deleted_at` (`deleted_at`) USING BTREE,
+  KEY `idx_sys_users_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+CREATE TABLE `jwt_blacklist` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `jwt` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_jwt_blacklists_deleted_at` (`deleted_at`) USING BTREE,
+  KEY `idx_jwt_blacklist_deleted_at` (`deleted_at`)
+) ENGINE=INNODB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"newchat/global"
 	"newchat/model"
 	"newchat/model/request"
@@ -64,6 +65,7 @@ func JWTAuth() gin.HandlerFunc {
 				_ = service.SetRedisJWT(newToken, newClaims.Mobile)
 			}
 		}
+		fmt.Println(claims)
 		c.Set("claims", claims)
 		c.Next()
 	}

@@ -6,7 +6,7 @@ import (
 	"newchat/model"
 	"newchat/model/request"
 
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)

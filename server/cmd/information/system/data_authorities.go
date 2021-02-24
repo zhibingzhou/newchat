@@ -4,7 +4,7 @@ import (
 	"newchat/global"
 
 	"github.com/gookit/color"
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 var DataAuthorities = new(dataAuthorities)

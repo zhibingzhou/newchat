@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gookit/color"
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 var Workflow = new(workflow)

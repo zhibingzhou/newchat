@@ -8,8 +8,8 @@ import (
 	"newchat/utils"
 	"strconv"
 
+	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
-	"gorm.io/gorm"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)

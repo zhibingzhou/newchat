@@ -2,14 +2,11 @@ package initialize
 
 import (
 	"newchat/global"
-	"newchat/initialize/internal"
-	"newchat/model"
 	"os"
 
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"go.uber.org/zap"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 //@author: SliverHorn
@@ -33,33 +30,34 @@ func Gorm() *gorm.DB {
 //@param: db *gorm.DB
 
 func MysqlTables(db *gorm.DB) {
-	err := db.AutoMigrate(
-		model.SysUser{},
-		// model.SysAuthority{},
-		// model.SysApi{},
-		// model.SysBaseMenu{},
-		// model.SysBaseMenuParameter{},
-		model.JwtBlacklist{},
-		// model.SysDictionary{},
-		// model.SysDictionaryDetail{},
-		// model.ExaFileUploadAndDownload{},
-		// model.ExaFile{},
-		// model.ExaFileChunk{},
-		// model.ExaSimpleUploader{},
-		// model.ExaCustomer{},
-		// model.SysOperationRecord{},
-		// model.WorkflowProcess{},
-		// model.WorkflowNode{},
-		// model.WorkflowEdge{},
-		// model.WorkflowStartPoint{},
-		// model.WorkflowEndPoint{},
-		// model.WorkflowMove{},
-		// model.ExaWfLeave{},
-	)
-	if err != nil {
-		global.GVA_LOG.Error("register table failed", zap.Any("err", err))
-		os.Exit(0)
-	}
+	// err := db.AutoMigrate(
+	// 	//model.SysUser{},
+	// 	// model.SysAuthority{},
+	// 	// model.SysApi{},
+	// 	// model.SysBaseMenu{},
+	// 	// model.SysBaseMenuParameter{},
+	// 	model.JwtBlacklist{},
+	// 	// model.SysDictionary{},
+	// 	// model.SysDictionaryDetail{},
+	// 	// model.ExaFileUploadAndDownload{},
+	// 	// model.ExaFile{},
+	// 	// model.ExaFileChunk{},
+	// 	// model.ExaSimpleUploader{},
+	// 	// model.ExaCustomer{},
+	// 	// model.SysOperationRecord{},
+	// 	// model.WorkflowProcess{},
+	// 	// model.WorkflowNode{},
+	// 	// model.WorkflowEdge{},
+	// 	// model.WorkflowStartPoint{},
+	// 	// model.WorkflowEndPoint{},
+	// 	// model.WorkflowMove{},
+	// 	// model.ExaWfLeave{},
+
+	// )
+	// if err != nil {
+	// 	global.GVA_LOG.Error("register table failed", zap.Any("err", err))
+	// 	os.Exit(0)
+	// }
 	global.GVA_LOG.Info("register table success")
 }
 
@@ -72,24 +70,18 @@ func MysqlTables(db *gorm.DB) {
 func GormMysql() *gorm.DB {
 	m := global.GVA_CONFIG.Mysql
 	dsn := m.Username + ":" + m.Password + "@tcp(" + m.Path + ")/" + m.Dbname + "?" + m.Config
-	mysqlConfig := mysql.Config{
-		DSN:                       dsn,   // DSN data source name
-		DefaultStringSize:         191,   // string 类型字段的默认长度
-		DisableDatetimePrecision:  true,  // 禁用 datetime 精度，MySQL 5.6 之前的数据库不支持
-		DontSupportRenameIndex:    true,  // 重命名索引时采用删除并新建的方式，MySQL 5.7 之前的数据库和 MariaDB 不支持重命名索引
-		DontSupportRenameColumn:   true,  // 用 `change` 重命名列，MySQL 8 之前的数据库和 MariaDB 不支持重命名列
-		SkipInitializeWithVersion: false, // 根据版本自动配置
-	}
-	if db, err := gorm.Open(mysql.New(mysqlConfig), gormConfig(m.LogMode)); err != nil {
+	db, err := gorm.Open("mysql", dsn)
+	db.SingularTable(true)
+	if err != nil {
 		global.GVA_LOG.Error("MySQL启动异常", zap.Any("err", err))
 		os.Exit(0)
-		return nil
 	} else {
-		sqlDB, _ := db.DB()
-		sqlDB.SetMaxIdleConns(m.MaxIdleConns)
-		sqlDB.SetMaxOpenConns(m.MaxOpenConns)
-		return db
+		global.GVA_DB = db
+		// global.GVA_DB.DB().SetMaxIdleConns(admin.MaxIdleConns)
+		// global.GVA_DB.DB().SetMaxOpenConns(admin.MaxOpenConns)
+		global.GVA_DB.LogMode(false)
 	}
+	return db
 }
 
 //@author: SliverHorn
@@ -98,25 +90,25 @@ func GormMysql() *gorm.DB {
 //@param: mod bool
 //@return: *gorm.Config
 
-func gormConfig(mod bool) *gorm.Config {
-	var config = &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true}
-	switch global.GVA_CONFIG.Mysql.LogZap {
-	case "silent", "Silent":
-		config.Logger = internal.Default.LogMode(logger.Silent)
-	case "error", "Error":
-		config.Logger = internal.Default.LogMode(logger.Error)
-	case "warn", "Warn":
-		config.Logger = internal.Default.LogMode(logger.Warn)
-	case "info", "Info":
-		config.Logger = internal.Default.LogMode(logger.Info)
-	case "zap", "Zap":
-		config.Logger = internal.Default.LogMode(logger.Info)
-	default:
-		if mod {
-			config.Logger = internal.Default.LogMode(logger.Info)
-			break
-		}
-		config.Logger = internal.Default.LogMode(logger.Silent)
-	}
-	return config
-}
+// func gormConfig(mod bool) *gorm.Config {
+// 	var config = &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true}
+// 	switch global.GVA_CONFIG.Mysql.LogZap {
+// 	case "silent", "Silent":
+// 		config.Logger = internal.Default.LogMode(logger.Silent)
+// 	case "error", "Error":
+// 		config.Logger = internal.Default.LogMode(logger.Error)
+// 	case "warn", "Warn":
+// 		config.Logger = internal.Default.LogMode(logger.Warn)
+// 	case "info", "Info":
+// 		config.Logger = internal.Default.LogMode(logger.Info)
+// 	case "zap", "Zap":
+// 		config.Logger = internal.Default.LogMode(logger.Info)
+// 	default:
+// 		if mod {
+// 			config.Logger = internal.Default.LogMode(logger.Info)
+// 			break
+// 		}
+// 		config.Logger = internal.Default.LogMode(logger.Silent)
+// 	}
+// 	return config
+// }

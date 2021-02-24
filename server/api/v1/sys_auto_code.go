@@ -2,9 +2,6 @@ package v1
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
-	"go.uber.org/zap"
 	"net/url"
 	"newchat/global"
 	"newchat/model"
@@ -12,6 +9,9 @@ import (
 	"newchat/service"
 	"newchat/utils"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // @Tags AutoCode
@@ -39,15 +39,15 @@ func CreateTemp(c *gin.Context) {
 	}
 	err := service.CreateTemp(a)
 	if err != nil {
-		if errors.Is(err, model.AutoMoveErr) {
-			c.Writer.Header().Add("success", "false")
-			c.Writer.Header().Add("msgtype", "success")
-			c.Writer.Header().Add("msg", url.QueryEscape(err.Error()))
-		} else {
-			c.Writer.Header().Add("success", "false")
-			c.Writer.Header().Add("msg", url.QueryEscape(err.Error()))
-			_ = os.Remove("./ginvueadmin.zip")
-		}
+		// if errors.Is(err, model.AutoMoveErr) {
+		// 	c.Writer.Header().Add("success", "false")
+		// 	c.Writer.Header().Add("msgtype", "success")
+		// 	c.Writer.Header().Add("msg", url.QueryEscape(err.Error()))
+		// } else {
+		// 	c.Writer.Header().Add("success", "false")
+		// 	c.Writer.Header().Add("msg", url.QueryEscape(err.Error()))
+		// 	_ = os.Remove("./ginvueadmin.zip")
+		// }
 
 	} else {
 		c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", "ginvueadmin.zip")) // fmt.Sprintf("attachment; filename=%s", filename)对下载的文件重命名

@@ -8,3 +8,7 @@ import (
 type System struct {
 	Config config.Server
 }
+
+type Totaln struct {
+	Num int `json:"num"`
+}

@@ -8,7 +8,7 @@ import (
 	"newchat/model/response"
 	"strconv"
 
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -83,7 +83,7 @@ func DeleteAuthority(auth *model.SysAuthority) (err error) {
 	db := global.GVA_DB.Preload("SysBaseMenus").Where("authority_id = ?", auth.AuthorityId).First(auth)
 	err = db.Unscoped().Delete(auth).Error
 	if len(auth.SysBaseMenus) > 0 {
-		err = global.GVA_DB.Model(auth).Association("SysBaseMenus").Delete(auth.SysBaseMenus)
+		err = global.GVA_DB.Model(auth).Association("SysBaseMenus").Delete(auth.SysBaseMenus).Error
 		//err = db.Association("SysBaseMenus").Delete(&auth)
 	} else {
 		err = db.Error
@@ -132,7 +132,7 @@ func GetAuthorityInfo(auth model.SysAuthority) (err error, sa model.SysAuthority
 func SetDataAuthority(auth model.SysAuthority) error {
 	var s model.SysAuthority
 	global.GVA_DB.Preload("DataAuthorityId").First(&s, "authority_id = ?", auth.AuthorityId)
-	err := global.GVA_DB.Model(&s).Association("DataAuthorityId").Replace(&auth.DataAuthorityId)
+	err := global.GVA_DB.Model(&s).Association("DataAuthorityId").Replace(&auth.DataAuthorityId).Error
 	return err
 }
 
@@ -145,7 +145,7 @@ func SetDataAuthority(auth model.SysAuthority) error {
 func SetMenuAuthority(auth *model.SysAuthority) error {
 	var s model.SysAuthority
 	global.GVA_DB.Preload("SysBaseMenus").First(&s, "authority_id = ?", auth.AuthorityId)
-	err := global.GVA_DB.Model(&s).Association("SysBaseMenus").Replace(&auth.SysBaseMenus)
+	err := global.GVA_DB.Model(&s).Association("SysBaseMenus").Replace(&auth.SysBaseMenus).Error
 	return err
 }
 

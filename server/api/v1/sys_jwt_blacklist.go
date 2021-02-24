@@ -17,7 +17,7 @@ import (
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"拉黑成功"}"
 // @Router /jwt/jsonInBlacklist [post]
 func JsonInBlacklist(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
+	token := c.Request.Header.Get("x-token")
 	jwt := model.JwtBlacklist{Jwt: token}
 	if err := service.JsonInBlacklist(jwt); err != nil {
 		global.GVA_LOG.Error("jwt作废失败!", zap.Any("err", err))

@@ -32,7 +32,7 @@ func Routers() *gin.Engine {
 	}
 
 	PrivateGroup := Router.Group("")
-	PrivateGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler())
+	PrivateGroup.Use(middleware.JWTAuth())
 	{
 		router.InitApiRouter(PrivateGroup)                   // 注册功能api路由
 		router.InitJwtRouter(PrivateGroup)                   // jwt相关路由
@@ -50,6 +50,8 @@ func Routers() *gin.Engine {
 		router.InitSysDictionaryDetailRouter(PrivateGroup)   // 字典详情管理
 		router.InitFileUploadAndDownloadRouter(PrivateGroup) // 文件上传下载功能路由
 		router.InitWorkflowProcessRouter(PrivateGroup)       // 工作流相关接口
+		router.InitMessageRouter(PrivateGroup)
+		router.InitContactsRouter(PrivateGroup)
 		//router.InitWebSocketRouter(PrivateGroup)
 	}
 	global.GVA_LOG.Info("router register success")

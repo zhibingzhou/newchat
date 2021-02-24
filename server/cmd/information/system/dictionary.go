@@ -7,7 +7,7 @@ import (
 
 	"github.com/gookit/color"
 
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 var Dictionary = new(dictionary)

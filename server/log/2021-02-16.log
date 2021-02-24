@@ -1,6 +1,0 @@
-[newchat]2021/02/16 - 13:28:05.449	[34minfo[0m	d:/zhou/src/chat/server/initialize/gorm.go:63	register table success
-[newchat]2021/02/16 - 13:28:05.492	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:22	use middleware logger
-[newchat]2021/02/16 - 13:28:05.492	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:25	use middleware cors
-[newchat]2021/02/16 - 13:28:05.492	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:27	register swagger handler
-[newchat]2021/02/16 - 13:28:05.498	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:55	router register success
-[newchat]2021/02/16 - 13:28:05.500	[34minfo[0m	d:/zhou/src/chat/server/core/server.go:29	server run success on 	{"address": ":8888"}

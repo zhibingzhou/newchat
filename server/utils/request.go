@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 func HttpPostjson(url string, js []byte) (int, string) {
@@ -31,4 +32,21 @@ func HttpPostjson(url string, js []byte) (int, string) {
 	status = 200
 	msg = string(all)
 	return status, msg
+}
+
+/**
+*  处理分页
+ */
+func ThreadPage(page, page_size string) (int, int) {
+	page_int, _ := strconv.Atoi(page)
+	if page_int < 1 {
+		page_int = 1
+	}
+	size_int, _ := strconv.Atoi(page_size)
+	if size_int < 1 {
+		size_int = 20
+	} else if size_int > 100 {
+		size_int = 100
+	}
+	return page_int, size_int
 }

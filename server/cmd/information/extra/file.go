@@ -2,7 +2,7 @@ package information
 
 import (
 	"github.com/gookit/color"
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 	"newchat/global"
 	"newchat/model"
 	"time"

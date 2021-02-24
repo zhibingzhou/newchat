@@ -3,14 +3,16 @@ package internal
 import (
 	"context"
 	"fmt"
-	"go.uber.org/zap"
-	"gorm.io/gorm/logger"
-	"gorm.io/gorm/utils"
+
 	"io/ioutil"
 	"log"
 	"newchat/global"
 	"os"
 	"time"
+
+	"go.uber.org/zap"
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/utils"
 )
 
 // writer log writer interface

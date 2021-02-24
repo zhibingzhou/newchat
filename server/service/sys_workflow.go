@@ -9,7 +9,7 @@ import (
 	"newchat/model/request"
 	"strconv"
 
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 	"gorm.io/gorm/schema"
 )
 

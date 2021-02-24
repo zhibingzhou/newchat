@@ -13,7 +13,7 @@ import (
 	"strings"
 	"text/template"
 
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 type tplData struct {

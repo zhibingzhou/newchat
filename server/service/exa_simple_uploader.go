@@ -9,7 +9,7 @@ import (
 	"os"
 	"strconv"
 
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)

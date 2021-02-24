@@ -167,6 +167,33 @@ func Register(c *gin.Context) {
 	}
 }
 
+// @Tags AutoCode
+// @Summary 用户设置
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
+// @Router /autoCode/getColumn [get]
+func Setting(c *gin.Context) {
+
+	uid := getUserID(c)
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
+	if err, columns := service.FindUserById(uid); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(gin.H{"user_info": response.Setting{
+			ID:       columns.ID,
+			NickName: columns.NickName,
+			Avatar:   columns.Avatar,
+			Gender:   columns.Gender,
+			Motto:    columns.Motto,
+		}}, "获取成功", c)
+	}
+}
+
 // @Tags SysUser
 // @Summary 用户修改密码
 // @Security ApiKeyAuth

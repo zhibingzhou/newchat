@@ -13,7 +13,7 @@
               @click="catFriendDetail(params.receiveId)"
               >{{ params.nickname }}</span
             >
-            <span v-else @click="groupBoxShow = !groupBoxShow">{{
+            <span v-else @click="group.panel = !group.panel">{{
               params.nickname
             }}</span>
           </p>
@@ -41,7 +41,7 @@
             <p v-show="params.source == 2">
               <i
                 class="iconfont icon-gonggao2"
-                @click="isShowGroupNotice = true"
+                @click="group.notice = true"
               ></i>
             </p>
           </el-tooltip>
@@ -49,7 +49,7 @@
             <p v-show="params.source == 2">
               <i
                 class="el-icon-setting"
-                @click="groupBoxShow = !groupBoxShow"
+                @click="group.panel = !group.panel"
               ></i>
             </p>
           </el-tooltip>
@@ -112,13 +112,14 @@
                   :size="30"
                   class="pointer"
                   :src="item.avatar"
+                  @click.native="catFriendDetail(item.user_id)"
                 />
               </aside>
               <main class="main-column">
                 <div class="talk-title">
                   <span
-                    v-show="item.source == 2 && item.float == 'left'"
                     class="nickname"
+                    v-show="item.source == 2 && item.float == 'left'"
                     v-text="item.nickname"
                   ></span>
                   <span v-show="item.friend_remarks"
@@ -190,13 +191,15 @@
                   <div class="unknown-msg" v-else>
                     未知消息类型[{{ item.msg_type }}]
                   </div>
+
+                  <!-- <reply-message /> -->
                 </div>
               </main>
             </div>
 
             <!-- 消息时间 -->
             <div
-              class="datetime"
+              class="datetime no-select"
               v-show="compareTime(idx, item.created_at)"
               v-text="sendTime(item.created_at)"
             />
@@ -214,6 +217,17 @@
             <span>回到底部</span>
           </div>
         </transition>
+
+        <!-- 对话气泡 -->
+        <!-- <div
+          class="talk-bubble pointer no-select"
+          v-show="tipsBoard"
+          @click="talkPanelScrollBottom"
+        >
+          <i class="el-icon-chat-dot-round"></i>
+          <span>新消息</span>
+          <span>@按手机看那三剑客反数据那就开始发你拿手机看</span>
+        </div> -->
       </el-main>
 
       <!-- 页脚信息 -->
@@ -222,7 +236,6 @@
           <me-editor
             ref="talkEditor"
             @send="submitSendMesage"
-            @sendCodeBlock="sendCodeBlock"
             @keyboard-event="keyboardEvent"
           />
         </template>
@@ -256,7 +269,7 @@
       <!-- 群设置侧边栏 -->
       <div
         class="sidebar-box"
-        :class="{ show: groupBoxShow }"
+        :class="{ show: group.panel }"
         v-outside="hideChatGroup"
       >
         <group-panel
@@ -297,15 +310,15 @@
     <!-- 群公告组件 -->
     <transition name="el-fade-in-linear">
       <group-notice
-        v-if="isShowGroupNotice"
+        v-if="group.notice"
         :group-id="params.receiveId"
-        @close="isShowGroupNotice = false"
+        @close="group.notice = false"
       />
     </transition>
   </div>
 </template>
 <script>
-import Vue from "vue";
+import { mapState } from "vuex";
 import UserBusinessCard from "@/components/user/UserBusinessCard";
 import TalkSearchRecord from "@/components/chat/TalkSearchRecord";
 import UserContacts from "@/components/chat/UserContacts";
@@ -320,12 +333,8 @@ import {
   ServeRevokeRecords,
 } from "@/api/chat";
 import { ServeCollectEmoticon } from "@/api/emoticon";
-import {
-  formateTime,
-  parseTime,
-  copyTextToClipboard,
-  replaceEmoji,
-} from "@/utils/functions";
+import { formateTime, parseTime, copyTextToClipboard } from "@/utils/functions";
+import { findTalkIndex } from "@/utils/talk";
 
 export default {
   name: "TalkEditorPanel",
@@ -386,9 +395,11 @@ export default {
         isShow: false,
       },
 
-      //图片查看器列表
-      images: [],
-      groupBoxShow: false,
+      //群box
+      group: {
+        panel: false,
+        notice: false,
+      },
 
       //键盘输入事件
       keyEvent: {
@@ -401,19 +412,16 @@ export default {
 
       // 置底按钮是否显示
       tipsBoard: false,
-
-      isShowGroupNotice: false,
     };
   },
   computed: {
+    ...mapState({
+      inputEvent: (state) => state.notify.inputEvent,
+      scroll: (state) => state.notify.scroll,
+      uid: (state) => state.user.uid,
+    }),
     records() {
       return this.$root.message.records;
-    },
-    inputEvent() {
-      return this.$store.state.notify.inputEvent;
-    },
-    scroll() {
-      return this.$store.state.notify.scroll;
     },
   },
   watch: {
@@ -431,9 +439,7 @@ export default {
       this.tipsBoard = false;
     },
     scroll(n, o) {
-      this.$nextTick(() => {
-        this.talkPanelScrollBottom();
-      });
+      this.$nextTick(() => this.talkPanelScrollBottom());
     },
     //监听好友键盘事件
     inputEvent(n, o) {
@@ -447,9 +453,8 @@ export default {
     this.loadChatRecords();
   },
   methods: {
-    //聊天时间人性化处理
+    parseTime,
     sendTime: formateTime,
-    parseTime: parseTime,
 
     //发送消息方法
     sendSocket(message) {
@@ -459,28 +464,28 @@ export default {
     //回车键发送消息回调事件
     submitSendMesage(content) {
       //调用父类Websocket组件发送消息
-      this.sendSocket({
-        event: "event_talk",
-        data: {
-          // 发送消息的用户ID
-          send_user: this.$store.state.user.uid,
-
-          // 接受者消息ID(用户ID或群ID)
-          receive_user: this.params.receiveId,
-
-          // 聊天类型  1:私聊 2:群聊信息显示用户昵称
-          source_type: this.params.source,
-
-          // 消息文本
-          text_message: content,
-        },
+      this.$root.socket.emit("event_talk", {
+        // 发送消息的用户ID
+        send_user: this.uid,
+        // 接受者消息ID(用户ID或群ID)
+        receive_user: this.params.receiveId,
+        // 聊天类型  1:私聊 2:群聊信息显示用户昵称
+        source_type: this.params.source,
+        // 消息文本
+        text_message: content,
       });
     },
-    // 发送代码消息
-    sendCodeBlock() {},
 
     //推送编辑事件消息
-    keyboardEvent() {
+    keyboardEvent(text) {
+      this.$store.commit({
+        type: "UPDATE_TALK_ITEM",
+        key: findTalkIndex(this.$root.message.index_name),
+        item: {
+          draft_text: text,
+        },
+      });
+
       // 判断是否推送键盘输入事件消息
       if (!this.$store.state.settings.keyboardEventNotify) {
         return false;
@@ -502,7 +507,7 @@ export default {
       this.sendSocket({
         event: "event_keyboard",
         data: {
-          send_user: this.$store.state.user.uid,
+          send_user: this.uid,
           receive_user: this.params.receiveId,
         },
       });
@@ -538,7 +543,7 @@ export default {
           this.loadRecord.minRecord =
             res.data.rows.length == res.data.limit ? res.data.record_id : 0;
 
-          let user_id = this.$store.state.user.uid;
+          let user_id = this.uid;
 
           this.$root.message.records = records.map((item) => {
             item.float =
@@ -547,10 +552,6 @@ export default {
                 : item.user_id == user_id
                 ? "right"
                 : "left";
-
-            if (item.msg_type == 1) {
-              item.content = replaceEmoji(item.content);
-            }
 
             return item;
           });
@@ -702,7 +703,7 @@ export default {
 
     //删除消息
     removeRecords(idx, item) {
-      let user_id = this.$store.state.user.uid;
+      let user_id = this.uid;
       let receive_id = item.receive_id;
       if (item.source == 1 && item.user_id != user_id) {
         receive_id = item.user_id;
@@ -800,7 +801,7 @@ export default {
         });
       }
 
-      if (item.user_id == this.$store.state.user.uid) {
+      if (item.user_id == this.uid) {
         let time =
           new Date().getTime() - Date.parse(item.created_at.replace(/-/g, "/"));
         if (Math.floor(time / 1000 / 60) < 2) {
@@ -893,7 +894,7 @@ export default {
       event.preventDefault();
     },
     hideChatGroup() {
-      this.groupBoxShow = false;
+      this.group.panel = false;
     },
 
     //修改群聊免打扰状态
@@ -970,6 +971,10 @@ export default {
       &.friend {
         background: #f97348;
       }
+    }
+
+    .num {
+      margin-left: 5px;
     }
   }
 
@@ -1141,11 +1146,30 @@ export default {
   }
 }
 
+.talk-bubble {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: 300px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: white;
+  padding: 0 10px;
+  font-size: 13px;
+  background: linear-gradient(to right, #87cfef, #0fb0f5);
+  animation: talkbubble 1s ease-in-out infinite;
+  // display: none;
+}
+
 .talks-container {
   height: 100%;
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 10px 30px;
+  padding: 10px 15px 30px;
   overflow-y: auto;
 
   .message-box {
@@ -1238,6 +1262,8 @@ export default {
 
       .talk-content {
         display: flex;
+        flex-direction: column;
+        align-items: flex-start;
         box-sizing: border-box;
         width: 100%;
       }
@@ -1257,9 +1283,12 @@ export default {
       .main-column {
         order: 2;
 
-        .talk-title,
-        .talk-content {
+        .talk-title {
           justify-content: flex-end;
+        }
+
+        .talk-content {
+          align-items: flex-end;
         }
       }
     }
@@ -1270,6 +1299,20 @@ export default {
         border-color: #409eff;
       }
     }
+  }
+}
+
+@keyframes talkbubble {
+  from {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.01);
+  }
+
+  to {
+    transform: scale(1);
   }
 }
 

@@ -7,15 +7,14 @@
       'max-width': !fullWidth,
     }"
   >
-    <pre
-      v-html="content"
-      v-href="float == 'right' ? '#ffffff' : 'rgb(9 149 208)'"
-    />
-
     <div class="arrow" v-if="arrow"></div>
+    <pre v-html="html" />
   </div>
 </template>
 <script>
+import { textReplaceLink } from "@/utils/functions";
+import { textReplaceEmoji } from "@/utils/emojis";
+
 export default {
   name: "TextMessage",
   props: {
@@ -36,6 +35,19 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      html: "",
+    };
+  },
+  created() {
+    const text = textReplaceLink(
+      this.content,
+      this.float == "right" ? "#ffffff" : "rgb(9 149 208)"
+    );
+
+    this.html = textReplaceEmoji(text);
+  },
 };
 </script>
 <style lang="less" scoped>
@@ -46,7 +58,7 @@ export default {
   position: relative;
   min-width: 30px;
   min-height: 30px;
-  border-radius: 2px;
+  border-radius: 5px;
 
   .arrow {
     position: absolute;
@@ -54,7 +66,7 @@ export default {
     height: 0;
     font-size: 0;
     border: 5px solid;
-    top: 5px;
+    top: 10px;
     left: -10px;
   }
 
@@ -88,10 +100,9 @@ export default {
     word-break: break-word;
     word-wrap: break-word;
     font-size: 15px;
-    padding: 0 10px;
+    padding: 3px 10px;
     font-family: "Microsoft YaHei";
     line-height: 25px;
-    padding-top: 2px;
   }
 }
 </style>

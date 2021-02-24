@@ -99,7 +99,7 @@
             <el-scrollbar
               :native="false"
               tag="section"
-              ref="myScrollbar"
+              ref="menusScrollbar"
               class="full-height"
             >
               <el-main class="main">
@@ -128,12 +128,12 @@
                   class="talk-item pointer"
                   v-show="loadStatus == 1"
                   v-for="(item, idx) in talkItems"
-                  :class="{ 'active-border': index_name == item.index_name }"
+                  :key="item.index_name"
+                  :class="{ active: index_name == item.index_name }"
                   @click="clickTab(2, item.index_name)"
                   @contextmenu.prevent="talkItemsMenu(item, $event)"
-                  :key="item.index_name"
                 >
-                  <div class="avatar">
+                  <div class="avatar-box">
                     <span v-show="!item.avatar">
                       {{
                         (item.remark_name
@@ -152,10 +152,10 @@
                       v-show="item.is_top == 0"
                       @click.stop="topChatItem(item)"
                     >
-                      <i class="el-icon-top"></i>
+                      <i class="el-icon-top" />
                     </div>
                   </div>
-                  <div class="card">
+                  <div class="card-box">
                     <div class="title">
                       <div class="card-name">
                         <p class="nickname">
@@ -181,7 +181,19 @@
                         {{ beautifyTime(formatDate(item.updated_at)) }}
                       </div>
                     </div>
-                    <div class="content">
+
+                    <div
+                      v-if="index_name != item.index_name && item.draft_text"
+                      class="content"
+                    >
+                      <span style="color: red">[草稿内容]</span>
+                      <span
+                        v-text="item.draft_text"
+                        style="margin-left: 5px"
+                      ></span>
+                    </div>
+
+                    <div v-else class="content">
                       <span
                         v-if="item.type == 1"
                         :class="{ 'online-color': item.online }"
@@ -203,7 +215,7 @@
         <!-- 聊天面板容器 -->
         <el-main class="panel-box">
           <template v-if="index_name == null">
-            <div class="friendly-tips animated flipInY">
+            <div class="famous-box">
               <img src="~@/assets/image/chat.png" width="300" />
               <p>
                 不是井里没有水，而是你挖的不够深<br />
@@ -362,7 +374,6 @@ export default {
     clearInterval(this.interval);
     this.clearTalk();
   },
-
   methods: {
     // 美化时间格式
     beautifyTime,
@@ -404,7 +415,7 @@ export default {
 
     // 监听自定义滚动条事件
     scrollEvent(e) {
-      let scrollbarEl = this.$refs.myScrollbar.wrap;
+      let scrollbarEl = this.$refs.menusScrollbar.wrap;
       scrollbarEl.onscroll = () => {
         this.subHeaderShadow = scrollbarEl.scrollTop > 0;
       };
@@ -451,9 +462,7 @@ export default {
     clickTab(type = 1, index_name) {
       let idx = this.getIndex(index_name);
 
-      if (idx == -1) {
-        return;
-      }
+      if (idx == -1) return;
 
       let item = this.talks[idx];
       let [source, receive_id] = index_name.split("_");
@@ -597,7 +606,7 @@ export default {
       return false;
     },
 
-    // 会话列表置顶（重写）
+    // 会话列表置顶
     topChatItem(item) {
       ServeTopTalkList({
         list_id: item.id,
@@ -897,7 +906,7 @@ export default {
     border-left: 3px solid transparent;
     transition: 0.2s ease-in;
 
-    .avatar {
+    .avatar-box {
       height: 35px;
       width: 35px;
       flex-basis: 35px;
@@ -940,7 +949,7 @@ export default {
       }
     }
 
-    .card {
+    .card-box {
       height: 40px;
       display: flex;
       align-content: center;
@@ -1025,7 +1034,7 @@ export default {
       background-color: #eff0f1;
     }
 
-    &.active-border {
+    &.active {
       border-color: #3370ff;
       background-color: #eff0f1;
     }
@@ -1037,14 +1046,13 @@ export default {
   height: 100%;
   padding: 0;
 
-  .friendly-tips {
+  .famous-box {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     height: 100%;
     font-size: 24px;
-    background-color: white;
     user-select: none;
 
     p {

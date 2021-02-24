@@ -3,7 +3,7 @@ import {
     getToken,
     setClientId,
 } from '@/utils/auth';
-import { RegisterWebsocket } from "@/api/user";
+
 class WsSocket {
 
     /**
@@ -79,7 +79,7 @@ class WsSocket {
         }
 
         this.connect = null;
-        console.log(this.config.url)
+
         const connect = new WebSocket(this.config.url);
         connect.onerror = (evt) => this.onError(evt);
         connect.onopen = (evt) => this.onOpen(evt);
@@ -183,7 +183,6 @@ class WsSocket {
     onMessage(evt) {
 
         let result = this.onParse(evt);
-        console.log(result)
         if (result.event == "connect") {
             setClientId(result.data.clientId)
             return

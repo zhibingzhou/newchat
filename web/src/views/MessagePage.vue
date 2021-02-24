@@ -178,7 +178,7 @@
                         </div>
                       </div>
                       <div class="card-time">
-                        {{ beautifyTime(item.updated_at) }}
+                        {{ beautifyTime(formatDate(item.updated_at)) }}
                       </div>
                     </div>
                     <div class="content">
@@ -253,9 +253,10 @@ import {
   ServeTopTalkList,
   ServeSetNotDisturb,
 } from "@/api/chat";
-import { ServeDeleteContact,ServeEditContactRemark } from "@/api/contacts";
+import { ServeDeleteContact, ServeEditContactRemark } from "@/api/contacts";
 import { ServeSecedeGroup } from "@/api/group";
 import { packTalkItem, beautifyTime } from "@/utils/functions";
+import { formatTimeToStr } from "@/utils/data";
 
 const title = document.title;
 
@@ -361,10 +362,19 @@ export default {
     clearInterval(this.interval);
     this.clearTalk();
   },
+
   methods: {
     // 美化时间格式
     beautifyTime,
 
+    formatDate: function (time) {
+      if (time != null && time != "") {
+        var date = new Date(time);
+        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
+      } else {
+        return "";
+      }
+    },
     // header 功能栏隐藏事件
     closeSubMenu() {
       this.subMenu = false;

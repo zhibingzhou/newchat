@@ -99,7 +99,7 @@
   </div>
 </template>
 <script>
-import { setToken, setUserInfo } from "@/utils/auth";
+import { setToken } from "@/utils/auth";
 import { isMobile } from "@/utils/validate";
 import { ServeLogin, Captcha, RegisterWebsocket } from "@/api/user";
 

@@ -63,7 +63,9 @@
                   v-text="item.nickname"
                   @click="$refs.userBusinessCard.open(item.user_id)"
                 ></span>
-                <span class="text">发表于 {{ item.created_at }}</span>
+                <span class="text"
+                  >发表于 {{ formatDate(item.created_at) }}</span
+                >
               </p>
               <p
                 class="content"
@@ -80,6 +82,7 @@
 <script>
 import { ServeGetGroupNotices } from "@/api/group";
 import { SvgNotData } from "@/core/icons";
+import { formatTimeToStr } from "@/utils/data";
 
 export default {
   name: "GroupNotice",
@@ -102,7 +105,16 @@ export default {
   created() {
     this.loadNotices();
   },
+
   methods: {
+    formatDate: function (time) {
+      if (time != null && time != "") {
+        var date = new Date(time);
+        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
+      } else {
+        return "";
+      }
+    },
     // 加载群组公告列表
     loadNotices() {
       this.loadStatus = 0;

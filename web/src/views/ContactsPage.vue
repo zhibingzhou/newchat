@@ -156,7 +156,8 @@
                         </div>
                       </div>
                       <div class="content">
-                        [申请时间] {{ item.created_at }} ~ [备注说明]
+                        [申请时间] {{ item.created_at | formatDate }} ~
+                        [备注说明]
                         {{ item.remarks }}
                       </div>
                     </div>
@@ -377,6 +378,7 @@ import GroupLaunch from "@/components/group/GroupLaunch";
 import UserBusinessCard from "@/components/user/UserBusinessCard";
 import UserSearch from "@/components/user/UserSearch";
 import GroupPanel from "@/components/group/GroupPanel";
+import { formatTimeToStr } from "@/utils/data";
 
 import {
   ServeGetContacts,
@@ -436,6 +438,16 @@ export default {
       return this.apply.items.filter((item) => {
         return item.status == 0;
       }).length;
+    },
+  },
+  filters: {
+    formatDate: function (time) {
+      if (time != null && time != "") {
+        var date = new Date(time);
+        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
+      } else {
+        return "";
+      }
     },
   },
   created() {
@@ -559,7 +571,7 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         customClass: "border-radius0",
-        inputValue:item.remarks,
+        inputValue: item.remarks,
         inputValidator(val) {
           return val == null || val == "" ? "好友备注不能为空" : true;
         },

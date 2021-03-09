@@ -126,7 +126,7 @@
                     >({{ item.friend_remarks }})</span
                   >
                   <span class="time">{{
-                    parseTime(item.created_at, "{m}月{d}日 {h}:{i}")
+                    parseTime(formatDate(item.created_at), "{m}月{d}日 {h}:{i}")
                   }}</span>
                 </div>
 
@@ -200,8 +200,8 @@
             <!-- 消息时间 -->
             <div
               class="datetime no-select"
-              v-show="compareTime(idx, item.created_at)"
-              v-text="sendTime(item.created_at)"
+              v-show="compareTime(idx, formatDate(item.created_at))"
+              v-text="sendTime(formatDate(item.created_at))"
             />
           </div>
         </div>
@@ -326,6 +326,7 @@ import GroupPanel from "@/components/group/GroupPanel";
 import GroupNotice from "@/components/group/GroupNotice";
 import MeEditor from "@/components/editor/MeEditor";
 import { SvgMentionDown } from "@/core/icons";
+import { formatTimeToStr } from "@/utils/data";
 import {
   ServeTalkRecords,
   ServeForwardRecords,
@@ -464,7 +465,8 @@ export default {
     //回车键发送消息回调事件
     submitSendMesage(content) {
       //调用父类Websocket组件发送消息
-      this.$root.socket.emit("event_talk", {
+      this.$root.socket.send({
+        msg_type: "event_talk",
         // 发送消息的用户ID
         send_user: this.uid,
         // 接受者消息ID(用户ID或群ID)
@@ -674,10 +676,9 @@ export default {
         return true;
       }
 
-      let nextDate = this.$root.message.records[index + 1].created_at.replace(
-        /-/g,
-        "/"
-      );
+      let nextDate = this.formatDate(
+        this.$root.message.records[index + 1].created_at
+      ).replace(/-/g, "/");
 
       return !(
         parseTime(new Date(datetime), "{y}-{m}-{d} {h}:{i}") ==
@@ -803,7 +804,8 @@ export default {
 
       if (item.user_id == this.uid) {
         let time =
-          new Date().getTime() - Date.parse(item.created_at.replace(/-/g, "/"));
+          new Date().getTime() -
+          Date.parse(formatDate(item.created_at).replace(/-/g, "/"));
         if (Math.floor(time / 1000 / 60) < 2) {
           menus.push({
             label: "撤回",
@@ -932,6 +934,14 @@ export default {
         Math.ceil(e.target.scrollTop) + e.target.clientHeight >=
         e.target.scrollHeight
       );
+    },
+    formatDate: function (time) {
+      if (time != null && time != "") {
+        var date = new Date(time);
+        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
+      } else {
+        return "";
+      }
     },
 
     // 聊天版本滚动到底部

@@ -3,6 +3,8 @@ import {
     getToken,
     setClientId,
 } from '@/utils/auth';
+// 引入消息处理类
+import TalkEvent from '@/plugins/socket/event/talk-event';
 
 class WsSocket {
 
@@ -187,14 +189,18 @@ class WsSocket {
             setClientId(result.data.clientId)
             return
         }
+        console.log(result)
         // 判断消息事件是否被绑定
-        if (this.onCallBacks.hasOwnProperty(result.event)) {
+        switch (result.event) {
+            case "event_talk":
+                let data = JSON.parse(result.data);
+                (new TalkEvent(data)).handle();
+                break;
 
-            this.onCallBacks[result.event](result.data, result.orginData);
-        } else {
-            console.warn(`WsSocket 消息事件[${result.event}]未绑定...`)
+            default:
+                console.warn(`WsSocket 消息事件[${result.event}]未绑定...`)
+                break;
         }
-
 
     }
 

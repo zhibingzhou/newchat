@@ -90,7 +90,8 @@ export default {
     return {
       // 记录列表
       records: [],
-
+      test:
+        "http://im-img.gzydong.club/media/images/talks/6046edf0cda90IZIvB9TwXKkjHZQa6046edf0cdabe_690x690.jpg",
       // 加载状态
       loading: false,
 

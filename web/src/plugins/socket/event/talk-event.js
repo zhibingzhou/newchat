@@ -38,7 +38,6 @@ class TalkEvent extends AppMessageEvent {
       this.vm.$store.commit('incrUnreadNum');
       return false;
     }
-
     let indexName = this.getIndexName();
     let idx = this.getIndex(indexName);
 
@@ -67,7 +66,7 @@ class TalkEvent extends AppMessageEvent {
     } else {
       record.float = record.user_id == this.getUserId ? 'right' : 'left';
     }
-
+    console.log("hai")
     this.vm.$store.commit({
       type: 'UPDATE_TALK_ITEM',
       key: idx,
@@ -76,7 +75,7 @@ class TalkEvent extends AppMessageEvent {
         updated_at: parseTime(new Date())
       }
     });
-
+    console.log("hai1")
     if (this.resource.data.source == 1 && this.getUserId !== this.resource.data.user_id) {
       // 更新未读消息
       ServeClearTalkUnreadNum({
@@ -84,7 +83,7 @@ class TalkEvent extends AppMessageEvent {
         receive: this.vm.message.receiveId
       });
     }
-
+    console.log("hai2")
     this.vm.message.records.push(record);
     this.vm.$store.commit('setScrollHeight');
   }

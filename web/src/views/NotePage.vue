@@ -608,6 +608,8 @@ import {
   copyTextToClipboard,
 } from "@/utils/functions";
 
+import { formatTimeToStr } from "@/utils/data";
+
 export default {
   name: "NotePage",
   components: {
@@ -801,6 +803,15 @@ export default {
     //下载笔记附件
     downloadAnnex: ServeDownloadAnnex,
 
+    formatDate: function (time) {
+      if (time != null && time != "") {
+        var date = new Date(time);
+        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
+      } else {
+        return "";
+      }
+    },
+
     //加载笔记详情信息
     loadNoteDetail(id, isEdit) {
       this.markdown.isEdit = false;
@@ -908,7 +919,7 @@ export default {
             return {
               id: item.id,
               title: item.title,
-              datetime: parseTime(item.updated_at, "{y}/{m}/{d}"),
+              datetime: parseTime(this.formatDate(item.updated_at), "{y}/{m}/{d}"),
               classify: item.class_name || "我的笔记",
               abstract: item.abstract,
               img: item.image,

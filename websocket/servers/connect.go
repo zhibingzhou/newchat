@@ -59,7 +59,7 @@ func (c *Controller) Run(w http.ResponseWriter, r *http.Request) {
 
 	clientId := util.GenClientId()
 
-	clientSocket := NewClient(clientId, systemId, conn)
+	clientSocket := NewClient(clientId, systemId, uid, conn)
 
 	Manager.AddClient2SystemClient(systemId, clientSocket)
 
@@ -67,7 +67,9 @@ func (c *Controller) Run(w http.ResponseWriter, r *http.Request) {
 	clientSocket.Read()
 
 	//保存user信息
-	redis.RedisDB.HSet(redis.UserId, uid, clientId+","+systemId)
+	redis.RedisDB.HSet(redis.UserIdClient, uid, clientId)
+	redis.RedisDB.HSet(redis.UserIdSystem, uid, systemId)
+	redis.RedisDB.HSet(redis.UserStatus, uid, "1")
 
 	if err = api.ConnRender(conn, renderData{ClientId: clientId}); err != nil {
 		_ = conn.Close()

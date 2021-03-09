@@ -10,7 +10,11 @@ import (
 
 var RedisDB *redis.Client
 
-var UserId = "user_id" 
+var UserIdClient = "user_Client" 
+
+var UserIdSystem = "user_System"
+
+var UserStatus = "user_Online" 
 
 func InitRedis() *redis.Client {
 

@@ -1,7 +1,6 @@
 package servers
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -24,10 +23,11 @@ type SendData struct {
 	Data *interface{}
 }
 
-func NewClient(clientId string, systemId string, socket *websocket.Conn) *Client {
+func NewClient(clientId string, systemId, userId string, socket *websocket.Conn) *Client {
 	return &Client{
 		ClientId:    clientId,
 		SystemId:    systemId,
+		UserId:      userId,
 		Socket:      socket,
 		ConnectTime: uint64(time.Now().Unix()),
 		IsDeleted:   false,
@@ -46,7 +46,10 @@ func (c *Client) Read() {
 					return
 				}
 			}
-			fmt.Println(message)
+			if string(message) != "PING" {
+				MessageChannel.Request <- DRequest{Message: message}
+			}
+
 		}
 	}()
 }

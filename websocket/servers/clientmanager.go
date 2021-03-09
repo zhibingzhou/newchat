@@ -8,6 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/woodylan/go-websocket/define/retcode"
+	"github.com/woodylan/go-websocket/pkg/redis"
 	"github.com/woodylan/go-websocket/pkg/setting"
 	"github.com/woodylan/go-websocket/tools/util"
 )
@@ -76,6 +77,14 @@ func (manager *ClientManager) EventDisconnect(client *Client) {
 		"userId":   client.UserId,
 		"extend":   client.Extend,
 	})
+
+	// abc := []string{"12", "13"}
+	redis.RedisDB.Del(redis.UserIdClient, client.UserId)
+	redis.RedisDB.Del(redis.UserIdSystem, client.UserId)
+	redis.RedisDB.HSet(redis.UserStatus, client.UserId, "0")
+	// aaa, _ := redis.RedisDB.HMGet(redis.UserStatus, abc...).Result()
+	// fmt.Println(aaa)
+
 	data := string(mJson)
 	sendUserId := ""
 

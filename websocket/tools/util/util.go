@@ -1,11 +1,15 @@
 package util
 
 import (
+	"bytes"
 	"errors"
+	"io/ioutil"
+	"net/http"
+	"strings"
+
 	uuid "github.com/satori/go.uuid"
 	"github.com/woodylan/go-websocket/pkg/setting"
 	"github.com/woodylan/go-websocket/tools/crypto"
-	"strings"
 )
 
 //GenUUID 生成uuid
@@ -73,4 +77,22 @@ func GetAddrInfoAndIsLocal(clientId string) (addr string, host string, port stri
 
 func GenGroupKey(systemId, groupName string) string {
 	return systemId + ":" + groupName
+}
+
+func HttPRquest(url string, jsonStr []byte) (err error, rep []byte) {
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	// req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err, rep
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	return err, body
 }

@@ -15,6 +15,7 @@ type commonConf struct {
 	RPCPort   string
 	Cluster   bool
 	CryptoKey string
+	Weburl    string
 }
 
 type redis struct {

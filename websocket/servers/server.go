@@ -1,12 +1,13 @@
 package servers
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 	"github.com/woodylan/go-websocket/pkg/setting"
 	"github.com/woodylan/go-websocket/tools/util"
-	"net/http"
-	"time"
 )
 
 //channel通道
@@ -18,7 +19,7 @@ type clientInfo struct {
 	SendUserId string
 	MessageId  string
 	Code       int
-	Msg        string
+	Event      string
 	Data       *string
 }
 
@@ -26,7 +27,7 @@ type RetData struct {
 	MessageId  string      `json:"messageId"`
 	SendUserId string      `json:"sendUserId"`
 	Code       int         `json:"code"`
-	Msg        string      `json:"msg"`
+	Event      string      `json:"event"`
 	Data       interface{} `json:"data"`
 }
 
@@ -41,13 +42,13 @@ var Manager = NewClientManager() // 管理者
 
 func StartWebSocket() {
 	websocketHandler := &Controller{}
-	
+
 	http.HandleFunc("/ws", websocketHandler.Run)
 	go Manager.Start()
 }
 
 //发送信息到指定客户端
-func SendMessage2Client(clientId string, sendUserId string, code int, msg string, data *string) (messageId string) {
+func SendMessage2Client(clientId string, sendUserId string, code int, event string, data *string) (messageId string) {
 	messageId = util.GenUUID()
 	if util.IsCluster() {
 		addr, _, _, isLocal, err := util.GetAddrInfoAndIsLocal(clientId)
@@ -58,14 +59,14 @@ func SendMessage2Client(clientId string, sendUserId string, code int, msg string
 
 		//如果是本机则发送到本机
 		if isLocal {
-			SendMessage2LocalClient(messageId, clientId, sendUserId, code, msg, data)
+			SendMessage2LocalClient(messageId, clientId, sendUserId, code, event, data)
 		} else {
 			//发送到指定机器
-			SendRpc2Client(addr, messageId, sendUserId, clientId, code, msg, data)
+			SendRpc2Client(addr, messageId, sendUserId, clientId, code, event, data)
 		}
 	} else {
 		//如果是单机服务，则只发送到本机
-		SendMessage2LocalClient(messageId, clientId, sendUserId, code, msg, data)
+		SendMessage2LocalClient(messageId, clientId, sendUserId, code, event, data)
 	}
 
 	return
@@ -169,13 +170,14 @@ func GetOnlineList(systemId *string, groupName *string) map[string]interface{} {
 }
 
 //通过本服务器发送信息
-func SendMessage2LocalClient(messageId, clientId string, sendUserId string, code int, msg string, data *string) {
+func SendMessage2LocalClient(messageId, clientId string, sendUserId string, code int, event string, data *string) {
 	log.WithFields(log.Fields{
 		"host":     setting.GlobalSetting.LocalHost,
 		"port":     setting.CommonSetting.HttpPort,
 		"clientId": clientId,
+		"data":     *data,
 	}).Info("发送到通道")
-	ToClientChan <- clientInfo{ClientId: clientId, MessageId: messageId, SendUserId: sendUserId, Code: code, Msg: msg, Data: data}
+	ToClientChan <- clientInfo{ClientId: clientId, MessageId: messageId, SendUserId: sendUserId, Code: code, Event: event, Data: data}
 	return
 }
 
@@ -206,29 +208,29 @@ func WriteMessage() {
 			"messageId":  clientInfo.MessageId,
 			"sendUserId": clientInfo.SendUserId,
 			"code":       clientInfo.Code,
-			"msg":        clientInfo.Msg,
+			"event":      clientInfo.Event,
 			"data":       clientInfo.Data,
 		}).Info("发送到本机")
 		if conn, err := Manager.GetByClientId(clientInfo.ClientId); err == nil && conn != nil {
-			if err := Render(conn.Socket, clientInfo.MessageId, clientInfo.SendUserId, clientInfo.Code, clientInfo.Msg, clientInfo.Data); err != nil {
+			if err := Render(conn.Socket, clientInfo.MessageId, clientInfo.SendUserId, clientInfo.Code, clientInfo.Event, clientInfo.Data); err != nil {
 				Manager.DisConnect <- conn
 				log.WithFields(log.Fields{
 					"host":     setting.GlobalSetting.LocalHost,
 					"port":     setting.CommonSetting.HttpPort,
 					"clientId": clientInfo.ClientId,
-					"msg":      clientInfo.Msg,
+					"event":    clientInfo.Event,
 				}).Error("客户端异常离线：" + err.Error())
 			}
 		}
 	}
 }
 
-func Render(conn *websocket.Conn, messageId string, sendUserId string, code int, message string, data interface{}) error {
+func Render(conn *websocket.Conn, messageId string, sendUserId string, code int, event string, data interface{}) error {
 	return conn.WriteJSON(RetData{
 		Code:       code,
 		MessageId:  messageId,
 		SendUserId: sendUserId,
-		Msg:        message,
+		Event:      event,
 		Data:       data,
 	})
 }

@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/casbin/casbin v1.9.1
 	github.com/casbin/casbin/v2 v2.23.4
 	github.com/casbin/gorm-adapter/v3 v3.2.0
@@ -14,6 +15,7 @@ require (
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/google/uuid v1.2.0
 	github.com/googollee/go-socket.io v1.4.4
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
@@ -27,7 +29,10 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0
+	github.com/tealeg/xlsx v1.0.5 // indirect
+	github.com/tuotoo/qrcode v0.0.0-20190222102259-ac9c44189bf2 // indirect
 	github.com/unrolled/secure v1.0.8
+	github.com/zhibingzhou/go_public v0.0.0-20201225024050-22e0daa20d38
 	go.uber.org/zap v1.16.0
 	gorm.io/gorm v1.20.7
 )

@@ -43,8 +43,10 @@ CREATE TABLE `contacts` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `friend_status` TINYINT DEFAULT '1' COMMENT '2 是好友 ， 1 审核中',
+  `is_top` INT DEFAULT '0' COMMENT '是否置顶',
   `friend_id` INT DEFAULT '0' COMMENT '好友id',
   `user_id` INT DEFAULT '0' COMMENT '好友id',
+  `not_disturb` INT DEFAULT '0' COMMENT '是否开启免打扰'
   `friend_remark` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户备注名',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `index_id` (`friend_id`,`user_id`) USING BTREE,
@@ -54,31 +56,27 @@ CREATE TABLE `contacts` (
 ) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 
 
-//消息列表
-DROP TABLE IF EXISTS `messages_list`;
-
 CREATE TABLE `messages_list` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
   `type` TINYINT DEFAULT '1' COMMENT '1 私聊 ，2 群聊',
-  `friend_id` INT DEFAULT '0' COMMENT '好友id',
-  `not_disturb` TINYINT DEFAULT '0' COMMENT '是否免打扰 0 ，1 ',
-  `is_top` TINYINT DEFAULT '0' COMMENT '是否置顶 0 ，1 ',
+  `user_id` INT DEFAULT '0' COMMENT '用户id',
+  `friend_id` INT DEFAULT '0' COMMENT '朋友id',
   `group_id` INT DEFAULT '0' COMMENT '群id',
-  `unread_num` INT DEFAULT '0' COMMENT 'unread_num',
-  `name` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户昵称或者群组名称',
-  `remark_name` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户备注名',
+  `unread_num` INT DEFAULT '0' COMMENT '是否已经查看',
   `msg_text` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '消息内容',
-  `avatar` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户头像',
   `online` BOOL DEFAULT FALSE COMMENT '在线状态',
   KEY `index_group` (`group_id`),
   KEY `index_friend` (`friend_id`),
+  KEY `index_user` (`user_id`),
   KEY `index_type` (`type`),
+  UNIQUE KEY `index_id` (`group_id`,`user_id`,`type`,`friend_id`) USING BTREE,
   PRIMARY KEY (`id`) USING BTREE,
   KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
 ) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
 
 
 //群列表
@@ -90,6 +88,7 @@ CREATE TABLE `group_list` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
+  `manager_id` INT DEFAULT '0' COMMENT '管理员id',
   `group_name` VARCHAR(20) NOT NULL COMMENT '群名称',
   `avatar` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'http://qmplusimg.henrongyi.top/head.png' COMMENT '群图片',
   `group_profile` VARCHAR(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '群简介',
@@ -108,7 +107,9 @@ CREATE TABLE `group_member` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
+  `visit_card` VARCHAR(100) DEFAULT NULL COMMENT '群名片',
   `not_disturb` tinyint(1) DEFAULT '1' COMMENT '是否开启群免打扰:1=开启,0=关闭',
+  `is_top` INT DEFAULT '0' COMMENT '是否置顶',
   `isGroupLeader` tinyint(1) DEFAULT '1' COMMENT '是否管理员:1=管理员,0=成员 ',
   `group_id` int DEFAULT '0' COMMENT '群组id',
   `user_id` int DEFAULT '0' COMMENT '用户id',
@@ -118,6 +119,26 @@ CREATE TABLE `group_member` (
   KEY `index_user_id` (`user_id`),
   KEY `idx_group_list_deleted_at` (`deleted_at`) USING BTREE
 ) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+//群公告列表
+DROP TABLE IF EXISTS `group_notice`;
+
+
+CREATE TABLE `group_notice` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `group_id` INT DEFAULT '0' COMMENT '群组id',
+  `user_id` INT DEFAULT '0' COMMENT '用户id',
+  `title` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '公告名',
+  `content` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '公告内容',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_group` (`group_id`),
+  KEY `index_user_id` (`user_id`),
+  KEY `idx_group_notice_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
 
 
 //好友请求列表
@@ -131,13 +152,147 @@ CREATE TABLE `apply_records` (
   `status` TINYINT DEFAULT '0' COMMENT '0 审核中 ， 1 同意',
   `remarks` INT DEFAULT '0' COMMENT '备注',
   `user_id` INT DEFAULT '0' COMMENT '群id',
-  `nickname` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户昵称或者群组名称',
   `friend_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户备注名',
-  `avatar` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户头像',
-  `mobile` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户手机号',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `index_fri` (`friend_id`),
   KEY `index_use` (`user_id`),
   KEY `idx_jwt_blacklists_deleted_at` (`deleted_at`) USING BTREE,
   KEY `idx_jwt_blacklist_deleted_at` (`deleted_at`)
+) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+
+
+//消息内容列表
+DROP TABLE IF EXISTS `talk_list`;
+
+CREATE TABLE `talk_list` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `source` TINYINT DEFAULT '1' COMMENT '群 还是 私聊',
+  `msg_type` INT DEFAULT '0' COMMENT '消息类型 1 文字 5 代码 2 图片',
+  `receive_id` INT DEFAULT '0' COMMENT '接收人或者群id',
+  `is_revoke` INT DEFAULT '0' COMMENT '是否是好友请求消息',
+  `user_id` INT DEFAULT '0' COMMENT '好友id',
+  `content` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '消息内容',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_msg_type_id` (`msg_type`),
+  KEY `index_source_id` (`source`),
+  KEY `index_receive_id` (`receive_id`),
+  KEY `index_user_id` (`user_id`),
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+
+//表情包
+DROP TABLE IF EXISTS `emoticon`;
+
+CREATE TABLE `emoticon` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `name` VARCHAR(250) DEFAULT '' COMMENT '系统名称',
+  `status` TINYINT DEFAULT '0' COMMENT '移除，显示',
+  `user_id` INT DEFAULT '0' COMMENT '用户id',
+  `src` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '表情地址',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_fri` (`user_id`),
+  KEY `idx_jwt_blacklists_deleted_at` (`deleted_at`) USING BTREE,
+  KEY `idx_jwt_blacklist_deleted_at` (`deleted_at`)
+) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+
+
+//文件列表
+DROP TABLE IF EXISTS `file`;
+
+CREATE TABLE `file` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `save_type` TINYINT DEFAULT '0' COMMENT '保存类型',
+  `record_id` INT DEFAULT '0' COMMENT '消息id',
+  `user_id` INT DEFAULT '0' COMMENT '用户id',
+  `file_source` INT DEFAULT '0' COMMENT '群聊，还是私聊',
+  `file_type` INT DEFAULT '0' COMMENT '消息id',
+  `file_size` INT DEFAULT '0' COMMENT '文件大小',
+  `original_name` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '文件名称',
+  `file_suffix` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '文件扩展名',
+  `save_dir` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '保存路径',
+  `file_url` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '文件url',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_rec` (`record_id`)
+) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+
+//笔记类型
+DROP TABLE IF EXISTS `article_class`;
+
+CREATE TABLE `article_class` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `default` INT DEFAULT '0' COMMENT '备用',
+  `sort` INT DEFAULT '0' COMMENT '用户id',
+  `name` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '类型名称',
+  KEY `index_user` (`sort`),
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+//笔记标签
+DROP TABLE IF EXISTS `article_tags`;
+
+CREATE TABLE `article_tags` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `user_id` INT DEFAULT 0 COMMENT '用户id',
+  `name` VARCHAR(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '标签名称',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+
+
+//笔记内容
+DROP TABLE IF EXISTS `article_list`;
+
+CREATE TABLE `article_list` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `class_id` INT DEFAULT '0' COMMENT '类型id',
+  `user_id` INT DEFAULT '0' COMMENT '用户id',
+  `heart` INT DEFAULT '0' COMMENT '是否是星标',
+  `status` INT DEFAULT '1' COMMENT '状态2是删除状态，1是正常状态',
+  `title` VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '笔记标题',
+  `image` VARCHAR(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '图片链接',
+  `abstract` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '内容',
+  KEY `index_user` (`class_id`),
+  KEY `index_status` (`status`),
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+
+
+//笔记对应标签
+DROP TABLE IF EXISTS `article_tag_list`;
+
+CREATE TABLE `article_tag_list` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `article_id` INT DEFAULT '0' COMMENT 'id',
+  `tags_id` INT DEFAULT '0' COMMENT '类型id',
+  `user_id` INT DEFAULT '0' COMMENT '好友id',
+  KEY `index_user` (`article_id`),
+  KEY `index_tags` (`tags_id`),
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
 ) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;

@@ -8,7 +8,7 @@ import (
 type CustomClaims struct {
 	ID         int
 	Mobile     string
-	NickName   string
+	Nickname   string
 	BufferTime int64
 	jwt.StandardClaims
 }

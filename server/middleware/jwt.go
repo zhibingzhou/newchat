@@ -3,16 +3,19 @@ package middleware
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"newchat/global"
 	"newchat/model"
 	"newchat/model/request"
 	"newchat/model/response"
 	"newchat/service"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/zhibingzhou/go_public/common"
 	"go.uber.org/zap"
 )
 
@@ -69,6 +72,40 @@ func JWTAuth() gin.HandlerFunc {
 		c.Set("claims", claims)
 		c.Next()
 	}
+}
+
+var port string
+var host string
+
+//判断域名是否合法
+func HostAuth() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		local_host := GetLocalHost()
+		host := ctx.Request.Host
+		h_msg := "域名异常"
+		if Host(host, 0) != local_host {
+			ctx.Abort()
+			ctx.JSON(http.StatusOK, gin.H{"Status": 403, "Msg": h_msg})
+		}
+	}
+}
+
+func Host(host string, is_top int) string {
+	res := host
+	//去掉www.
+	h_arr := strings.Split(host, ".")
+	if common.Arr_In(h_arr, "www") {
+		res = strings.Replace(host, "www.", "", 1)
+	}
+	h_len := len(h_arr)
+	if is_top == 1 && h_len > 2 {
+		res = h_arr[h_len-2] + "." + h_arr[h_len-1]
+	}
+	return res
+}
+
+func GetLocalHost() string {
+	return "127.0.0.1" + ":" + strconv.Itoa(global.GVA_CONFIG.System.Addr)
 }
 
 type JWT struct {

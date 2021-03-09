@@ -8,10 +8,10 @@ import (
 )
 
 type GVA_MODEL struct {
-	ID        int        `gorm:"primarykey"`
-	CreatedAt time.Time  `json:"create_at" gorm:"comment:创建时间"`
+	ID        int        `json:"id" gorm:"primarykey"`
+	CreatedAt time.Time  `json:"created_at" gorm:"comment:创建时间"`
 	UpdatedAt time.Time  `json:"updated_at" gorm:"comment:更新时间"`
-	DeletedAt *time.Time `json:"delete_at" gorm:"comment:删除时间"`
+	DeletedAt *time.Time `json:"deleted_at" gorm:"comment:删除时间"`
 }
 
 type TimeStamp time.Time

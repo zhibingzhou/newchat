@@ -88,7 +88,7 @@ func tokenNext(c *gin.Context, user model.SysUser) {
 	j := &middleware.JWT{SigningKey: []byte(global.GVA_CONFIG.JWT.SigningKey)} // 唯一签名
 	claims := request.CustomClaims{
 		ID:         user.ID,
-		NickName:   user.NickName,
+		Nickname:   user.Nickname,
 		Mobile:     user.Mobile,
 		BufferTime: global.GVA_CONFIG.JWT.BufferTime, // 缓冲时间1天 缓冲时间内会获得新的token刷新令牌 此时一个用户会存在两个有效令牌 但是前端只留一个 另一个会丢失
 		StandardClaims: jwt.StandardClaims{
@@ -157,7 +157,7 @@ func Register(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	user := &model.SysUser{Mobile: R.Mobile, NickName: R.NickName, Password: R.Password, Avatar: R.Avatar}
+	user := &model.SysUser{Mobile: R.Mobile, Nickname: R.Nickname, Password: R.Password, Avatar: R.Avatar}
 	err, userReturn := service.Register(*user)
 	if err != nil {
 		global.GVA_LOG.Error("注册失败", zap.Any("err", err))
@@ -186,11 +186,63 @@ func Setting(c *gin.Context) {
 	} else {
 		response.OkWithDetailed(gin.H{"user_info": response.Setting{
 			ID:       columns.ID,
-			NickName: columns.NickName,
+			Nickname: columns.Nickname,
 			Avatar:   columns.Avatar,
 			Gender:   columns.Gender,
 			Motto:    columns.Motto,
 		}}, "获取成功", c)
+	}
+}
+
+// @Tags AutoCode
+// @Summary 用户信息
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
+// @Router /autoCode/getColumn [get]
+func UserDetail(c *gin.Context) {
+
+	uid := getUserID(c)
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
+	if err, columns := service.FindUserById(uid); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.ResponseUserDetail{
+			Email:    columns.Email,
+			Nickname: columns.Nickname,
+			Avatar:   columns.Avatar,
+			Gender:   columns.Gender,
+			Motto:    columns.Motto,
+			Mobile:   columns.Mobile,
+		}, "获取成功", c)
+	}
+}
+
+// @Tags AutoCode
+// @Summary 用户设置
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
+// @Router /autoCode/getColumn [get]
+func Search_user(c *gin.Context) {
+
+	uid := getUserID(c)
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
+	var R request.UserId
+	_ = c.ShouldBindJSON(&R)
+
+	if err, columns := service.SearchUserById(uid, R.User_id); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(columns, "获取成功", c)
 	}
 }
 
@@ -204,14 +256,48 @@ func Setting(c *gin.Context) {
 func ChangePassword(c *gin.Context) {
 	var user request.ChangePasswordStruct
 	_ = c.ShouldBindJSON(&user)
+	uid := getUserID(c)
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
 	if err := utils.Verify(user, utils.ChangePasswordVerify); err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	U := &model.SysUser{Mobile: user.Mobile, Password: user.Password}
-	if err, _ := service.ChangePassword(U, user.NewPassword); err != nil {
+	U := &model.SysUser{ID: uid, Password: user.Old_password}
+	if err, _ := service.ChangePassword(U, user.New_password); err != nil {
 		global.GVA_LOG.Error("修改失败", zap.Any("err", err))
 		response.FailWithMessage("修改失败，原密码与当前账户不符", c)
+	} else {
+		response.OkWithMessage("修改成功", c)
+	}
+}
+
+// @Tags SysUser
+// @Summary 用户修改信息
+// @Security ApiKeyAuth
+// @Produce  application/json
+// @Param data body request.ChangePasswordStruct true "用户名, 原密码, 新密码"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"修改成功"}"
+// @Router /user/changePassword [put]
+func EditUserDetail(c *gin.Context) {
+	var user request.RequestUserEdit
+	_ = c.ShouldBindJSON(&user)
+	uid := getUserID(c)
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
+
+	ruser := map[string]interface{}{
+		"avatar":   user.Avatar,
+		"nickname": user.Nickname,
+		"motto":    user.Motto,
+		"gender":   user.Gender,
+	}
+
+	if err := service.EditUserDetail(uid, ruser); err != nil {
+		global.GVA_LOG.Error("修改失败", zap.Any("err", err))
+		response.FailWithMessage("修改失败", c)
 	} else {
 		response.OkWithMessage("修改成功", c)
 	}

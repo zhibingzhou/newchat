@@ -21,3 +21,7 @@ type GetAuthorityId struct {
 }
 
 type Empty struct{}
+
+type RequestFileStream struct {
+	FileStream string `json:"fileStream"`
+}

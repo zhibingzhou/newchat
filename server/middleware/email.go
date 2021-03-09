@@ -19,7 +19,7 @@ func ErrorToEmail() gin.HandlerFunc {
 		var username string
 		if claims, ok := c.Get("claims"); ok {
 			waitUse := claims.(*request.CustomClaims)
-			username = waitUse.NickName
+			username = waitUse.Nickname
 		} else {
 			id, _ := strconv.Atoi(c.Request.Header.Get("x-user-id"))
 			err, _ := service.FindUserById(id)

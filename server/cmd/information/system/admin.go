@@ -15,7 +15,7 @@ var Admin = new(admin)
 type admin struct{}
 
 var admins = []model.SysUser{
-	{GVA_MODEL: global.GVA_MODEL{ID: 1001, CreatedAt: time.Now(), UpdatedAt: time.Now()}, Mobile: "18064321742", Password: "e10adc3949ba59abbe56e057f20f883e", NickName: "超级管理员"},
+	{GVA_MODEL: global.GVA_MODEL{ID: 1001, CreatedAt: time.Now(), UpdatedAt: time.Now()}, Mobile: "18064321742", Password: "e10adc3949ba59abbe56e057f20f883e", Nickname: "超级管理员"},
 }
 
 //@author: [SliverHorn](https://github.com/SliverHorn)

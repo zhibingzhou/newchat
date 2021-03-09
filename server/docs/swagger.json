@@ -2547,7 +2547,7 @@
                 "isSSL": {
                     "type": "boolean"
                 },
-                "nickname": {
+                "Nickname": {
                     "type": "string"
                 },
                 "port": {
@@ -3084,7 +3084,7 @@
                 "id": {
                     "type": "integer"
                 },
-                "nickName": {
+                "Nickname": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -3118,7 +3118,7 @@
                     "description": "工作流英文id",
                     "type": "string"
                 },
-                "workflowNickName": {
+                "workflowNickname": {
                     "description": "工作流名称",
                     "type": "string"
                 },

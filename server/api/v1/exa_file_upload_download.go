@@ -1,14 +1,42 @@
 package v1
 
 import (
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"newchat/global"
 	"newchat/model"
 	"newchat/model/request"
 	"newchat/model/response"
 	"newchat/service"
+	"newchat/utils"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
+
+// @Tags ExaFileUploadAndDownload
+// @Summary 上传文件示例
+// @Security ApiKeyAuth
+// @accept multipart/form-data
+// @Produce  application/json
+// @Param file formData file true "上传文件示例"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"上传成功"}"
+// @Router /fileUploadAndDownload/upload [post]
+func FileStream(c *gin.Context) {
+	var filestream request.RequestFileStream
+	err := c.ShouldBindJSON(&filestream)
+
+	if err != nil {
+		global.GVA_LOG.Error("接收文件失败!", zap.Any("err", err))
+		response.FailWithMessage("接收文件失败", c)
+		return
+	}
+	err, file := utils.Base64ToImage(filestream.FileStream) // 文件上传后拿到文件路径
+	if err != nil {
+		global.GVA_LOG.Error("修改数据库链接失败!", zap.Any("err", err))
+		response.FailWithMessage("修改数据库链接失败", c)
+		return
+	}
+	response.OkWithDetailed(response.ResponseFileStream{Avatar: file}, "上传成功", c)
+}
 
 // @Tags ExaFileUploadAndDownload
 // @Summary 上传文件示例

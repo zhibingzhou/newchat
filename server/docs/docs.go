@@ -2563,7 +2563,7 @@ var doc = `{
                 "isSSL": {
                     "type": "boolean"
                 },
-                "nickname": {
+                "Nickname": {
                     "type": "string"
                 },
                 "port": {
@@ -3100,7 +3100,7 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 },
-                "nickName": {
+                "Nickname": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -3134,7 +3134,7 @@ var doc = `{
                     "description": "工作流英文id",
                     "type": "string"
                 },
-                "workflowNickName": {
+                "workflowNickname": {
                     "description": "工作流名称",
                     "type": "string"
                 },

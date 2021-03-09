@@ -6,7 +6,7 @@ import uuid "github.com/satori/go.uuid"
 type Register struct {
 	Mobile   string `json:"mobile"`
 	Password string `json:"passWord"`
-	NickName string `json:"nickname" gorm:"default:''"`
+	Nickname string `json:"nickname" gorm:"default:''"`
 	Avatar   string `json:"avatar" gorm:"default:'http://img.wxcha.com/m00/b0/2b/65252be5c6e7e8ace4458e517cb5ad08.jpg'"`
 }
 
@@ -20,9 +20,8 @@ type Login struct {
 
 // Modify password structure
 type ChangePasswordStruct struct {
-	Mobile    string `json:"mobile"`
-	Password    string `json:"password"`
-	NewPassword string `json:"newPassword"`
+	Old_password string `json:"old_password"`
+	New_password string `json:"new_password"`
 }
 
 // Modify  user's auth structure
@@ -31,3 +30,13 @@ type SetUserAuth struct {
 	AuthorityId string    `json:"authorityId"`
 }
 
+type UserId struct {
+	User_id int `json:"user_id"`
+}
+
+type RequestUserEdit struct {
+	Nickname string `json:"nickname" gorm:"default:系统用户;comment:用户昵称" `
+	Avatar   string `json:"avatar" gorm:"default:http://img.wxcha.com/m00/b0/2b/65252be5c6e7e8ace4458e517cb5ad08.jpg;comment:用户头像"`
+	Motto    string `json:"motto" gorm:"default:这个人很懒什么都没留下;comment:修改签名"`
+	Gender   int    `json:"gender" gorm:"default:-1;comment:性别"`
+}

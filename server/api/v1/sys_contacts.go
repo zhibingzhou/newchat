@@ -66,3 +66,26 @@ func Apply_records(c *gin.Context) {
 	}, "success", c)
 
 }
+
+// @Tags Base
+// @Summary 查看好友列表
+// @Produce  application/json
+// @Param data body request.Login true "用户名, 密码, 验证码"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
+// @Router /base/login [post]
+func Contacts_List(c *gin.Context) {
+	uid := getUserID(c)
+
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
+
+	err, rep := service.Contacts_List(uid)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+	response.OkWithDetailed(rep, "success", c)
+
+}

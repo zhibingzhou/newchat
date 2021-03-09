@@ -22,7 +22,7 @@ definitions:
         type: string
       isSSL:
         type: boolean
-      nickname:
+      Nickname:
         type: string
       port:
         type: integer
@@ -379,7 +379,7 @@ definitions:
         type: string
       id:
         type: integer
-      nickName:
+      Nickname:
         type: string
       updatedAt:
         type: string
@@ -402,7 +402,7 @@ definitions:
       workflowName:
         description: 工作流英文id
         type: string
-      workflowNickName:
+      workflowNickname:
         description: 工作流名称
         type: string
       workflowStep:

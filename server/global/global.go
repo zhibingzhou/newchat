@@ -18,3 +18,10 @@ var (
 	//GVA_LOG    *oplogging.Logger
 	GVA_LOG *zap.Logger
 )
+
+var (
+	UserId     = "user_id"
+	UserStatus = "user_Online"
+	MsgNoRead  = "no_read_msg"
+	FileId = "file_id"
+)

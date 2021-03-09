@@ -1,12 +1,13 @@
 package router
 
 import (
+	v1 "newchat/api/v1"
+
 	"github.com/gin-gonic/gin"
-	"newchat/api/v1"
 )
 
 func InitFileUploadAndDownloadRouter(Router *gin.RouterGroup) {
-	FileUploadAndDownloadGroup := Router.Group("fileUploadAndDownload")
+	FileUploadAndDownloadGroup := Router.Group("upload")
 	{
 		FileUploadAndDownloadGroup.POST("/upload", v1.UploadFile)                                 // 上传文件
 		FileUploadAndDownloadGroup.POST("/getFileList", v1.GetFileList)                           // 获取上传文件列表
@@ -14,6 +15,7 @@ func InitFileUploadAndDownloadRouter(Router *gin.RouterGroup) {
 		FileUploadAndDownloadGroup.POST("/breakpointContinue", v1.BreakpointContinue)             // 断点续传
 		FileUploadAndDownloadGroup.GET("/findFile", v1.FindFile)                                  // 查询当前文件成功的切片
 		FileUploadAndDownloadGroup.POST("/breakpointContinueFinish", v1.BreakpointContinueFinish) // 查询当前文件成功的切片
-		FileUploadAndDownloadGroup.POST("/removeChunk", v1.RemoveChunk)                           // 查询当前文件成功的切片
+		FileUploadAndDownloadGroup.POST("/removeChunk", v1.RemoveChunk)
+		FileUploadAndDownloadGroup.POST("/file-stream", v1.FileStream) // 查询当前文件成功的切片
 	}
 }

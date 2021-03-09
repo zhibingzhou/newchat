@@ -11,5 +11,6 @@ func InitContactsRouter(Router *gin.RouterGroup) {
 	{
 		Contacts.GET("apply-unread-num", v1.Apply_unread_num)
 		Contacts.GET("apply-records", v1.Apply_records)
+		Contacts.GET("list", v1.Contacts_List)
 	}
 }

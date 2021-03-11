@@ -7,7 +7,6 @@ import (
 	"newchat/model/response"
 	"newchat/service"
 	"newchat/utils"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -111,7 +110,7 @@ func UploadEmoticon(c *gin.Context) {
 	singleFile := "uploads/file/img/" + guid + utils.GetExt(files.Filename)
 	_ = c.SaveUploadedFile(files, singleFile)
 
-	weburl := global.GVA_CONFIG.System.Url + ":" + strconv.Itoa(global.GVA_CONFIG.System.Addr)
+	weburl := global.GVA_CONFIG.System.Url
 	url := fmt.Sprintf("%s/%s", weburl, singleFile)
 
 	err, rep := service.UploadEmoticon(uid, url)

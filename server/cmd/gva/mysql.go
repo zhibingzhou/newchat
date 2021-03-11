@@ -2,17 +2,18 @@ package gva
 
 import (
 	"fmt"
-	gormadapter "github.com/casbin/gorm-adapter/v3"
-	"github.com/gookit/color"
-	"github.com/jinzhu/gorm"
-	"github.com/jinzhu/gorm/logger"
-	"gorm.io/driver/mysql"
 	information "newchat/cmd/information/extra"
 	data "newchat/cmd/information/system"
 	"newchat/global"
 	"newchat/model"
 	"os"
 	"strings"
+
+	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"github.com/gookit/color"
+	"github.com/jinzhu/gorm"
+	"github.com/jinzhu/gorm/logger"
+	"gorm.io/driver/mysql"
 )
 
 type DatabaseInfo struct {
@@ -244,7 +245,7 @@ func (m *_mysql) utf8mb4() {
 	color.Debug.Print("\n[Mysql] --> 设置数据库名为:")
 	color.LightGreen.Printf(" {%v} ", global.GVA_CONFIG.Mysql.Dbname)
 	color.Debug.Print("数据库的编码为utf8mb4中.......\n")
-	if err := global.GVA_DB.Debug().Exec("ALTER DATABASE " + global.GVA_CONFIG.Mysql.Dbname + " CHARACTER SET `utf8mb4` COLLATE `utf8mb4_general_ci`").Error; err != nil {
+	if err := global.GVA_DB.Exec("ALTER DATABASE " + global.GVA_CONFIG.Mysql.Dbname + " CHARACTER SET `utf8mb4` COLLATE `utf8mb4_general_ci`").Error; err != nil {
 		color.Debug.Print("\n[Mysql] --> 设置数据库名为:")
 		color.LightGreen.Printf(" {%v} ", global.GVA_CONFIG.Mysql.Dbname)
 		color.Debug.Print("数据库的编码为utf8mb4失败!请手动修改数据库名为:")

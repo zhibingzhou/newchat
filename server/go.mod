@@ -11,6 +11,7 @@ require (
 	github.com/casbin/gorm-adapter/v3 v3.2.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.4.7
+	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/go-redis/redis v6.15.9+incompatible

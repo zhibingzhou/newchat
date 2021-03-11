@@ -152,7 +152,7 @@ func FindUserByUuid(uuid string) (err error, user *model.SysUser) {
 
 func SearchUserById(user_id, friend_id int) (err error, user *response.ResponseSearchUser) {
 	var u response.ResponseSearchUser
-	err = global.GVA_DB.Debug().Raw("SELECT sys_user.`id` AS id ,mobile,nickname,avatar,motto,gender,contacts.`friend_status` AS friend_status,contacts.`friend_remark` AS nickname_remark FROM sys_user,contacts WHERE sys_user.`id` = ? AND contacts.`friend_id` = ? AND contacts.`user_id` = ? ;", friend_id, friend_id, user_id).Scan(&u).Error
+	err = global.GVA_DB.Raw("SELECT sys_user.`id` AS id ,mobile,nickname,avatar,motto,gender,contacts.`friend_status` AS friend_status,contacts.`friend_remark` AS nickname_remark FROM sys_user,contacts WHERE sys_user.`id` = ? AND contacts.`friend_id` = ? AND contacts.`user_id` = ? ;", friend_id, friend_id, user_id).Scan(&u).Error
 
 	return err, &u
 }

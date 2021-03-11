@@ -36,10 +36,10 @@ type ResponseTalkRecord struct {
 	Content    string             `json:"content"  gorm:"comment:聊天内容"`
 	Nickname   string             `json:"nickname"  gorm:"comment:用户名"`
 	Avatar     string             `json:"avatar"  gorm:"comment:用户头像"`
-	File       model.File         `json:"file"  gorm:"comment:文件名称"`
-	Code_block []model.Code_block `json:"code_block"  gorm:"comment:代码片段"`
-	Forward    []model.Forward    `json:"forward"  gorm:"comment:代码片段"`
-	Invite     []model.Invite     `json:"invite"  gorm:"comment:代码片段"`
+	File       model.File       `json:"file"  gorm:"comment:文件名称"`
+	Code_block model.Code_block `json:"code_block"  gorm:"comment:代码片段"`
+	Forward    model.Forward    `json:"forward"  gorm:"comment:代码片段"`
+	Invite     model.Invite     `json:"invite"  gorm:"comment:代码片段"`
 }
 
 type ResponseTalkRecords struct {

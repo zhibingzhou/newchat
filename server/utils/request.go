@@ -76,7 +76,7 @@ func Base64ToImage(file string) (error, string) {
 	f, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	defer f.Close()
 	f.Write(dist)
-	weburl := global.GVA_CONFIG.System.Url + ":" + strconv.Itoa(global.GVA_CONFIG.System.Addr)
+	weburl := global.GVA_CONFIG.System.Url
 	url := fmt.Sprintf("%s/uploads/file/img/%s.png", weburl, guid)
 
 	return err, url

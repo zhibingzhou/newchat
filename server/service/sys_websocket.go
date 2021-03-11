@@ -25,7 +25,7 @@ func CreatTalk(send_id int, received_id, source, msg_type, msg string) (err erro
 
 func GetTalk_listById(id int) (err error, rep response.ResponseTalkRecord) {
 
-	err = global.GVA_DB.Debug().Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE  user_id = sys_user.`id`  AND talk_list.`id` = ? ORDER BY created_at DESC ", id).Scan(&rep).Error
+	err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE  user_id = sys_user.`id`  AND talk_list.`id` = ? ORDER BY created_at DESC ", id).Scan(&rep).Error
 	if err != nil {
 		return err, rep
 	}

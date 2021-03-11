@@ -16,7 +16,7 @@ import (
 
 func UserEmoticon(id int) (err error, rep response.ResponseUserEmoticon) {
 
-	result := global.GVA_DB.Debug().Raw("SELECT emoticon.id AS media_id , emoticon.`src` FROM emoticon WHERE user_id = ? AND STATUS = 1 ", id).Scan(&rep.Collect_emoticon)
+	result := global.GVA_DB.Raw("SELECT emoticon.id AS media_id , emoticon.`src` FROM emoticon WHERE user_id = ? AND STATUS = 1 ", id).Scan(&rep.Collect_emoticon)
 
 	if result.Error != nil {
 		if result.Error != gorm.ErrRecordNotFound {
@@ -24,7 +24,7 @@ func UserEmoticon(id int) (err error, rep response.ResponseUserEmoticon) {
 		}
 	}
 
-	err = global.GVA_DB.Debug().Raw("SELECT emoticon.id AS media_id , emoticon.`src` FROM emoticon WHERE user_id = 1 AND STATUS = 1 ").Scan(&rep.Sys_emoticon).Error
+	err = global.GVA_DB.Raw("SELECT emoticon.id AS media_id , emoticon.`src` FROM emoticon WHERE user_id = 1 AND STATUS = 1 ").Scan(&rep.Sys_emoticon).Error
 
 	return err, rep
 }
@@ -37,7 +37,7 @@ func UserEmoticon(id int) (err error, rep response.ResponseUserEmoticon) {
 
 func SystemEmoticon() (err error, rep []response.ResponseSysEmoticon) {
 
-	err = global.GVA_DB.Debug().Raw(" SELECT emoticon.id , emoticon.`src` AS url, emoticon.`name` ,emoticon.`status`  FROM emoticon WHERE user_id = 1 AND STATUS = 1 ").Scan(&rep).Error
+	err = global.GVA_DB.Raw(" SELECT emoticon.id , emoticon.`src` AS url, emoticon.`name` ,emoticon.`status`  FROM emoticon WHERE user_id = 1 AND STATUS = 1 ").Scan(&rep).Error
 
 	return err, rep
 }
@@ -66,7 +66,7 @@ func UploadEmoticon(id int, url string) (err error, emoticon model.Emoticon) {
 	emoticon = model.Emoticon{
 		User_id: id,
 		Src:     url,
-		Status: 1,
+		Status:  1,
 	}
 	err = global.GVA_DB.Table("emoticon").Create(&emoticon).Error
 

@@ -52,7 +52,7 @@ func DelArticleClass(id int) (err error) {
 
 func ArticleClass(id int) (err error, rep response.ResponseArticleClassList) {
 
-	err = global.GVA_DB.Debug().Raw("SELECT  article_class.`id` , article_class.`name` AS class_name, article_class.`default` AS is_default ,( SELECT COUNT(*) FROM article_list WHERE  article_list.`class_id` = article_class.`id` AND article_class.`user_id` = ? AND article_list.`status` = 1 ) AS count  FROM article_class WHERE article_class.`user_id` = ? AND article_class.`deleted_at` IS NULL ", id, id).Scan(&rep.Rows).Error
+	err = global.GVA_DB.Raw("SELECT  article_class.`id` , article_class.`name` AS class_name, article_class.`default` AS is_default ,( SELECT COUNT(*) FROM article_list WHERE  article_list.`class_id` = article_class.`id` AND article_class.`user_id` = ? AND article_list.`status` = 1 ) AS count  FROM article_class WHERE article_class.`user_id` = ? AND article_class.`deleted_at` IS NULL ", id, id).Scan(&rep.Rows).Error
 
 	return err, rep
 }
@@ -65,7 +65,7 @@ func ArticleClass(id int) (err error, rep response.ResponseArticleClassList) {
 
 func ArticleTags(id int) (err error, rep response.ResponseTagsList) {
 
-	err = global.GVA_DB.Debug().Raw("SELECT article_tags.`id`,article_tags.`name` AS tag_name , (SELECT COUNT(*) FROM article_tag_list WHERE  article_tags.`id` = article_tag_list.`tags_id` AND article_tags.user_id = ?   ) AS count FROM article_tags WHERE article_tags.user_id = ?  ", id, id).Scan(&rep.Tags).Error
+	err = global.GVA_DB.Raw("SELECT article_tags.`id`,article_tags.`name` AS tag_name , (SELECT COUNT(*) FROM article_tag_list WHERE  article_tags.`id` = article_tag_list.`tags_id` AND article_tags.user_id = ?   ) AS count FROM article_tags WHERE article_tags.user_id = ?  ", id, id).Scan(&rep.Tags).Error
 
 	return err, rep
 }
@@ -105,7 +105,7 @@ func ArticleList(id int, pages, keyword, find_type, cid string) (err error, rep 
 			return err, rep
 		}
 		//星标笔记
-		err = global.GVA_DB.Debug().Raw("SELECT article_list.`id`,article_list.`class_id`,article_list.`title`,article_list.`image`,article_list.`abstract`,article_list.`updated_at`,article_list.`status`,article_class.`name` FROM article_list,article_class WHERE article_list.`class_id` = article_class.`id` AND article_class.`user_id` = ? AND article_list.`heart` = 1 AND  article_class.`deleted_at` IS NULL  ORDER BY article_list.`updated_at` DESC  LIMIT ?  OFFSET ? ", pagesize, page-1).Scan(&rep.Rows).Error
+		err = global.GVA_DB.Raw("SELECT article_list.`id`,article_list.`class_id`,article_list.`title`,article_list.`image`,article_list.`abstract`,article_list.`updated_at`,article_list.`status`,article_class.`name` FROM article_list,article_class WHERE article_list.`class_id` = article_class.`id` AND article_class.`user_id` = ? AND article_list.`heart` = 1 AND  article_class.`deleted_at` IS NULL  ORDER BY article_list.`updated_at` DESC  LIMIT ?  OFFSET ? ", pagesize, page-1).Scan(&rep.Rows).Error
 		break
 	case "3":
 
@@ -133,7 +133,7 @@ func ArticleList(id int, pages, keyword, find_type, cid string) (err error, rep 
 			return err, rep
 		}
 
-		err = global.GVA_DB.Debug().Raw("SELECT article_list.`id`,article_list.`class_id`,article_list.`title`,article_list.`image`,article_list.`abstract`,article_list.`updated_at`,article_list.`status`,article_class.`name` FROM article_list,article_class WHERE article_list.`class_id` = article_class.`id` AND article_class.`user_id` = ? AND article_list.`id` IN (?) AND  article_class.`deleted_at` IS NULL  ORDER BY article_list.`updated_at` DESC  LIMIT ?  OFFSET ? ", id, idlist, pagesize, page-1).Scan(&rep.Rows).Error
+		err = global.GVA_DB.Raw("SELECT article_list.`id`,article_list.`class_id`,article_list.`title`,article_list.`image`,article_list.`abstract`,article_list.`updated_at`,article_list.`status`,article_class.`name` FROM article_list,article_class WHERE article_list.`class_id` = article_class.`id` AND article_class.`user_id` = ? AND article_list.`id` IN (?) AND  article_class.`deleted_at` IS NULL  ORDER BY article_list.`updated_at` DESC  LIMIT ?  OFFSET ? ", id, idlist, pagesize, page-1).Scan(&rep.Rows).Error
 		//标签
 		break
 	case "5":

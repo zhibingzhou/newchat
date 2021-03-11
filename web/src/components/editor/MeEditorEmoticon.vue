@@ -167,8 +167,8 @@ export default {
     },
 
     //加载用户表情包
-    loadUserEmoji() {
-      ServeFindUserEmoticon().then((res) => {
+     loadUserEmoji() {
+       ServeFindUserEmoticon().then((res) => {
         if (res.code == 200) {
           this.emojiItem = this.emojiItem.slice(0, 2);
 

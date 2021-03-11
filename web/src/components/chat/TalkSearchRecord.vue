@@ -140,9 +140,7 @@
                         }}
                       </span>
                       <el-divider direction="vertical" />
-                      <span class="time">{{
-                        record.created_at
-                      }}</span>
+                      <span class="time">{{ formatDate(record.created_at) }}</span>
                     </div>
 
                     <!-- 文本消息 -->
@@ -221,17 +219,13 @@
 <script>
 import { ServeGetContacts } from "@/api/contacts";
 import { ServeGetGroups } from "@/api/group";
-
+import { formatTimeToStr } from "@/utils/data";
 import {
   ServeFindTalkRecords,
   ServeSearchTalkRecords,
   ServeGetRecordsContext,
 } from "@/api/chat";
-import {
-  formateSize,
-  download,
-  imgZoom
-} from "@/utils/functions";
+import { formateSize, download, imgZoom } from "@/utils/functions";
 
 export default {
   name: "TalkSearchRecord",
@@ -299,6 +293,15 @@ export default {
     this.loadGroups();
   },
   methods: {
+    formatDate: function (time) {
+      if (time != null && time != "") {
+        var date = new Date(time);
+        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
+      } else {
+        return "";
+      }
+    },
+
     //格式化文件大小
     renderSize: formateSize,
 
@@ -393,6 +396,7 @@ export default {
               this.records.items.length - 1
             ].id;
           }
+          console.log(records)
         })
         .catch((err) => {
           this.records.loadStatus = 0;

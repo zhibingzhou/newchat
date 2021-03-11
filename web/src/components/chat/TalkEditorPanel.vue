@@ -142,6 +142,7 @@
                   />
 
                   <!-- 图片消息 -->
+                  <!-- :src="item.file.file_url" -->
                   <image-message
                     v-else-if="item.msg_type == 2 && item.file.file_type == 1"
                     :src="item.file.file_url"
@@ -524,9 +525,7 @@ export default {
       };
 
       this.loadRecord.status = 0;
-      this.loadRecord.scrollHeight = document.getElementById(
-        "lumenChatPanel"
-      ).scrollHeight;
+
       ServeTalkRecords(data)
         .then((res) => {
           //防止点击切换过快消息返回延迟，导致信息错误
@@ -537,7 +536,7 @@ export default {
           ) {
             return;
           }
-
+         
           let records = data.record_id == 0 ? [] : this.$root.message.records;
 
           records.unshift(...res.data.rows.reverse());
@@ -572,6 +571,7 @@ export default {
               el.scrollTop = el.scrollHeight - this.loadRecord.scrollHeight;
             }
           });
+          console.log(records)
         })
         .catch((e) => {
           this.loadRecord.status = 1;
@@ -785,6 +785,7 @@ export default {
 
     //消息点击右键触发自定义菜单
     onCopy(idx, item, event) {
+      console.log("我是右击");
       let menus = [];
       let content = "";
       if (document.getElementById("copy_class_" + item.id)) {
@@ -805,7 +806,7 @@ export default {
       if (item.user_id == this.uid) {
         let time =
           new Date().getTime() -
-          Date.parse(formatDate(item.created_at).replace(/-/g, "/"));
+          Date.parse(this.formatDate(item.created_at).replace(/-/g, "/"));
         if (Math.floor(time / 1000 / 60) < 2) {
           menus.push({
             label: "撤回",

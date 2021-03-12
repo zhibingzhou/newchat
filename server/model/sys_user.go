@@ -17,3 +17,7 @@ type SysUser struct {
 	Email     string    `json:"email" gorm:"default:888;comment:用户邮箱"`
 	Gender    int       `json:"gender" gorm:"default:-1;comment:性别"`
 }
+
+type UserId struct {
+	User_id int `json:"user_id"`
+}

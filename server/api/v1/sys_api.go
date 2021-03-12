@@ -1,14 +1,15 @@
 package v1
 
 import (
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"newchat/global"
 	"newchat/model"
 	"newchat/model/request"
 	"newchat/model/response"
 	"newchat/service"
 	"newchat/utils"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // @Tags SysApi
@@ -66,23 +67,23 @@ func DeleteApi(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /api/getApiList [post]
 func GetApiList(c *gin.Context) {
-	var pageInfo request.SearchApiParams
-	_ = c.ShouldBindJSON(&pageInfo)
-	if err := utils.Verify(pageInfo.PageInfo, utils.PageInfoVerify); err != nil {
-		response.FailWithMessage(err.Error(), c)
-		return
-	}
-	if err, list, total := service.GetAPIInfoList(pageInfo.SysApi, pageInfo.PageInfo, pageInfo.OrderKey, pageInfo.Desc); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
-		response.FailWithMessage("获取失败", c)
-	} else {
-		response.OkWithDetailed(response.PageResult{
-			List:     list,
-			Total:    total,
-			Page:     pageInfo.Page,
-			PageSize: pageInfo.PageSize,
-		}, "获取成功", c)
-	}
+	// var pageInfo request.SearchApiParams
+	// _ = c.ShouldBindJSON(&pageInfo)
+	// if err := utils.Verify(pageInfo.PageInfo, utils.PageInfoVerify); err != nil {
+	// 	response.FailWithMessage(err.Error(), c)
+	// 	return
+	// }
+	// if err, list, total := service.GetAPIInfoList(pageInfo.SysApi, pageInfo.PageInfo, pageInfo.OrderKey, pageInfo.Desc); err != nil {
+	// 	global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+	// 	response.FailWithMessage("获取失败", c)
+	// } else {
+	// 	response.OkWithDetailed(response.PageResult{
+	// 		List:     list,
+	// 		Total:    total,
+	// 		Page:     pageInfo.Page,
+	// 		PageSize: pageInfo.PageSize,
+	// 	}, "获取成功", c)
+	// }
 }
 
 // @Tags SysApi

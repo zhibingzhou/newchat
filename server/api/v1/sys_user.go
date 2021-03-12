@@ -38,7 +38,7 @@ func RegisterWebsocket(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	status, msg := utils.HttpPostjson(global.GVA_CONFIG.Websocket.Url+global.GVA_CONFIG.Websocket.Register, js_L)
+	status, msg := utils.HttpPostjson(global.GVA_CONFIG.Websocket.Url+global.GVA_CONFIG.Websocket.Register, js_L, map[string]string{})
 	if status != 200 {
 		response.FailWithMessage(msg, c)
 		return
@@ -235,7 +235,7 @@ func Search_user(c *gin.Context) {
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
 	}
-	var R request.UserId
+	var R model.UserId
 	_ = c.ShouldBindJSON(&R)
 
 	if err, columns := service.SearchUserById(uid, R.User_id); err != nil {

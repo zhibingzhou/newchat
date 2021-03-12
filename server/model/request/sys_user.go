@@ -30,9 +30,6 @@ type SetUserAuth struct {
 	AuthorityId string    `json:"authorityId"`
 }
 
-type UserId struct {
-	User_id int `json:"user_id"`
-}
 
 type RequestUserEdit struct {
 	Nickname string `json:"nickname" gorm:"default:系统用户;comment:用户昵称" `

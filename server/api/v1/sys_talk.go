@@ -157,6 +157,8 @@ func SendImage(c *gin.Context) {
 	//record_id := c.Query("record_id")
 	receive_id := c.PostForm("receive_id")
 	source := c.PostForm("source")
+	width := c.PostForm("width")
+	height := c.PostForm("height")
 
 	files, err := c.FormFile("img")
 	if err != nil {
@@ -166,13 +168,13 @@ func SendImage(c *gin.Context) {
 	}
 	// 上传文件至指定目录
 	guid := uuid.New().String()
-
-	singleFile := "uploads/file/img/" + guid + utils.GetExt(files.Filename)
+	// _690x690.jpg
+	widthandheight := "_" + width + "x" + height
+	singleFile := "uploads/file/img/" + guid + widthandheight + utils.GetExt(files.Filename)
 	_ = c.SaveUploadedFile(files, singleFile)
 
 	weburl := global.GVA_CONFIG.System.Url
 	url := fmt.Sprintf("%s/%s", weburl, singleFile)
-
 
 	err, res := service.CreatTalk(uid, receive_id, source, "2", "")
 	file := model.File{
@@ -194,6 +196,15 @@ func SendImage(c *gin.Context) {
 		response.FailWithMessage("获取失败", c)
 		return
 	}
+    
+	err, data := service.GetTalk_listById(res.ID)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+	}
+
+	go service.SendToClient("event_img", data)
+
 	response.Ok(c)
 
 }

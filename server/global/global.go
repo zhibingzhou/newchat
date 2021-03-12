@@ -20,8 +20,12 @@ var (
 )
 
 var (
-	UserId     = "user_id"
-	UserStatus = "user_Online"
-	MsgNoRead  = "no_read_msg"
-	FileId = "file_id"
+	UserId    = "user_id"
+	MsgNoRead = "no_read_msg"
+	FileId    = "file_id"
+)
+
+var (
+	UserStatus   = "user_Online" //websocekt
+	UserIdSystem = "user_System" //websocket
 )

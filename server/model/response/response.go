@@ -1,8 +1,9 @@
 package response
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Response struct {
@@ -10,6 +11,7 @@ type Response struct {
 	Data interface{} `json:"data"`
 	Msg  string      `json:"msg"`
 }
+
 
 const (
 	ERROR   = 7

@@ -16,7 +16,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func HttpPostjson(url string, js []byte) (int, string) {
+func HttpPostjson(url string, js []byte, header map[string]string) (int, string) {
 	status := 100
 	msg := "fail"
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(js))
@@ -24,7 +24,12 @@ func HttpPostjson(url string, js []byte) (int, string) {
 		return status, err.Error()
 	}
 	request.Header.Set("Content-Type", "application/json")
+	if len(header) > 0 {
+		for key, value := range header {
+			request.Header.Set(key, value)
+		}
 
+	}
 	client := new(http.Client)
 	response, err := client.Do(request)
 	if err != nil {

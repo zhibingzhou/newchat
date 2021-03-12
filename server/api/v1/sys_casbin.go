@@ -1,13 +1,14 @@
 package v1
 
 import (
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"newchat/global"
 	"newchat/model/request"
 	"newchat/model/response"
 	"newchat/service"
 	"newchat/utils"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // @Tags Casbin
@@ -48,6 +49,6 @@ func GetPolicyPathByAuthorityId(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	paths := service.GetPolicyPathByAuthorityId(casbin.AuthorityId)
-	response.OkWithDetailed(response.PolicyPathResponse{Paths: paths}, "获取成功", c)
+	//paths := service.GetPolicyPathByAuthorityId(casbin.AuthorityId)
+	response.OkWithMessage("获取成功", c)
 }

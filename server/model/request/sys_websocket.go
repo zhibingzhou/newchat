@@ -11,3 +11,4 @@ type RequestEvenTalk struct {
 	Msg_type     string `json:"msg_type"`    //事件类型
 	Source_type  string `json:"source_type"` //群聊或者私聊
 }
+

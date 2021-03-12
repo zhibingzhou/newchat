@@ -293,22 +293,68 @@ export default {
 
     // 确认上传图片消息回调事件
     confirmUploadImage() {
-      let fileData = new FormData();
-      fileData.append("img", this.imageViewer.file);
-      fileData.append("receive_id", this.$root.message.receiveId);
-      fileData.append("source", this.$root.message.source);
-
+      let datawidth = "",
+        dataheight = "";
+      var file = this.imageViewer.file;
+      var received = this.$root.message.receiveId;
+      var source = this.$root.message.source;
       let ref = this.$refs.imageViewer;
-      ServeSendTalkImage(fileData)
-        .then((res) => {
-          ref.loading = false;
-          if (res.code == 200) {
-            ref.closeBox();
-          }
-        })
-        .catch((err) => {
-          ref.loading = false;
-        });
+      var reader = new FileReader();
+      reader.readAsDataURL(this.imageViewer.file);
+      reader.onload = function () {
+        //让页面中的img标签的src指向读取的路径
+        var img = new Image();
+        img.src = reader.result;
+        if (img.complete) {
+          datawidth = img.width.toString();
+          dataheight = img.height.toString();
+          console.log("sddf1", img.width + 1, img.height);
+          console.log(" here1 ", datawidth, dataheight);
+
+          let fileData = new FormData();
+          fileData.append("img", file);
+          fileData.append("receive_id", received);
+          fileData.append("source", source);
+          fileData.append("width", datawidth);
+          fileData.append("height", dataheight);
+
+          ServeSendTalkImage(fileData)
+            .then((res) => {
+              ref.loading = false;
+              if (res.code == 200) {
+                ref.closeBox();
+              }
+            })
+            .catch((err) => {
+              ref.loading = false;
+            });
+        } else {
+          img.onload = function () {
+            datawidth = img.width.toString();
+            dataheight = img.height.toString();
+            console.log("sddf", img.width + 1, img.height);
+            console.log(" here ", datawidth, dataheight);
+
+            let fileData = new FormData();
+            fileData.append("img", this.imageViewer.file);
+            fileData.append("receive_id", this.$root.message.receiveId);
+            fileData.append("source", this.$root.message.source);
+            fileData.append("width", datawidth);
+            fileData.append("height", dataheight);
+            let ref = this.$refs.imageViewer;
+            ServeSendTalkImage(fileData)
+              .then((res) => {
+                ref.loading = false;
+                if (res.code == 200) {
+                  ref.closeBox();
+                }
+              })
+              .catch((err) => {
+                ref.loading = false;
+              });
+          };
+        }
+      };
     },
 
     // 选中表情包回调事件

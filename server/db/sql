@@ -296,3 +296,405 @@ CREATE TABLE `article_tag_list` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
 ) ENGINE=INNODB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//数据和结构
+
+/*
+SQLyog Ultimate v12.09 (64 bit)
+MySQL - 8.0.19 : Database - newchat
+*********************************************************************
+*/
+
+
+/*!40101 SET NAMES utf8 */;
+
+/*!40101 SET SQL_MODE=''*/;
+
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`newchat` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `newchat`;
+
+/*Table structure for table `apply_records` */
+
+DROP TABLE IF EXISTS `apply_records`;
+
+CREATE TABLE `apply_records` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `status` tinyint DEFAULT '0' COMMENT '0 审核中 ， 1 同意',
+  `friend_id` int DEFAULT '0' COMMENT '朋友id',
+  `user_id` int DEFAULT '0' COMMENT '用户id',
+  `remarks` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户备注名',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_fri` (`friend_id`),
+  KEY `index_use` (`user_id`),
+  KEY `idx_jwt_blacklists_deleted_at` (`deleted_at`) USING BTREE,
+  KEY `idx_jwt_blacklist_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `apply_records` */
+
+insert  into `apply_records`(`id`,`created_at`,`updated_at`,`deleted_at`,`status`,`friend_id`,`user_id`,`remarks`) values (12,'2020-12-28 13:21:52',NULL,NULL,0,12,15,'找你');
+
+/*Table structure for table `article_class` */
+
+DROP TABLE IF EXISTS `article_class`;
+
+CREATE TABLE `article_class` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `default` int DEFAULT '0' COMMENT '备用',
+  `sort` int DEFAULT '0' COMMENT '用户id',
+  `name` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '类型名称',
+  `user_id` int DEFAULT '0' COMMENT '用户id',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_user` (`sort`),
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `article_class` */
+
+insert  into `article_class`(`id`,`created_at`,`updated_at`,`deleted_at`,`default`,`sort`,`name`,`user_id`) values (12,'2021-03-04 17:13:44','2021-03-04 17:13:44',NULL,0,0,'php',12),(13,'2021-03-04 17:13:48','2021-03-04 17:13:48','2021-03-04 17:35:05',0,0,'php',12),(14,'2021-03-04 17:46:32','2021-03-04 17:46:32',NULL,0,1,'php1',12);
+
+/*Table structure for table `article_list` */
+
+DROP TABLE IF EXISTS `article_list`;
+
+CREATE TABLE `article_list` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `class_id` int DEFAULT '0' COMMENT '类型id',
+  `user_id` int DEFAULT '0' COMMENT '用户id',
+  `heart` int DEFAULT '0' COMMENT '是否是星标',
+  `status` int DEFAULT '1' COMMENT '状态2是删除状态，1是正常状态',
+  `title` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '笔记标题',
+  `image` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '图片链接',
+  `abstract` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '内容',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_user` (`class_id`),
+  KEY `index_status` (`status`),
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `article_list` */
+
+insert  into `article_list`(`id`,`created_at`,`updated_at`,`deleted_at`,`class_id`,`user_id`,`heart`,`status`,`title`,`image`,`abstract`) values (12,NULL,NULL,NULL,12,12,0,1,'你好','噼里啪啦','中华人民共和国'),(13,NULL,NULL,NULL,14,12,0,1,'你好','噼里啪啦1','中华人民共和国1');
+
+/*Table structure for table `article_tag_list` */
+
+DROP TABLE IF EXISTS `article_tag_list`;
+
+CREATE TABLE `article_tag_list` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `article_id` int DEFAULT '0' COMMENT 'id',
+  `tags_id` int DEFAULT '0' COMMENT '类型id',
+  `user_id` int DEFAULT '0' COMMENT '用户id',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_user` (`article_id`),
+  KEY `index_tags` (`tags_id`),
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `article_tag_list` */
+
+insert  into `article_tag_list`(`id`,`created_at`,`updated_at`,`deleted_at`,`article_id`,`tags_id`,`user_id`) values (12,NULL,NULL,NULL,12,13,12);
+
+/*Table structure for table `article_tags` */
+
+DROP TABLE IF EXISTS `article_tags`;
+
+CREATE TABLE `article_tags` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `name` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '标签名称',
+  `user_id` int DEFAULT '0' COMMENT '用户id',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `article_tags` */
+
+insert  into `article_tags`(`id`,`created_at`,`updated_at`,`deleted_at`,`name`,`user_id`) values (12,NULL,NULL,NULL,'标签1',12),(13,NULL,NULL,NULL,'标签2',12),(14,NULL,NULL,NULL,'标签3',12);
+
+/*Table structure for table `contacts` */
+
+DROP TABLE IF EXISTS `contacts`;
+
+CREATE TABLE `contacts` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `friend_status` tinyint DEFAULT '1' COMMENT '2 是好友 ， 1 审核中',
+  `friend_id` int DEFAULT '0' COMMENT '好友id',
+  `user_id` int DEFAULT '0' COMMENT '好友id',
+  `friend_remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户备注名',
+  `not_disturb` int DEFAULT '0' COMMENT '是否开启免打扰',
+  `is_top` int DEFAULT '0' COMMENT '是否置顶',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `index_id` (`friend_id`,`user_id`) USING BTREE,
+  KEY `index_fri` (`friend_id`),
+  KEY `index_use` (`user_id`),
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `contacts` */
+
+insert  into `contacts`(`id`,`created_at`,`updated_at`,`deleted_at`,`friend_status`,`friend_id`,`user_id`,`friend_remark`,`not_disturb`,`is_top`) values (12,NULL,NULL,NULL,2,13,12,'小燕子飞啊飞',0,0),(13,NULL,NULL,NULL,2,12,13,'always test',0,0);
+
+/*Table structure for table `emoticon` */
+
+DROP TABLE IF EXISTS `emoticon`;
+
+CREATE TABLE `emoticon` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `status` tinyint DEFAULT '0' COMMENT '移除，显示',
+  `user_id` int DEFAULT '0' COMMENT '用户id',
+  `src` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '表情地址',
+  `name` varchar(250) DEFAULT '' COMMENT '系统名称',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_fri` (`user_id`),
+  KEY `idx_jwt_blacklists_deleted_at` (`deleted_at`) USING BTREE,
+  KEY `idx_jwt_blacklist_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `emoticon` */
+
+insert  into `emoticon`(`id`,`created_at`,`updated_at`,`deleted_at`,`status`,`user_id`,`src`,`name`) values (12,'2021-02-21 20:03:06',NULL,NULL,1,12,'http://im-img.gzydong.club/media/images/talks/20200909/5f58845a7cf3frWtAZsCURdUM8jRzqk5f58845a7cf57_480x480.png',''),(13,'2021-02-21 06:03:06',NULL,NULL,1,12,'http://im-img.gzydong.club/media/images/emoticon/20200929/5f73130b96842XhApnoKdVTtK6nv7PI5f73130b96857_533x300.jpg',''),(16,'2021-02-21 06:03:06',NULL,NULL,2,1,'http://im-img.gzydong.club/media/images/emoticon/5fe5bed118e508yOXDlz37LU8Xsnx5fe5bed118e5e_344x224.png','世界'),(21,'2021-03-03 20:34:11','2021-03-03 20:34:11',NULL,1,12,'http://127.0.0.1:8888/uploads/file/img/383b7a07-213a-41b4-8944-9d5f334d4a41.jpg','');
+
+/*Table structure for table `file` */
+
+DROP TABLE IF EXISTS `file`;
+
+CREATE TABLE `file` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `save_type` tinyint DEFAULT '0' COMMENT '保存类型',
+  `record_id` int DEFAULT '0' COMMENT '消息id',
+  `user_id` int DEFAULT '0' COMMENT '用户id',
+  `file_source` int DEFAULT '0' COMMENT '群聊，还是私聊',
+  `file_type` int DEFAULT '0' COMMENT '消息id',
+  `file_size` int DEFAULT '0' COMMENT '文件大小',
+  `original_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '文件名称',
+  `file_suffix` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '文件扩展名',
+  `save_dir` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '保存路径',
+  `file_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '文件url',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_rec` (`record_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `file` */
+
+insert  into `file`(`id`,`save_type`,`record_id`,`user_id`,`file_source`,`file_type`,`file_size`,`original_name`,`file_suffix`,`save_dir`,`file_url`) values (12,0,32,12,1,1,1,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/fab97b2b-dcdb-4dfa-9400-df3d62ae29fd.jpg','http://127.0.0.1:8888/uploads/file/img/fab97b2b-dcdb-4dfa-9400-df3d62ae29fd.jpg'),(13,0,33,12,1,1,1,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/01db3bae-b43f-4b0c-973c-b271846cf52c.jpg','http://127.0.0.1:8888/uploads/file/img/01db3bae-b43f-4b0c-973c-b271846cf52c.jpg'),(14,0,35,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','.jpg','uploads/file/img/b8689445-127a-4a34-95e3-2c17e4a23a1c.jpg','http://127.0.0.1:8888/uploads/file/img/b8689445-127a-4a34-95e3-2c17e4a23a1c.jpg'),(15,0,36,12,1,1,22779,'65252be5c6e7e8ace4458e517cb5ad08.jpg','jpg','uploads/file/img/42591d94-a09d-4dda-8b4d-cf28c0268bac.jpg','http://127.0.0.1:8888/uploads/file/img/42591d94-a09d-4dda-8b4d-cf28c0268bac.jpg'),(16,0,41,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/cfcc238f-323b-4a35-aa2c-153894d53927.jpg','http://127.0.0.1:8888/uploads/file/img/cfcc238f-323b-4a35-aa2c-153894d53927.jpg'),(17,0,42,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/c5fda72e-2a01-419d-a85a-de9ee35f6f56_x.jpg','http://127.0.0.1:8888/uploads/file/img/c5fda72e-2a01-419d-a85a-de9ee35f6f56_x.jpg'),(18,0,43,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/acf6b20b-ed9b-4727-af05-57b17ada3860_x.jpg','http://127.0.0.1:8888/uploads/file/img/acf6b20b-ed9b-4727-af05-57b17ada3860_x.jpg'),(19,0,44,12,1,1,22779,'65252be5c6e7e8ace4458e517cb5ad08.jpg','jpg','uploads/file/img/77825e11-26f9-46ee-95d0-47f8a818826b_0x0.jpg','http://127.0.0.1:8888/uploads/file/img/77825e11-26f9-46ee-95d0-47f8a818826b_0x0.jpg'),(20,0,45,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/00d75b45-864f-457b-ba5d-6377e4478405_123x567.jpg','http://127.0.0.1:8888/uploads/file/img/00d75b45-864f-457b-ba5d-6377e4478405_123x567.jpg'),(21,0,46,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/d66881db-e047-4a50-a8d2-43f27465c2cb_0x0.jpg','http://127.0.0.1:8888/uploads/file/img/d66881db-e047-4a50-a8d2-43f27465c2cb_0x0.jpg'),(22,0,47,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/4571d126-72e1-4db8-afd0-4601bad864ab_x.jpg','http://127.0.0.1:8888/uploads/file/img/4571d126-72e1-4db8-afd0-4601bad864ab_x.jpg'),(23,0,48,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/50b6a656-3899-4c01-817d-46b360c1e13f_x.jpg','http://127.0.0.1:8888/uploads/file/img/50b6a656-3899-4c01-817d-46b360c1e13f_x.jpg'),(24,0,49,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/749f3264-8c3d-4c84-8c79-381fe8bd7e0f_x.jpg','http://127.0.0.1:8888/uploads/file/img/749f3264-8c3d-4c84-8c79-381fe8bd7e0f_x.jpg'),(25,0,50,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/4c9a32f4-000a-4b5c-9eba-907e01b7f09e_690x690.jpg','http://127.0.0.1:8888/uploads/file/img/4c9a32f4-000a-4b5c-9eba-907e01b7f09e_690x690.jpg'),(26,0,74,12,2,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/1c8a3ffd-096d-4f5a-9182-97fecc80e4b9_690x690.jpg','http://127.0.0.1:8888/uploads/file/img/1c8a3ffd-096d-4f5a-9182-97fecc80e4b9_690x690.jpg'),(27,0,75,12,1,1,32282,'a8c11be06eae95d79a615e2351e2dac6.jpg','jpg','uploads/file/img/a828f71f-55aa-4631-9a20-f315e00c8938_690x690.jpg','http://127.0.0.1:8888/uploads/file/img/a828f71f-55aa-4631-9a20-f315e00c8938_690x690.jpg'),(28,0,125,13,1,1,11523,'D:\\zhou\\src\\cardsys\\assets\\img\\paylogo.png','png','uploads/file/img/ad656f22-e583-495b-a570-bd08a9812398_158x55.png','http://127.0.0.1:8888/uploads/file/img/ad656f22-e583-495b-a570-bd08a9812398_158x55.png'),(29,0,127,13,1,1,11523,'D:\\zhou\\src\\cardsys\\assets\\img\\paylogo.png','png','uploads/file/img/ac759f06-c7b4-4e87-a0b7-3d47dd8ee3e4_158x55.png','http://127.0.0.1:8888/uploads/file/img/ac759f06-c7b4-4e87-a0b7-3d47dd8ee3e4_158x55.png');
+
+/*Table structure for table `group_list` */
+
+DROP TABLE IF EXISTS `group_list`;
+
+CREATE TABLE `group_list` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `group_name` varchar(20) NOT NULL COMMENT '群名称',
+  `avatar` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'http://qmplusimg.henrongyi.top/head.png' COMMENT '群图片',
+  `group_profile` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '群简介',
+  `manager_id` int DEFAULT '0' COMMENT '管理员id',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_group_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1112 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `group_list` */
+
+insert  into `group_list`(`id`,`created_at`,`updated_at`,`deleted_at`,`group_name`,`avatar`,`group_profile`,`manager_id`) values (1111,NULL,'2021-03-04 12:45:02',NULL,'绿帽组1','http://127.0.0.1:8888/uploads/file/img/0054187e-41c6-4941-9ddf-fbc8e53732a0.png','奔30的人了，还不结婚，干什么2',12);
+
+/*Table structure for table `group_member` */
+
+DROP TABLE IF EXISTS `group_member`;
+
+CREATE TABLE `group_member` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `not_disturb` tinyint(1) DEFAULT '1' COMMENT '是否开启群免打扰:1=开启,0=关闭',
+  `isGroupLeader` tinyint(1) DEFAULT '1' COMMENT '是否管理员:1=管理员,0=成员 ',
+  `group_id` int DEFAULT '0' COMMENT '群组id',
+  `user_id` int DEFAULT '0' COMMENT '用户id',
+  `visit_card` varchar(100) DEFAULT NULL COMMENT '群名片',
+  `is_top` int DEFAULT '0' COMMENT '是否置顶',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `index_id` (`group_id`,`user_id`) USING BTREE,
+  KEY `index_group_id` (`group_id`),
+  KEY `index_user_id` (`user_id`),
+  KEY `idx_group_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `group_member` */
+
+insert  into `group_member`(`id`,`created_at`,`updated_at`,`deleted_at`,`not_disturb`,`isGroupLeader`,`group_id`,`user_id`,`visit_card`,`is_top`) values (12,NULL,NULL,NULL,0,1,1111,12,NULL,0),(13,NULL,NULL,NULL,1,0,1111,13,NULL,0),(14,NULL,NULL,NULL,1,0,1111,15,NULL,0);
+
+/*Table structure for table `group_notice` */
+
+DROP TABLE IF EXISTS `group_notice`;
+
+CREATE TABLE `group_notice` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `group_id` int DEFAULT '0' COMMENT '群组id',
+  `user_id` int DEFAULT '0' COMMENT '用户id',
+  `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '公告名',
+  `content` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '公告内容',
+  `is_show` tinyint(1) DEFAULT '0' COMMENT '是否展开',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_group` (`group_id`),
+  KEY `index_user_id` (`user_id`),
+  KEY `idx_group_notice_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `group_notice` */
+
+insert  into `group_notice`(`id`,`created_at`,`updated_at`,`deleted_at`,`group_id`,`user_id`,`title`,`content`,`is_show`) values (12,NULL,NULL,NULL,1111,12,'公告2','2021 牛年赚大钱',0),(13,NULL,NULL,NULL,1111,12,'公告1','2020 xixi年赚大钱',0),(14,'2021-03-04 14:03:39','2021-03-04 14:03:39',NULL,1111,12,'你好','低分了',0),(15,'2021-03-04 14:03:53','2021-03-04 14:03:53',NULL,1111,12,'12312','31223123313',0);
+
+/*Table structure for table `jwt_blacklist` */
+
+DROP TABLE IF EXISTS `jwt_blacklist`;
+
+CREATE TABLE `jwt_blacklist` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `jwt` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_jwt_blacklists_deleted_at` (`deleted_at`) USING BTREE,
+  KEY `idx_jwt_blacklist_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=119 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `jwt_blacklist` */
+
+insert  into `jwt_blacklist`(`id`,`created_at`,`updated_at`,`deleted_at`,`jwt`) values (1,'2021-02-19 19:44:41','2021-02-19 19:44:41',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja05hbWUiOiJ4aXhpIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNDMzOTg3MywiaXNzIjoicW1QbHVzIiwibmJmIjoxNjEzNzM0MDczfQ.DPUyas_qULHii6oTnjkVSUePjnfuez2C-pMCa0eC3yQ'),(2,'2021-02-20 11:53:32','2021-02-20 11:53:32',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja05hbWUiOiJ4aXhpIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNDM5Nzg2OCwiaXNzIjoicW1QbHVzIiwibmJmIjoxNjEzNzkyMDY4fQ.UWezNrXpbBAbEGRFJba_rq_uRMIzBmt7gD-6mqqd3yE'),(3,'2021-02-20 18:12:07','2021-02-20 18:12:07',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja05hbWUiOiJ4aXhpIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNDQyMDY4MiwiaXNzIjoicW1QbHVzIiwibmJmIjoxNjEzODE0ODgyfQ.v2nPLg1r4UWCEsYDETog6pdZOEnqkvltrfOvW5BvOXs'),(4,'2021-02-22 13:51:33','2021-02-22 13:51:33',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja05hbWUiOiJ4aXhpIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNDQyMDc0MCwiaXNzIjoicW1QbHVzIiwibmJmIjoxNjEzODE0OTQwfQ.qgTaw6s_M4szFth9kVjn4mmU-wnkf_YFG2t8QZF4u_4'),(97,'2021-02-23 20:43:00','2021-02-23 20:43:00',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja05hbWUiOiIiLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0NjgyNjE3LCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQwNzY4MTd9.miFMPJHzte2NkMBxkdQHNXOso-UCH61IEAVRD2TeChM'),(98,'2021-02-24 13:14:29','2021-02-24 13:14:29',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja05hbWUiOiIiLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0NzQzMjYyLCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQxMzc0NjJ9.SGGFnLuck7Gf6IrwFHoPmyyUKMUBOFvxFir2jREV_Kg'),(99,'2021-02-25 10:59:48','2021-02-25 10:59:48',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja05hbWUiOiIiLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0NzY2ODY4LCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQxNjEwNjh9.fPTXypqeEqbo0vuNq1hhyElMQQtNf4-Lw5D4vV0XpLo'),(100,'2021-02-25 13:47:05','2021-02-25 13:47:05',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja05hbWUiOiIiLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0ODI3MzY0LCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQyMjE1NjR9.6vdPgwyMGg7F3DSxxazpozXA5SFD0uOSq36WwUMgeR0'),(101,'2021-02-25 13:52:12','2021-02-25 13:52:12',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTMsIk1vYmlsZSI6IjE4Nzk4MjcyMDU1IiwiTmlja05hbWUiOiIiLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0ODM2ODQxLCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQyMzEwNDF9.JTILsdU9TPWzgr6-X-E5YsPTy3Z_GtMlfyj3_g2BTkM'),(102,'2021-02-25 18:20:12','2021-02-25 18:20:12',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTMsIk1vYmlsZSI6IjE4Nzk4MjcyMDU1IiwiTmlja05hbWUiOiIiLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0ODQ5NDg5LCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQyNDM2ODl9.am2_rtHqRT6FwZQzf7F0FNMGQitW2NxSWu9t3DmqzBI'),(103,'2021-02-25 19:45:56','2021-02-25 19:45:56',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja05hbWUiOiIiLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0ODM3MTQ1LCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQyMzEzNDV9.L1ATlCmE5ohkzw0qUONLOov2PTqAL3ecr-o9yrQbYsA'),(104,'2021-02-26 14:41:19','2021-02-26 14:41:19',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4iLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0ODU5OTYxLCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQyNTQxNjF9.LcJx_W85U2tWedBdymHLUjtQ3lNl7zZqV7xD09_e8l0'),(105,'2021-02-26 16:36:46','2021-02-26 16:36:46',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4iLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0ODU5OTYxLCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQyNTQxNjF9.LcJx_W85U2tWedBdymHLUjtQ3lNl7zZqV7xD09_e8l0'),(106,'2021-02-26 16:36:59','2021-02-26 16:36:59',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4iLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0OTI2NDc5LCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQzMjA2Nzl9.7cxHWEwVqT2jxCyXv3wQXZrVhLgSr8_rKNUTmP2T2j8'),(107,'2021-02-27 18:32:00','2021-02-27 18:32:00',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4iLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0OTMzNDE5LCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQzMjc2MTl9.6SJNkwNJJnARVP2FbZLOREv7DVeBp6VTbdFRTaVv5Tg'),(108,'2021-02-27 18:33:24','2021-02-27 18:33:24',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4iLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE0OTMzNDE5LCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQzMjc2MTl9.6SJNkwNJJnARVP2FbZLOREv7DVeBp6VTbdFRTaVv5Tg'),(109,'2021-03-05 18:34:09','2021-03-05 18:34:09',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4iLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE1MDI2ODAzLCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQ0MjEwMDN9.06Z57_2EfAafWTKPZV8yAvlUywUirivRmaacM9wWyYA'),(110,'2021-03-05 18:34:23','2021-03-05 18:34:23',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4iLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE1MDI2ODAzLCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQ0MjEwMDN9.06Z57_2EfAafWTKPZV8yAvlUywUirivRmaacM9wWyYA'),(111,'2021-03-05 18:34:35','2021-03-05 18:34:35',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4iLCJCdWZmZXJUaW1lIjo4NjQwMCwiZXhwIjoxNjE1NTQ1MjQ5LCJpc3MiOiJxbVBsdXMiLCJuYmYiOjE2MTQ0MjEwMDN9.dQvo2kou3QrR58Fj7Tyh72T5djybRmS0BE3fc6H7Pe0'),(112,'2021-03-10 19:18:11','2021-03-10 19:18:11',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4xIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNTk2ODY0OSwiaXNzIjoicW1QbHVzIiwibmJmIjoxNjE1MzYyODQ5fQ.aCdfXDgo2JlcqTu6r1t_WnMu5jksV8ZM_iQy0sCopIQ'),(113,'2021-03-10 19:18:20','2021-03-10 19:18:20',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4xIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNTU0NTI3NCwiaXNzIjoicW1QbHVzIiwibmJmIjoxNjE0OTM5NDc0fQ.AkoMY3w_vWON_CnCEu5PFpq9dK7XryvuonDyzJqcsMk'),(114,'2021-03-10 20:01:40','2021-03-10 20:01:40',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4xIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNTk3OTkwMCwiaXNzIjoicW1QbHVzIiwibmJmIjoxNjE1Mzc0MTAwfQ.agNiDzRz3Mxnz7aAWSLx7yoVj5VNMR-GaruW_CD1lcE'),(115,'2021-03-10 20:04:25','2021-03-10 20:04:25',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4xIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNTk3OTkwMCwiaXNzIjoicW1QbHVzIiwibmJmIjoxNjE1Mzc0MTAwfQ.agNiDzRz3Mxnz7aAWSLx7yoVj5VNMR-GaruW_CD1lcE'),(116,'2021-03-10 20:54:48','2021-03-10 20:54:48',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4xIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNTk4MjY2NCwiaXNzIjoicW1QbHVzIiwibmJmIjoxNjE1Mzc2ODY0fQ.IdClYRNK9TlkZqAelkXbKCrrMiIf9ziRnL76GflXSG8'),(117,'2021-03-12 18:33:18','2021-03-12 18:33:18',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4xIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNTk4NTY4OCwiaXNzIjoicW1QbHVzIiwibmJmIjoxNjE1Mzc5ODg4fQ.jkYrRrfw4Rk9d5i1NKTEMUFJXmn8ubKtySHIWsYy61Q'),(118,'2021-03-12 18:33:31','2021-03-12 18:33:31',NULL,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6MTIsIk1vYmlsZSI6IjE4Nzk4MjcyMDU0IiwiTmlja25hbWUiOiJ0ZXN0YWRtaW4xIiwiQnVmZmVyVGltZSI6ODY0MDAsImV4cCI6MTYxNTk4NTY4OCwiaXNzIjoicW1QbHVzIiwibmJmIjoxNjE1Mzc5ODg4fQ.jkYrRrfw4Rk9d5i1NKTEMUFJXmn8ubKtySHIWsYy61Q');
+
+/*Table structure for table `messages_list` */
+
+DROP TABLE IF EXISTS `messages_list`;
+
+CREATE TABLE `messages_list` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `type` tinyint DEFAULT '1' COMMENT '1 私聊 ，2 群聊',
+  `user_id` int DEFAULT '0' COMMENT '用户id',
+  `friend_id` int DEFAULT '0' COMMENT '朋友id',
+  `group_id` int DEFAULT '0' COMMENT '群id',
+  `unread_num` int DEFAULT '0' COMMENT '是否已经查看',
+  `msg_text` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '消息内容',
+  `online` tinyint(1) DEFAULT '0' COMMENT '在线状态',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `index_id` (`group_id`,`user_id`,`type`,`friend_id`) USING BTREE,
+  KEY `index_group` (`group_id`),
+  KEY `index_friend` (`friend_id`),
+  KEY `index_user` (`user_id`),
+  KEY `index_type` (`type`),
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `messages_list` */
+
+insert  into `messages_list`(`id`,`created_at`,`updated_at`,`deleted_at`,`type`,`user_id`,`friend_id`,`group_id`,`unread_num`,`msg_text`,`online`) values (12,'2021-03-03 18:47:29','2021-03-03 18:47:29',NULL,2,12,0,1111,0,'新年快乐！！',0),(13,'2021-03-03 18:50:45','2021-03-03 18:50:45',NULL,1,12,13,0,0,'同乐！同乐！！',0),(14,'2021-03-12 18:32:10','2021-03-12 18:32:10',NULL,1,13,12,0,0,'567',1);
+
+/*Table structure for table `sys_user` */
+
+DROP TABLE IF EXISTS `sys_user`;
+
+CREATE TABLE `sys_user` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `gender` tinyint DEFAULT '1' COMMENT '状态:1=男，0=女',
+  `nickname` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户昵称',
+  `email` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户邮箱',
+  `motto` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '个性签名',
+  `avatar` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'http://img.wxcha.com/m00/b0/2b/65252be5c6e7e8ace4458e517cb5ad08.jpg' COMMENT '用户头像',
+  `mobile` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用户手机号',
+  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '登录密码',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `index_mobile` (`mobile`),
+  KEY `idx_users_deleted_at` (`deleted_at`) USING BTREE,
+  KEY `idx_sys_user_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `sys_user` */
+
+insert  into `sys_user`(`id`,`created_at`,`updated_at`,`deleted_at`,`gender`,`nickname`,`email`,`motto`,`avatar`,`mobile`,`password`) values (12,NULL,NULL,NULL,2,'testadmin1','amdin@gimail.com','你好啊1','http://qmplusimg.henrongyi.top/head.png','18798272054','0192023a7bbd73250516f069df18b500'),(13,NULL,NULL,NULL,1,'小燕子','','飞翔','https://img2.woyaogexing.com/2021/02/24/e12f252aa4c24a7695ca34264faa5f15!400x400.jpeg','18798272055','0192023a7bbd73250516f069df18b500'),(15,NULL,NULL,NULL,-1,'尔康','','心里只爱紫薇','http://qmplusimg.henrongyi.top/head.png','18798272056','0192023a7bbd73250516f069df18b500');
+
+/*Table structure for table `talk_list` */
+
+DROP TABLE IF EXISTS `talk_list`;
+
+CREATE TABLE `talk_list` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `source` tinyint DEFAULT '1' COMMENT '群 还是 私聊',
+  `msg_type` int DEFAULT '0' COMMENT '消息类型 1 文字 5 代码 2 图片',
+  `receive_id` int DEFAULT '0' COMMENT '接收人或者群id',
+  `is_revoke` int DEFAULT '0' COMMENT '是否是好友请求消息',
+  `user_id` int DEFAULT '0' COMMENT '好友id',
+  `content` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '消息内容',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `index_msg_type_id` (`msg_type`),
+  KEY `index_source_id` (`source`),
+  KEY `index_receive_id` (`receive_id`),
+  KEY `index_user_id` (`user_id`),
+  KEY `idx_messages_list_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+
+/*Data for the table `talk_list` */
+
+insert  into `talk_list`(`id`,`created_at`,`updated_at`,`deleted_at`,`source`,`msg_type`,`receive_id`,`is_revoke`,`user_id`,`content`) values (12,NULL,NULL,NULL,1,0,0,0,0,''),(13,'2021-02-27 20:03:06',NULL,NULL,1,1,12,0,13,'你好'),(14,'2021-02-28 20:03:06',NULL,NULL,1,1,12,0,13,'你好个鬼'),(15,'2021-02-21 20:03:06',NULL,NULL,2,1,1111,0,13,'新年快乐！！'),(16,'2021-03-04 20:03:06',NULL,NULL,1,1,13,0,12,'同乐！同乐！！'),(17,'2021-03-09 17:57:35','2021-03-09 17:57:35',NULL,1,1,13,0,12,'asdfsa'),(18,'2021-03-09 17:58:29','2021-03-09 17:58:29',NULL,1,1,13,0,12,'asdfasfdf'),(19,'2021-03-09 18:02:28','2021-03-09 18:02:28',NULL,1,1,13,0,12,'asdfasdf'),(20,'2021-03-09 18:03:38','2021-03-09 18:03:38',NULL,1,1,13,0,12,'1`2431242134'),(21,'2021-03-09 18:10:24','2021-03-09 18:10:24',NULL,1,1,13,0,12,'sadfa'),(22,'2021-03-09 18:10:35','2021-03-09 18:10:35',NULL,1,1,13,0,12,'567'),(23,'2021-03-09 18:11:28','2021-03-09 18:11:28',NULL,1,1,13,0,12,'你好'),(24,'2021-03-09 18:11:41','2021-03-09 18:11:41',NULL,1,1,13,0,12,'你好'),(25,'2021-03-09 18:11:48','2021-03-09 18:11:48',NULL,1,1,13,0,12,'你好啊'),(26,'2021-03-09 18:12:50','2021-03-09 18:12:50',NULL,1,1,13,0,12,'asdf'),(27,'2021-03-09 18:13:36','2021-03-09 18:13:36',NULL,1,1,13,0,12,'123456'),(28,'2021-03-09 18:14:50','2021-03-09 18:14:50',NULL,1,1,13,0,12,'11111'),(29,'2021-03-09 18:17:26','2021-03-09 18:17:26',NULL,1,1,13,0,12,'444'),(30,'2021-03-09 18:17:52','2021-03-09 18:17:52',NULL,1,1,13,0,12,'222'),(31,'2021-03-09 18:18:02','2021-03-09 18:18:02',NULL,1,1,13,0,12,'666'),(32,'2021-03-09 18:18:42','2021-03-09 18:18:42',NULL,1,2,13,0,12,''),(33,'2021-03-09 18:20:02','2021-03-09 18:20:02',NULL,1,2,13,0,12,''),(34,'2021-03-09 18:56:09','2021-03-09 18:56:09',NULL,1,1,13,0,12,'[便便]'),(35,'2021-03-09 18:56:23','2021-03-09 18:56:23',NULL,1,2,13,0,12,''),(36,'2021-03-09 19:03:42','2021-03-09 19:03:42',NULL,1,2,13,0,12,''),(37,'2021-03-09 19:34:20','2021-03-09 19:34:20',NULL,1,1,13,0,12,'sdf'),(38,'2021-03-09 19:34:27','2021-03-09 19:34:27',NULL,1,1,13,0,12,'265151'),(39,'2021-03-09 19:34:45','2021-03-09 19:34:45',NULL,1,1,13,0,12,'841651'),(40,'2021-03-09 19:34:50','2021-03-09 19:34:50',NULL,1,1,13,0,12,'[便便]'),(41,'2021-03-10 19:40:09','2021-03-10 19:40:09',NULL,1,2,13,0,12,''),(42,'2021-03-11 15:33:40','2021-03-11 15:33:40',NULL,1,2,13,0,12,''),(43,'2021-03-11 15:37:47','2021-03-11 15:37:47',NULL,1,2,13,0,12,''),(44,'2021-03-11 15:43:12','2021-03-11 15:43:12',NULL,1,2,13,0,12,''),(45,'2021-03-11 15:45:39','2021-03-11 15:45:39',NULL,1,2,13,0,12,''),(46,'2021-03-11 15:47:47','2021-03-11 15:47:47',NULL,1,2,13,0,12,''),(47,'2021-03-11 15:54:55','2021-03-11 15:54:55',NULL,1,2,13,0,12,''),(48,'2021-03-11 15:56:27','2021-03-11 15:56:27',NULL,1,2,13,0,12,''),(49,'2021-03-11 15:57:43','2021-03-11 15:57:43',NULL,1,2,13,0,12,''),(50,'2021-03-11 16:45:34','2021-03-11 16:45:34',NULL,1,2,13,0,12,''),(51,'2021-03-11 19:59:57','2021-03-11 19:59:57',NULL,2,1,1111,0,12,'123'),(52,'2021-03-11 20:05:44','2021-03-11 20:05:44',NULL,2,1,1111,0,12,'123'),(53,'2021-03-11 20:06:30','2021-03-11 20:06:30',NULL,2,1,1111,0,12,'sadf'),(54,'2021-03-11 20:07:29','2021-03-11 20:07:29',NULL,2,1,1111,0,12,'sdf'),(55,'2021-03-11 20:07:36','2021-03-11 20:07:36',NULL,2,1,1111,0,12,'lalalal'),(56,'2021-03-11 20:07:44','2021-03-11 20:07:44',NULL,2,1,1111,0,12,'sadfasdf'),(57,'2021-03-11 20:43:31','2021-03-11 20:43:31',NULL,2,1,1111,0,12,'xx'),(58,'2021-03-11 20:45:35','2021-03-11 20:45:35',NULL,2,1,1111,0,12,'asdf'),(59,'2021-03-11 20:47:27','2021-03-11 20:47:27',NULL,2,1,1111,0,12,'asdf'),(60,'2021-03-11 20:47:46','2021-03-11 20:47:46',NULL,2,1,1111,0,12,'sdf'),(61,'2021-03-11 20:48:06','2021-03-11 20:48:06',NULL,2,1,1111,0,12,'123'),(62,'2021-03-11 20:48:11','2021-03-11 20:48:11',NULL,2,1,1111,0,12,'457'),(63,'2021-03-11 20:48:14','2021-03-11 20:48:14',NULL,2,1,1111,0,12,'aasdfads'),(64,'2021-03-11 20:48:15','2021-03-11 20:48:15',NULL,2,1,1111,0,12,'sadfsadfsd'),(65,'2021-03-11 20:48:16','2021-03-11 20:48:16',NULL,2,1,1111,0,12,'sdfasdf'),(66,'2021-03-11 20:48:17','2021-03-11 20:48:17',NULL,2,1,1111,0,12,'asdf'),(67,'2021-03-11 20:48:21','2021-03-11 20:48:21',NULL,2,1,1111,0,12,'asd'),(68,'2021-03-11 20:48:25','2021-03-11 20:48:25',NULL,1,1,13,0,12,'sadf'),(69,'2021-03-11 20:48:30','2021-03-11 20:48:30',NULL,1,1,13,0,12,'sad'),(70,'2021-03-11 20:48:44','2021-03-11 20:48:44',NULL,1,1,13,0,12,'sad'),(71,'2021-03-11 20:48:50','2021-03-11 20:48:50',NULL,2,1,1111,0,12,'sdfasdf'),(72,'2021-03-11 20:48:53','2021-03-11 20:48:53',NULL,2,1,1111,0,12,'[瓢虫]'),(73,'2021-03-11 20:49:36','2021-03-11 20:49:36',NULL,1,1,13,0,12,'sadfasdfsdafsf'),(74,'2021-03-11 20:49:56','2021-03-11 20:49:56',NULL,2,2,1111,0,12,''),(75,'2021-03-11 20:50:16','2021-03-11 20:50:16',NULL,1,2,13,0,12,''),(76,'2021-03-12 13:34:47','2021-03-12 13:34:47',NULL,1,1,13,0,12,'123'),(77,'2021-03-12 13:34:58','2021-03-12 13:34:58',NULL,1,1,13,0,12,'123'),(78,'2021-03-12 18:05:42','2021-03-12 18:05:42',NULL,1,1,13,0,12,'123'),(79,'2021-03-12 18:06:23','2021-03-12 18:06:23',NULL,1,1,13,0,12,'asdf'),(80,'2021-03-12 18:06:39','2021-03-12 18:06:39',NULL,1,1,13,0,12,'sdfasf'),(81,'2021-03-12 18:07:24','2021-03-12 18:07:24',NULL,1,1,13,0,12,'asdfadsf'),(82,'2021-03-12 18:09:11','2021-03-12 18:09:11',NULL,1,1,13,0,12,'asdf'),(83,'2021-03-12 18:29:57','2021-03-12 18:29:57',NULL,1,1,13,0,12,'sadf'),(84,'2021-03-12 18:30:22','2021-03-12 18:30:22',NULL,1,1,13,0,12,'asdf'),(85,'2021-03-12 18:30:31','2021-03-12 18:30:31',NULL,1,1,13,0,12,'123'),(86,'2021-03-12 18:30:34','2021-03-12 18:30:34',NULL,1,1,13,0,12,'567'),(87,'2021-03-12 18:32:13','2021-03-12 18:32:13',NULL,0,1,0,0,0,''),(88,'2021-03-12 18:32:15','2021-03-12 18:32:15',NULL,1,1,12,0,13,'12312313'),(89,'2021-03-12 18:32:50','2021-03-12 18:32:50',NULL,0,1,0,0,0,''),(90,'2021-03-12 18:32:50','2021-03-12 18:32:50',NULL,1,1,12,0,13,'123'),(91,'2021-03-12 18:32:59','2021-03-12 18:32:59',NULL,1,1,13,0,12,'123'),(92,'2021-03-12 18:33:10','2021-03-12 18:33:10',NULL,1,1,13,0,12,'asdf'),(93,'2021-03-12 18:33:15','2021-03-12 18:33:15',NULL,0,1,0,0,0,''),(94,'2021-03-12 18:33:36','2021-03-12 18:33:36',NULL,0,1,0,0,0,''),(95,'2021-03-12 18:33:37','2021-03-12 18:33:37',NULL,1,1,13,0,12,'123'),(96,'2021-03-12 18:33:45','2021-03-12 18:33:45',NULL,0,1,0,0,0,''),(97,'2021-03-12 18:33:46','2021-03-12 18:33:46',NULL,1,1,13,0,12,'111111'),(98,'2021-03-12 18:33:47','2021-03-12 18:33:47',NULL,0,1,0,0,0,''),(99,'2021-03-12 18:35:25','2021-03-12 18:35:25',NULL,0,1,0,0,0,''),(100,'2021-03-12 18:35:31','2021-03-12 18:35:31',NULL,0,1,0,0,0,''),(101,'2021-03-12 18:35:31','2021-03-12 18:35:31',NULL,1,1,12,0,13,'123'),(102,'2021-03-12 18:35:40','2021-03-12 18:35:40',NULL,0,1,0,0,0,''),(103,'2021-03-12 18:35:41','2021-03-12 18:35:41',NULL,1,1,13,0,12,'123'),(104,'2021-03-12 18:35:43','2021-03-12 18:35:43',NULL,0,1,0,0,0,''),(105,'2021-03-12 18:35:49','2021-03-12 18:35:49',NULL,0,1,0,0,0,''),(106,'2021-03-12 18:35:51','2021-03-12 18:35:51',NULL,1,1,12,0,13,'234234'),(107,'2021-03-12 18:36:01','2021-03-12 18:36:01',NULL,0,1,0,0,0,''),(108,'2021-03-12 18:36:02','2021-03-12 18:36:02',NULL,1,1,13,0,12,'wdfadfsafd'),(109,'2021-03-12 18:36:09','2021-03-12 18:36:09',NULL,0,1,0,0,0,''),(110,'2021-03-12 18:36:10','2021-03-12 18:36:10',NULL,1,1,12,0,13,'dfasdfasf'),(111,'2021-03-12 18:36:11','2021-03-12 18:36:11',NULL,0,1,0,0,0,''),(112,'2021-03-12 18:39:59','2021-03-12 18:39:59',NULL,0,1,0,0,0,''),(113,'2021-03-12 18:40:01','2021-03-12 18:40:01',NULL,1,1,13,0,12,'123'),(114,'2021-03-12 18:40:13','2021-03-12 18:40:13',NULL,0,1,0,0,0,''),(115,'2021-03-12 18:40:42','2021-03-12 18:40:42',NULL,0,1,0,0,0,''),(116,'2021-03-12 18:40:43','2021-03-12 18:40:43',NULL,1,1,13,0,12,'123'),(117,'2021-03-12 18:41:27','2021-03-12 18:41:27',NULL,0,1,0,0,0,''),(118,'2021-03-12 18:41:28','2021-03-12 18:41:28',NULL,1,1,13,0,12,'123'),(119,'2021-03-12 18:41:37','2021-03-12 18:41:37',NULL,0,1,0,0,0,''),(120,'2021-03-12 18:41:39','2021-03-12 18:41:39',NULL,1,1,12,0,13,'1231231323'),(121,'2021-03-12 18:41:42','2021-03-12 18:41:42',NULL,0,1,0,0,0,''),(122,'2021-03-12 18:41:43','2021-03-12 18:41:43',NULL,1,1,13,0,12,'refgswfasdf'),(123,'2021-03-12 18:41:46','2021-03-12 18:41:46',NULL,0,1,0,0,0,''),(124,'2021-03-12 18:41:50','2021-03-12 18:41:50',NULL,2,1,1111,0,12,'sdfasdf'),(125,'2021-03-12 18:43:39','2021-03-12 18:43:39',NULL,1,2,12,0,13,''),(126,'2021-03-12 18:44:04','2021-03-12 18:44:04',NULL,2,1,1111,0,12,'fsadasf'),(127,'2021-03-12 18:44:16','2021-03-12 18:44:16',NULL,1,2,12,0,13,''),(128,'2021-03-12 18:56:46','2021-03-12 18:56:46',NULL,2,2,1111,0,12,'');
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

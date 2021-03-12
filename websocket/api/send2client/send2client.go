@@ -2,10 +2,11 @@ package send2client
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/woodylan/go-websocket/api"
 	"github.com/woodylan/go-websocket/define/retcode"
 	"github.com/woodylan/go-websocket/servers"
-	"net/http"
 )
 
 type Controller struct {
@@ -15,7 +16,7 @@ type inputData struct {
 	ClientId   string `json:"clientId" validate:"required"`
 	SendUserId string `json:"sendUserId"`
 	Code       int    `json:"code"`
-	Msg        string `json:"msg"`
+	Event      string `json:"event"`
 	Data       string `json:"data"`
 }
 
@@ -33,8 +34,8 @@ func (c *Controller) Run(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//发送信息
-	messageId := servers.SendMessage2Client(inputData.ClientId, inputData.SendUserId, inputData.Code, inputData.Msg, &inputData.Data)
-
+	
+	messageId := servers.SendMessage2Client(inputData.ClientId, inputData.SendUserId, inputData.Code, inputData.Event, &inputData.Data)
 	api.Render(w, retcode.SUCCESS, "success", map[string]string{
 		"messageId": messageId,
 	})

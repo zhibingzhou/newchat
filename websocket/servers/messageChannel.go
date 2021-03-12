@@ -24,16 +24,23 @@ type DRequest struct {
 }
 
 type DResult struct {
-	Status   int    `json:"status"`
-	Received []int  `json:"received"`
-	Event    string `json:"event"`
-	ResponseEvenTalk
+	Status       int              `json:"status"`
+	Receivedlist []int            `json:"received"`
+	Event        string           `json:"event"`
+	DataResponse ResponseEvenTalk `json:"data"`
 }
 
-type ReponseWeb struct {
-	Code int                 `json:"code"`
-	Data MessageInformaction `json:"data"`
-	Msg  string              `json:"msg"`
+//接收参数
+type ReponseFromWeb struct {
+	Code int                `json:"code"`
+	Data ReponseFromWebData `json:"data"`
+	Msg  string             `json:"msg"`
+}
+
+type ReponseFromWebData struct {
+	Messagedata  ResponseEvenTalk `json:"messagedata"`
+	Receive_list []int            `json:"receive_list"`
+	Event        string           `json:"event"`
 }
 
 func NewChannel_Pool(count int) *Channel_Pool {
@@ -138,16 +145,17 @@ func (d DRequest) Run() DResult {
 		return result
 	}
 	result.Status = 200
-	result.Send_user = eventalk.Send_user
-	result.Source_type, _ = strconv.Atoi(eventalk.Source_type)
+	result.DataResponse.Send_user = eventalk.Send_user
+	result.DataResponse.Source_type, _ = strconv.Atoi(eventalk.Source_type)
 	result.Event = eventalk.Msg_type
-	result.Receive_user, _ = strconv.Atoi(eventalk.Receive_user)
-	var reponseweb ReponseWeb
+	result.DataResponse.Receive_user, _ = strconv.Atoi(eventalk.Receive_user)
+	var reponseweb ReponseFromWeb
 	_ = json.Unmarshal(rep, &reponseweb)
 	if reponseweb.Code == 200 {
-		result.Data = reponseweb.Data
+		fmt.Println(string(rep))
+		result.DataResponse.Data = reponseweb.Data.Messagedata.Data
+		result.Receivedlist = reponseweb.Data.Receive_list
 	}
-	fmt.Println(result.Data)
 	return result
 }
 
@@ -170,38 +178,39 @@ func MessageGetResult() {
 }
 
 func SendMessage(rep DResult) {
-	switch rep.Source_type {
+	switch rep.DataResponse.Source_type {
 	case 1:
-		userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, fmt.Sprintf("%d", rep.Receive_user)).Result()
+		userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, fmt.Sprintf("%d", rep.DataResponse.Receive_user)).Result()
 		if userstatus == "1" {
-			client, _ := redis.RedisDB.HGet(redis.UserIdClient, fmt.Sprintf("%d", rep.Receive_user)).Result()
+			client, _ := redis.RedisDB.HGet(redis.UserIdClient, fmt.Sprintf("%d", rep.DataResponse.Receive_user)).Result()
 			if client != "" {
-				evenTalk, _ := json.Marshal(rep.ResponseEvenTalk)
+				evenTalk, _ := json.Marshal(rep.DataResponse)
 				result := string(evenTalk)
 				SendMessage2Client(client, "0", 200, rep.Event, &result)
 			}
 		}
+
+		client, _ := redis.RedisDB.HGet(redis.UserIdClient, fmt.Sprintf("%d", rep.DataResponse.Send_user)).Result()
+		if client != "" {
+			evenTalk, _ := json.Marshal(rep.DataResponse)
+			result := string(evenTalk)
+			SendMessage2Client(client, "0", 200, rep.Event, &result)
+		}
+
 	case 2:
-		if len(rep.Received) > 0 { //组
-			for _, value := range rep.Received {
+		if len(rep.Receivedlist) > 0 { //组
+			for _, value := range rep.Receivedlist {
 				userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, fmt.Sprintf("%d", value)).Result()
 				if userstatus == "1" {
 					client, _ := redis.RedisDB.HGet(redis.UserIdClient, fmt.Sprintf("%d", value)).Result()
 					if client != "" {
-						evenTalk, _ := json.Marshal(rep.ResponseEvenTalk)
+						evenTalk, _ := json.Marshal(rep.DataResponse)
 						result := string(evenTalk)
 						SendMessage2Client(client, "0", 200, rep.Event, &result)
 					}
 				}
 			}
 		}
-	}
-
-	client, _ := redis.RedisDB.HGet(redis.UserIdClient, fmt.Sprintf("%d", rep.Data.User_id)).Result()
-	if client != "" {
-		evenTalk, _ := json.Marshal(rep.ResponseEvenTalk)
-		result := string(evenTalk)
-		SendMessage2Client(client, "0", 200, rep.Event, &result)
 	}
 
 }

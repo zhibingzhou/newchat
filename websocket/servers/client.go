@@ -53,3 +53,7 @@ func (c *Client) Read() {
 		}
 	}()
 }
+
+func WebSendMessage(message []byte) {
+	MessageChannel.Request <- DRequest{Message: message}
+}

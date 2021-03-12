@@ -1,7 +1,0 @@
-[newchat]2021/02/17 - 13:25:30.153	[34minfo[0m	d:/zhou/src/chat/server/initialize/gorm.go:63	register table success
-[newchat]2021/02/17 - 13:25:30.168	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:22	use middleware logger
-[newchat]2021/02/17 - 13:25:30.169	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:25	use middleware cors
-[newchat]2021/02/17 - 13:25:30.169	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:27	register swagger handler
-[newchat]2021/02/17 - 13:25:30.175	[34minfo[0m	d:/zhou/src/chat/server/initialize/router.go:55	router register success
-[newchat]2021/02/17 - 13:25:30.176	[34minfo[0m	d:/zhou/src/chat/server/core/server.go:29	server run success on 	{"address": ":8888"}
-[newchat]2021/02/17 - 20:52:14.928	[31merror[0m	d:/zhou/src/chat/server/api/v1/sys_user.go:35	登陆失败! 用户名不存在或者密码错误	{"err": "record not found"}

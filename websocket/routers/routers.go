@@ -33,7 +33,7 @@ func Init() {
 	http.HandleFunc("/api/bind_to_group", AccessTokenMiddleware(bindToGroupHandler.Run))
 	http.HandleFunc("/api/get_online_list", AccessTokenMiddleware(getGroupListHandler.Run))
 	http.HandleFunc("/api/close_client", AccessTokenMiddleware(closeClientHandler.Run))
-	http.HandleFunc("/send_message", AccessTokenMiddleware(websendtoclientHandler.Run))
+	http.HandleFunc("/send_message", WebTokenMiddleware(websendtoclientHandler.Run))
 
 	servers.StartWebSocket()
 

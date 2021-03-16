@@ -1,6 +1,7 @@
 package servers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -65,7 +66,8 @@ func (c *Controller) Run(w http.ResponseWriter, r *http.Request) {
 
 	//读取客户端消息
 	clientSocket.Read()
-
+    
+	fmt.Println("存信息，clientId")
 	//保存user信息
 	redis.RedisDB.HSet(redis.UserIdClient, uid, clientId)
 	redis.RedisDB.HSet(redis.UserIdSystem, uid, systemId)

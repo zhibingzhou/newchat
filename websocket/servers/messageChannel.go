@@ -133,11 +133,11 @@ func (d DRequest) Run() DResult {
 	var eventalk RequestEvenTalk
 	var result DResult
 	err := json.Unmarshal(d.Message, &eventalk)
-	if err != nil {
+	if err != nil || eventalk.Msg_type == "" {
 		result.Status = 0
 		return result
 	}
-
+	fmt.Println(eventalk)
 	url := setting.CommonSetting.Weburl + "/even_talk"
 	err, rep := util.HttPRquest(url, d.Message)
 	if err != nil {
@@ -152,7 +152,6 @@ func (d DRequest) Run() DResult {
 	var reponseweb ReponseFromWeb
 	_ = json.Unmarshal(rep, &reponseweb)
 	if reponseweb.Code == 200 {
-		fmt.Println(string(rep))
 		result.DataResponse.Data = reponseweb.Data.Messagedata.Data
 		result.Receivedlist = reponseweb.Data.Receive_list
 	}

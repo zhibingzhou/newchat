@@ -39,6 +39,17 @@ type MessageFile struct {
 }
 
 type File struct {
+	Id            int    `json:"id"`
+	Save_type     int    `json:"save_type"  gorm:"comment:保存类型"`
+	Record_id     int    `json:"record_id"  gorm:"comment:消息id"`
+	User_id       int    `json:"user_id"  gorm:"comment:用户id"`
+	File_source   int    `json:"file_source"  gorm:"comment:群聊，还是私聊"`
+	File_type     int    `json:"file_type"  gorm:"comment:消息id"`
+	File_size     int    `json:"file_size"  gorm:"comment:文件大小"`
+	Original_name string `json:"original_name"  gorm:"comment:文件名称"`
+	File_suffix   string `json:"file_suffix"  gorm:"comment:文件扩展名"`
+	Save_dir      string `json:"save_dir"  gorm:"comment:保存路径"`
+	File_url      string `json:"file_url"  gorm:"comment:文件url"`
 }
 
 type Code_block struct {

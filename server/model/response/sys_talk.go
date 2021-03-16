@@ -8,7 +8,7 @@ import (
 type ResponseMessages_list struct {
 	Id          int       `json:"id" gorm:"primarykey"`
 	UpdatedAt   time.Time `json:"updated_at" gorm:"comment:更新时间"`
-	Type        int       `json:"type"  gorm:"comment:1 私聊 ，2 群聊"`
+	Type        int       `json:"type"  gorm:"comment:消息类型1 文字 5 代码 2 图片"`
 	Friend_id   int       `json:"friend_id" gorm:"comment:好友id"`
 	Group_id    int       `json:"group_id"  gorm:"comment:群ID"`
 	Not_disturb int       `json:"not_disturb" gorm:"comment:是否开启免打扰"`

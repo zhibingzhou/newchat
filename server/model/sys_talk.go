@@ -13,6 +13,7 @@ import (
 // 如果含有time.Time 请自行import time包
 type Messages_list struct {
 	global.GVA_MODEL
+	Status     int    `json:"status"  gorm:"comment:0删除 1显示"`
 	Type       int    `json:"type"  gorm:"comment:1 私聊 ，2 群聊"`
 	Friend_id  int    `json:"friend_id" gorm:"comment:好友id"`
 	Group_id   int    `json:"group_id"  gorm:"comment:群ID"`

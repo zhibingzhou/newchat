@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"newchat/global"
 	"newchat/model/request"
 	"newchat/model/response"
@@ -14,6 +15,7 @@ import (
 func EvenTalk(c *gin.Context) {
 	var requesteventalk request.RequestEvenTalk
 	_ = c.ShouldBindJSON(&requesteventalk)
+	fmt.Println(requesteventalk)
 	send_id := requesteventalk.Send_user
 	received_id := requesteventalk.Receive_user //
 	source := requesteventalk.Source_type       //是否群聊

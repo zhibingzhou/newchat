@@ -66,12 +66,13 @@ func (c *Controller) Run(w http.ResponseWriter, r *http.Request) {
 
 	//读取客户端消息
 	clientSocket.Read()
-    
-	fmt.Println("存信息，clientId")
+
+	fmt.Println("存信息，clientId", uid, clientId)
 	//保存user信息
 	redis.RedisDB.HSet(redis.UserIdClient, uid, clientId)
 	redis.RedisDB.HSet(redis.UserIdSystem, uid, systemId)
 	redis.RedisDB.HSet(redis.UserStatus, uid, "1")
+	
 
 	if err = api.ConnRender(conn, renderData{ClientId: clientId}); err != nil {
 		_ = conn.Close()

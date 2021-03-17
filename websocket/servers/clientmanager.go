@@ -3,6 +3,7 @@ package servers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -77,10 +78,10 @@ func (manager *ClientManager) EventDisconnect(client *Client) {
 		"userId":   client.UserId,
 		"extend":   client.Extend,
 	})
-
+	fmt.Println("删除---", client.UserId)
 	// abc := []string{"12", "13"}
-	redis.RedisDB.Del(redis.UserIdClient, client.UserId)
-	redis.RedisDB.Del(redis.UserIdSystem, client.UserId)
+	redis.RedisDB.HDel(redis.UserIdClient, redis.UserIdClient)
+	redis.RedisDB.HDel(redis.UserIdSystem, client.UserId)
 	redis.RedisDB.HSet(redis.UserStatus, client.UserId, "0")
 	// aaa, _ := redis.RedisDB.HMGet(redis.UserStatus, abc...).Result()
 	// fmt.Println(aaa)

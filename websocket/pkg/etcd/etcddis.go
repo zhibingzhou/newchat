@@ -5,8 +5,8 @@ import (
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/mvcc/mvccpb"
 	log "github.com/sirupsen/logrus"
-	"github.com/woodylan/go-websocket/pkg/setting"
 	"time"
+	"websocket/pkg/setting"
 )
 
 type ClientDis struct {

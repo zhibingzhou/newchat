@@ -9,9 +9,9 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
-	"github.com/woodylan/go-websocket/define/retcode"
 	"gopkg.in/go-playground/validator.v9"
 	zh2 "gopkg.in/go-playground/validator.v9/translations/zh"
+	"websocket/define/retcode"
 )
 
 type RetData struct {
@@ -23,9 +23,9 @@ type RetData struct {
 
 func ConnRender(conn *websocket.Conn, data interface{}) (err error) {
 	err = conn.WriteJSON(RetData{
-		Code: retcode.SUCCESS,
-		Msg:  "success",
-		Data: data,
+		Code:  retcode.SUCCESS,
+		Msg:   "success",
+		Data:  data,
 		Event: "connect",
 	})
 

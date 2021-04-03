@@ -6,10 +6,10 @@ import (
 
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
-	"github.com/woodylan/go-websocket/api"
-	"github.com/woodylan/go-websocket/define/retcode"
-	"github.com/woodylan/go-websocket/pkg/redis"
-	"github.com/woodylan/go-websocket/tools/util"
+	"websocket/api"
+	"websocket/define/retcode"
+	"websocket/pkg/redis"
+	"websocket/tools/util"
 )
 
 const (
@@ -72,7 +72,6 @@ func (c *Controller) Run(w http.ResponseWriter, r *http.Request) {
 	redis.RedisDB.HSet(redis.UserIdClient, uid, clientId)
 	redis.RedisDB.HSet(redis.UserIdSystem, uid, systemId)
 	redis.RedisDB.HSet(redis.UserStatus, uid, "1")
-	
 
 	if err = api.ConnRender(conn, renderData{ClientId: clientId}); err != nil {
 		_ = conn.Close()

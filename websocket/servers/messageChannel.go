@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/woodylan/go-websocket/pkg/redis"
-	"github.com/woodylan/go-websocket/pkg/setting"
-	"github.com/woodylan/go-websocket/tools/util"
+	"websocket/pkg/redis"
+	"websocket/pkg/setting"
+	"websocket/tools/util"
 )
 
 var MessageChannel *Channel_Pool

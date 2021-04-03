@@ -8,10 +8,10 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/woodylan/go-websocket/define/retcode"
-	"github.com/woodylan/go-websocket/pkg/redis"
-	"github.com/woodylan/go-websocket/pkg/setting"
-	"github.com/woodylan/go-websocket/tools/util"
+	"websocket/define/retcode"
+	"websocket/pkg/redis"
+	"websocket/pkg/setting"
+	"websocket/tools/util"
 )
 
 // 连接管理

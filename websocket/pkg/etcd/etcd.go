@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/coreos/etcd/clientv3"
 	log "github.com/sirupsen/logrus"
-	"github.com/woodylan/go-websocket/pkg/setting"
 	"sync"
 	"time"
+	"websocket/pkg/setting"
 )
 
 var etcdKvClient *clientv3.Client

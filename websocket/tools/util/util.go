@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	uuid "github.com/satori/go.uuid"
-	"github.com/woodylan/go-websocket/pkg/setting"
-	"github.com/woodylan/go-websocket/tools/crypto"
+	"websocket/pkg/setting"
+	"websocket/tools/crypto"
 )
 
 //GenUUID 生成uuid

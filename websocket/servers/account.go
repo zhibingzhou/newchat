@@ -3,11 +3,11 @@ package servers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/woodylan/go-websocket/define"
-	"github.com/woodylan/go-websocket/pkg/etcd"
-	"github.com/woodylan/go-websocket/tools/util"
 	"sync"
 	"time"
+	"websocket/define"
+	"websocket/pkg/etcd"
+	"websocket/tools/util"
 )
 
 type accountInfo struct {
@@ -57,4 +57,3 @@ func Register(systemId string) (err error) {
 
 	return nil
 }
-

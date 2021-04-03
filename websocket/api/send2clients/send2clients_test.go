@@ -3,12 +3,12 @@ package send2clients
 import (
 	"encoding/json"
 	. "github.com/smartystreets/goconvey/convey"
-	"github.com/woodylan/go-websocket/pkg/setting"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"websocket/pkg/setting"
 )
 
 type testServer struct {

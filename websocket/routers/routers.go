@@ -4,15 +4,15 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/woodylan/go-websocket/api/bind2group"
-	"github.com/woodylan/go-websocket/api/closeclient"
-	"github.com/woodylan/go-websocket/api/getonlinelist"
-	"github.com/woodylan/go-websocket/api/register"
-	"github.com/woodylan/go-websocket/api/send2client"
-	"github.com/woodylan/go-websocket/api/send2clients"
-	"github.com/woodylan/go-websocket/api/send2group"
-	"github.com/woodylan/go-websocket/api/sendtoclient"
-	"github.com/woodylan/go-websocket/servers"
+	"websocket/api/bind2group"
+	"websocket/api/closeclient"
+	"websocket/api/getonlinelist"
+	"websocket/api/register"
+	"websocket/api/send2client"
+	"websocket/api/send2clients"
+	"websocket/api/send2group"
+	"websocket/api/sendtoclient"
+	"websocket/servers"
 )
 
 func Init() {

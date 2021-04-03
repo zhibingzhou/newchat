@@ -3,18 +3,18 @@ package redis
 import (
 	"log"
 
-	"github.com/woodylan/go-websocket/pkg/setting"
+	"websocket/pkg/setting"
 
 	"github.com/go-redis/redis/v7"
 )
 
 var RedisDB *redis.Client
 
-var UserIdClient = "user_Client" 
+var UserIdClient = "user_Client"
 
 var UserIdSystem = "user_System"
 
-var UserStatus = "user_Online" 
+var UserStatus = "user_Online"
 
 func InitRedis() *redis.Client {
 
@@ -27,6 +27,6 @@ func InitRedis() *redis.Client {
 	if err != nil {
 		log.Fatalln(err)
 	}
-    RedisDB = client
+	RedisDB = client
 	return client
 }

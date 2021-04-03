@@ -3,11 +3,11 @@ package servers
 import (
 	"context"
 	log "github.com/sirupsen/logrus"
-	"github.com/woodylan/go-websocket/pkg/setting"
-	"github.com/woodylan/go-websocket/servers/pb"
-	"github.com/woodylan/go-websocket/tools/util"
 	"google.golang.org/grpc"
 	"net"
+	"websocket/pkg/setting"
+	"websocket/servers/pb"
+	"websocket/tools/util"
 )
 
 type CommonServiceServer struct{}

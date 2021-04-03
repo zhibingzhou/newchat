@@ -5,8 +5,8 @@ import (
 
 	"github.com/gorilla/websocket"
 	. "github.com/smartystreets/goconvey/convey"
-	"github.com/woodylan/go-websocket/pkg/setting"
-	"github.com/woodylan/go-websocket/tools/util"
+	"websocket/pkg/setting"
+	"websocket/tools/util"
 )
 
 func TestAddClient(t *testing.T) {

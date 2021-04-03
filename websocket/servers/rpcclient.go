@@ -3,10 +3,10 @@ package servers
 import (
 	"context"
 	log "github.com/sirupsen/logrus"
-	"github.com/woodylan/go-websocket/pkg/setting"
-	"github.com/woodylan/go-websocket/servers/pb"
 	"google.golang.org/grpc"
 	"sync"
+	"websocket/pkg/setting"
+	"websocket/servers/pb"
 )
 
 func grpcConn(addr string) *grpc.ClientConn {

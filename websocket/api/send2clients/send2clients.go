@@ -2,10 +2,10 @@ package send2clients
 
 import (
 	"encoding/json"
-	"github.com/woodylan/go-websocket/api"
-	"github.com/woodylan/go-websocket/define/retcode"
-	"github.com/woodylan/go-websocket/servers"
 	"net/http"
+	"websocket/api"
+	"websocket/define/retcode"
+	"websocket/servers"
 )
 
 type Controller struct {

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/woodylan/go-websocket/api"
-	"github.com/woodylan/go-websocket/define/retcode"
-	"github.com/woodylan/go-websocket/servers"
+	"websocket/api"
+	"websocket/define/retcode"
+	"websocket/servers"
 )
 
 type Controller struct {

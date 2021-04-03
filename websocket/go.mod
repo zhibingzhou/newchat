@@ -1,4 +1,4 @@
-module github.com/woodylan/go-websocket
+module websocket
 
 go 1.13
 

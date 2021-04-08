@@ -52,7 +52,7 @@ func TalkRecords(record_id, source, receive_id string, uid int) (err error, reco
 		}
 		break
 	case "2":
-		if receive_id != "0" {
+		if record_id != "0" {
 			err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE receive_id = ? AND user_id = sys_user.`id` AND talk_list.`source` = 2 and talk_list.`id` < ? ORDER BY created_at DESC limit 30 ", receive_id, record_id).Scan(&records.Rows).Error
 		} else {
 			err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE receive_id = ? AND user_id = sys_user.`id` AND talk_list.`source` = 2 ORDER BY created_at DESC limit 30 ", receive_id).Scan(&records.Rows).Error

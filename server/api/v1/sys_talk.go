@@ -49,11 +49,11 @@ func TalkRecords(c *gin.Context) {
 		response.FailWithMessage("获取Uid失败", c)
 	}
 
-	//record_id := c.Query("record_id")
+	record_id := c.Query("record_id")
 	receive_id := c.Query("receive_id")
 	source := c.Query("source")
 
-	err, rep := service.TalkRecords(source, receive_id, uid)
+	err, rep := service.TalkRecords(record_id, source, receive_id, uid)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
@@ -196,7 +196,7 @@ func SendImage(c *gin.Context) {
 		response.FailWithMessage("获取失败", c)
 		return
 	}
-    
+
 	err, data := service.GetTalk_listById(res.ID)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))

@@ -41,14 +41,23 @@ func FindTalk_List(id int) (err error, messages []response.ResponseMessages_list
 //@param: id int
 //@return: err error, user *model.SysUser
 
-func TalkRecords(source, receive_id string, uid int) (err error, records response.ResponseTalkRecords) {
+func TalkRecords(record_id, source, receive_id string, uid int) (err error, records response.ResponseTalkRecords) {
 
 	switch source {
 	case "1":
-		err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE (receive_id = ? OR receive_id = ?)  AND user_id = sys_user.`id`  AND talk_list.`source` = 1 ORDER BY created_at DESC ", uid, receive_id).Scan(&records.Rows).Error
+		if record_id != "0" {
+			err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE (receive_id = ? OR receive_id = ?)  AND user_id = sys_user.`id`  AND talk_list.`source` = 1 and talk_list.`id` < ? ORDER BY created_at DESC limit 30 ", uid, receive_id, record_id).Scan(&records.Rows).Error
+		} else {
+			err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE (receive_id = ? OR receive_id = ?)  AND user_id = sys_user.`id`  AND talk_list.`source` = 1  ORDER BY created_at DESC limit 30 ", uid, receive_id).Scan(&records.Rows).Error
+		}
 		break
 	case "2":
-		err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE receive_id = ? AND user_id = sys_user.`id` AND talk_list.`source` = 2 ORDER BY created_at DESC  ", receive_id).Scan(&records.Rows).Error
+		if receive_id != "0" {
+			err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE receive_id = ? AND user_id = sys_user.`id` AND talk_list.`source` = 2 and talk_list.`id` < ? ORDER BY created_at DESC limit 30 ", receive_id, record_id).Scan(&records.Rows).Error
+		} else {
+			err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE receive_id = ? AND user_id = sys_user.`id` AND talk_list.`source` = 2 ORDER BY created_at DESC limit 30 ", receive_id).Scan(&records.Rows).Error
+		}
+
 		break
 	}
 	if err != nil {
@@ -135,7 +144,7 @@ func TalkCreate(id int, rep request.RequestCreate) (err error, mes response.Resp
 				_, user := FindUserById(friend_id)
 
 				mes = response.ResponseMessages_list{
-					Type:        rep.Type,
+					Type:        1,
 					Friend_id:   friend_id,
 					Group_id:    0,
 					Not_disturb: con.Not_disturb,
@@ -148,7 +157,7 @@ func TalkCreate(id int, rep request.RequestCreate) (err error, mes response.Resp
 				}
 
 				meg := model.Messages_list{
-					Type:      rep.Type,
+					Type:      1,
 					Friend_id: friend_id,
 					Group_id:  0,
 					User_id:   id,
@@ -179,7 +188,7 @@ func TalkCreate(id int, rep request.RequestCreate) (err error, mes response.Resp
 				_, group := FindGroupById(group_id)
 
 				mes = response.ResponseMessages_list{
-					Type:        rep.Type,
+					Type:        2,
 					Friend_id:   0,
 					Group_id:    group_id,
 					Not_disturb: con.Not_disturb,
@@ -192,7 +201,7 @@ func TalkCreate(id int, rep request.RequestCreate) (err error, mes response.Resp
 				}
 
 				meg := model.Messages_list{
-					Type:      rep.Type,
+					Type:      2,
 					Friend_id: 0,
 					Group_id:  group_id,
 					User_id:   id,

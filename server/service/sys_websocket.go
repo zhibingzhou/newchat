@@ -34,18 +34,25 @@ func CreatTalk(send_id int, received_id, source, msg_type, msg string) (err erro
 		return err, rep
 	}
 	if isource == 1 {
-		err = tx.Table("messages_list").Update(map[string]interface{}{
+		err = tx.Table("messages_list").Where(" user_id = ? and friend_id = ? and type = ?", received_id, send_id, isource).Update(map[string]interface{}{
 			"msg_text": msg,
-			"type":   imsg_type,
+			"type":     isource,
 			"status":   1,
-		}).Where(" user_id = ? and friend_id = ?", received_id, send_id).Error
+		}).Error
+		err = tx.Table("messages_list").Debug().Where(" user_id = ? and friend_id = ? and type = ?", send_id, received_id, isource).Update(map[string]interface{}{
+			"msg_text": msg,
+			"type":     isource,
+			"status":   1,
+		}).Error
+	} else {
+		err = tx.Table("messages_list").Debug().Where(" group_id = ? and type = ?", received_id, isource).Update(map[string]interface{}{
+			"msg_text": msg,
+			"type":     isource,
+			"status":   1,
+			"user_id" : send_id,
+		}).Error
 	}
 
-	err = tx.Table("messages_list").Update(map[string]interface{}{
-		"msg_text": msg,
-		"type":   imsg_type,
-		"status":   1,
-	}).Where(" user_id = ? and friend_id = ? ", send_id, received_id).Error
 	if err != nil {
 		tx.Rollback()
 		return err, rep

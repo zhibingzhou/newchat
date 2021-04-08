@@ -308,8 +308,7 @@ export default {
         if (img.complete) {
           datawidth = img.width.toString();
           dataheight = img.height.toString();
-          console.log("sddf1", img.width + 1, img.height);
-          console.log(" here1 ", datawidth, dataheight);
+
 
           let fileData = new FormData();
           fileData.append("img", file);
@@ -332,9 +331,6 @@ export default {
           img.onload = function () {
             datawidth = img.width.toString();
             dataheight = img.height.toString();
-            console.log("sddf", img.width + 1, img.height);
-            console.log(" here ", datawidth, dataheight);
-
             let fileData = new FormData();
             fileData.append("img", this.imageViewer.file);
             fileData.append("receive_id", this.$root.message.receiveId);

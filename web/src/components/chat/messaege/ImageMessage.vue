@@ -25,7 +25,6 @@ export default {
   methods: {
     //获取图片信息
     getImgStyle(url) {
-      console.log("here", url);
       return imgZoom(url, 200);
     },
   },

@@ -485,9 +485,11 @@ export default {
         type: "UPDATE_TALK_ITEM",
         key: findTalkIndex(this.$root.message.index_name),
         item: {
-          draft_text: text,
+          draft_text: "",
         },
       });
+
+    
 
       // 判断是否推送键盘输入事件消息
       if (!this.$store.state.settings.keyboardEventNotify) {
@@ -536,7 +538,7 @@ export default {
           ) {
             return;
           }
-         
+
           let records = data.record_id == 0 ? [] : this.$root.message.records;
 
           records.unshift(...res.data.rows.reverse());
@@ -571,7 +573,7 @@ export default {
               el.scrollTop = el.scrollHeight - this.loadRecord.scrollHeight;
             }
           });
-          console.log(records)
+          console.log(records);
         })
         .catch((e) => {
           this.loadRecord.status = 1;
@@ -785,7 +787,6 @@ export default {
 
     //消息点击右键触发自定义菜单
     onCopy(idx, item, event) {
-      console.log("我是右击");
       let menus = [];
       let content = "";
       if (document.getElementById("copy_class_" + item.id)) {

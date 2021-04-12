@@ -3,6 +3,7 @@ package model
 
 import (
 	"newchat/global"
+	"strconv"
 	"time"
 )
 
@@ -20,12 +21,11 @@ type Apply_records struct {
 }
 
 type Friend_id struct {
-	Friend_id   int `json:"friend_id"  gorm:"comment:好友id"`
+	Friend_id int `json:"friend_id"  gorm:"comment:好友id"`
 }
 
 type Contacts struct {
 	global.GVA_MODEL
-	Friend_status int    `json:"friend_status"  gorm:"comment:0 审核中 ， 1 同意"`
 	User_id       int    `json:"user_id" gorm:"comment:用户id"`
 	Friend_id     int    `json:"friend_id"  gorm:"comment:好友id"`
 	Friend_remark string `json:"friend_remark"  gorm:"comment:用户名，或者群名"`
@@ -33,9 +33,9 @@ type Contacts struct {
 	Is_top        int    `json:"is_top"  gorm:"comment:是否置顶"`
 }
 
-func RedisGetUserOnline(ids string) bool {
+func RedisGetUserOnline(ids int) bool {
 	result := false
-	Online, _ := global.GVA_REDIS.HMGet(global.UserStatus, ids).Result()
+	Online, _ := global.GVA_REDIS.HMGet(global.UserStatus, strconv.Itoa(ids)).Result()
 	if Online[0] == "1" {
 		result = true
 	}

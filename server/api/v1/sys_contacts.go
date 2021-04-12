@@ -2,6 +2,7 @@ package v1
 
 import (
 	"newchat/global"
+	"newchat/model/request"
 	"newchat/model/response"
 	"newchat/service"
 	"newchat/utils"
@@ -87,5 +88,144 @@ func Contacts_List(c *gin.Context) {
 		return
 	}
 	response.OkWithDetailed(rep, "success", c)
+
+}
+
+// @Tags Base
+// @Summary 手机号查看用户
+// @Produce  application/json
+// @Param data body request.Login true "用户名, 密码, 验证码"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
+// @Router /base/login [post]
+func Contacts_Search(c *gin.Context) {
+	uid := getUserID(c)
+	mobile := c.Query("mobile")
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
+
+	err, rep := service.Contacts_Search(mobile)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+	response.OkWithDetailed(rep, "success", c)
+
+}
+
+// @Tags Base
+// @Summary 手机号查看用户
+// @Produce  application/json
+// @Param data body request.Login true "用户名, 密码, 验证码"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
+// @Router /base/login [post]
+func Contacts_Add(c *gin.Context) {
+	uid := getUserID(c)
+	var contacts_add request.RequestContactsAdd
+	_ = c.ShouldBindJSON(&contacts_add)
+
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
+
+	err := service.Contacts_Add(uid, contacts_add.Friend_id, contacts_add.Remarks)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+	response.OkWithMessage("加好友审请成功", c)
+
+}
+
+// @Tags Base
+// @Summary 手机号查看用户
+// @Produce  application/json
+// @Param data body request.Login true "用户名, 密码, 验证码"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
+// @Router /base/login [post]
+func DeleteApply(c *gin.Context) {
+
+	var contacts_del request.RequestDeleteContacts
+	_ = c.ShouldBindJSON(&contacts_del)
+
+	err := service.Contacts_Del(contacts_del.Apply_id)
+	if err != nil {
+		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
+		response.FailWithMessage("删除失败", c)
+		return
+	}
+	response.OkWithMessage("删除成功", c)
+
+}
+
+// @Tags Base
+// @Summary 接收请求
+// @Produce  application/json
+// @Param data body request.Login true "用户名, 密码, 验证码"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
+// @Router /base/login [post]
+func AcceptInvitation(c *gin.Context) {
+	var apply_accept request.RequestAcceptApply
+	_ = c.ShouldBindJSON(&apply_accept)
+	userInfo := getUserInfobytoken(c)
+	err := service.AcceptInvitation(apply_accept.Apply_id, apply_accept.Remarks, userInfo.Nickname)
+	if err != nil {
+		global.GVA_LOG.Error("加好友失败!", zap.Any("err", err))
+		response.FailWithMessage("加好友失败", c)
+		return
+	}
+	response.OkWithMessage("加好友成功", c)
+
+}
+
+// @Tags Base
+// @Summary 接收请求
+// @Produce  application/json
+// @Param data body request.Login true "用户名, 密码, 验证码"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
+// @Router /base/login [post]
+func Contacts_Delete(c *gin.Context) {
+	var concacts_delete request.RequestContactsDelete
+	uid := getUserID(c)
+
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
+	_ = c.ShouldBindJSON(&concacts_delete)
+
+	err := service.Contacts_Delete(uid, concacts_delete.Friend_id)
+	if err != nil {
+		global.GVA_LOG.Error("删除好友失败!", zap.Any("err", err))
+		response.FailWithMessage("删除好友失败", c)
+		return
+	}
+	response.OkWithMessage("删除好友成功", c)
+
+}
+
+// @Tags Base
+// @Summary 编辑备注
+// @Produce  application/json
+// @Param data body request.Login true "用户名, 密码, 验证码"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
+// @Router /base/login [post]
+func Edit_Remark(c *gin.Context) {
+	var concacts_edit request.RequestContactsEditRemarks
+	uid := getUserID(c)
+
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
+	_ = c.ShouldBindJSON(&concacts_edit)
+
+	err := service.Edit_Remark(uid, concacts_edit.Friend_id, concacts_edit.Remarks)
+	if err != nil {
+		global.GVA_LOG.Error("编辑备注失败!", zap.Any("err", err))
+		response.FailWithMessage("编辑备注失败", c)
+		return
+	}
+	response.OkWithMessage("编辑备注成功", c)
 
 }

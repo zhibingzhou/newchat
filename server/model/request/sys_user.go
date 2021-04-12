@@ -30,10 +30,17 @@ type SetUserAuth struct {
 	AuthorityId string    `json:"authorityId"`
 }
 
-
 type RequestUserEdit struct {
 	Nickname string `json:"nickname" gorm:"default:系统用户;comment:用户昵称" `
 	Avatar   string `json:"avatar" gorm:"default:http://img.wxcha.com/m00/b0/2b/65252be5c6e7e8ace4458e517cb5ad08.jpg;comment:用户头像"`
 	Motto    string `json:"motto" gorm:"default:这个人很懒什么都没留下;comment:修改签名"`
 	Gender   int    `json:"gender" gorm:"default:-1;comment:性别"`
+}
+
+type RequestUserRegister struct {
+	Mobile   string `json:"mobile"`
+	Nickname string `json:"nickname"`
+	Password string `json:"password"`
+	Platform string `json:"platform"`
+	Sms_code string `json:"sms_code"`
 }

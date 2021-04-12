@@ -22,7 +22,7 @@ import (
 func Register(u model.SysUser) (err error, userInter model.SysUser) {
 	var user model.SysUser
 	if !errors.Is(global.GVA_DB.Where("mobile = ?", u.Mobile).First(&user).Error, gorm.ErrRecordNotFound) { // 判断用户名是否注册
-		return errors.New("用户名已注册"), userInter
+		return errors.New("手机号已注册"), userInter
 	}
 	// 否则 附加uuid 密码md5简单加密 注册
 	u.Password = utils.MD5V([]byte(u.Password))
@@ -40,7 +40,7 @@ func Register(u model.SysUser) (err error, userInter model.SysUser) {
 func Login(u *model.SysUser) (err error, userInter *model.SysUser) {
 	var user model.SysUser
 	u.Password = utils.MD5V([]byte(u.Password))
-	err = global.GVA_DB.Where("mobile = ? AND password = ?", u.Mobile, u.Password).First(&user).Error
+	err = global.GVA_DB.Debug().Where("mobile = ? AND password = ?", u.Mobile, u.Password).First(&user).Error
 	return err, &user
 }
 
@@ -151,8 +151,25 @@ func FindUserByUuid(uuid string) (err error, user *model.SysUser) {
 //@return: err error, user *model.SysUser
 
 func SearchUserById(user_id, friend_id int) (err error, user *response.ResponseSearchUser) {
-	var u response.ResponseSearchUser
-	err = global.GVA_DB.Raw("SELECT sys_user.`id` AS id ,mobile,nickname,avatar,motto,gender,contacts.`friend_status` AS friend_status,contacts.`friend_remark` AS nickname_remark FROM sys_user,contacts WHERE sys_user.`id` = ? AND contacts.`friend_id` = ? AND contacts.`user_id` = ? ;", friend_id, friend_id, user_id).Scan(&u).Error
+	u := response.ResponseSearchUser{}
+	var c model.Contacts
+	var a model.ApplyRecords
+	err = global.GVA_DB.Debug().Table("sys_user").Where("id = ?", friend_id).Scan(&u).Error
+	if u.ID <= 0 {
+		return errors.New("无此用户"), &u
+	}
+	//是好友
+	if !errors.Is(global.GVA_DB.Debug().Table("contacts").Where("user_id = ? and friend_id = ? ", user_id, friend_id).Scan(&c).Error, gorm.ErrRecordNotFound) {
+		u.Friend_status = 2
+		u.Nickname_remark = c.Friend_remark
+	}else {
+		//不是好友
+        u.Friend_status = 1
+		//查找是否有已经审请中的记录 , 有审请记录 apply=1
+		if !errors.Is(global.GVA_DB.Debug().Table("apply_records").Where("user_id = ? and friend_id = ? and status = 0 ", user_id, friend_id).Scan(&a).Error, gorm.ErrRecordNotFound){
+          u.Friend_apply = 1 
+		}
+	}
 
 	return err, &u
 }

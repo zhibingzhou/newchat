@@ -8,7 +8,7 @@ type SysUser struct {
 	ID        int `json:"uid" gorm:"primarykey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt time.Time `gorm:"index" json:"-"`
+	DeletedAt time.Time `gorm:"default:NULL"`
 	Mobile    string    `json:"mobile" gorm:"comment:用户手机号"`
 	Password  string    `json:"password"  gorm:"comment:用户登录密码"`
 	Nickname  string    `json:"nickname" gorm:"default:系统用户;comment:用户昵称" `

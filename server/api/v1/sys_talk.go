@@ -99,7 +99,9 @@ func TalkCreate(c *gin.Context) {
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
 	}
-	err, rep := service.TalkCreate(uid, dis)
+	received, _ := strconv.Atoi(dis.Receive_id)
+
+	err, rep := service.TalkCreate(uid, received, dis.Type)
 	if err != nil {
 		global.GVA_LOG.Error("修改失败!", zap.Any("err", err))
 		response.FailWithMessage("修改失败", c)
@@ -206,6 +208,39 @@ func SendImage(c *gin.Context) {
 	go service.SendToClient("event_img", data)
 
 	response.Ok(c)
+
+}
+
+//会话置顶
+func Topping(c *gin.Context) {
+	uid := getUserID(c)
+	var topping request.RequestTopping
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+	}
+	_ = c.ShouldBindJSON(&topping)
+
+	err := service.Topping(uid, topping.Receive_id, topping.Type, topping.Is_top)
+	if err != nil {
+		global.GVA_LOG.Error("置顶失败!", zap.Any("err", err))
+		response.FailWithMessage("置顶失败", c)
+		return
+	}
+	response.OkWithMessage("置顶成功", c)
+
+}
+
+//会话删除
+func TalkDelete(c *gin.Context) {
+	var deltalk request.RequestTalkDelte
+	_ = c.ShouldBindJSON(&deltalk)
+	err := service.TalkDelete(deltalk.List_id)
+	if err != nil {
+		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
+		response.FailWithMessage("删除失败", c)
+		return
+	}
+	response.OkWithMessage("删除成功", c)
 
 }
 

@@ -110,7 +110,7 @@ CREATE TABLE `group_member` (
   `visit_card` VARCHAR(100) DEFAULT NULL COMMENT '群名片',
   `not_disturb` tinyint(1) DEFAULT '1' COMMENT '是否开启群免打扰:1=开启,0=关闭',
   `is_top` INT DEFAULT '0' COMMENT '是否置顶',
-  `isGroupLeader` tinyint(1) DEFAULT '1' COMMENT '是否管理员:1=管理员,0=成员 ',
+  `is_group_leader` tinyint(1) DEFAULT '1' COMMENT '是否管理员:1=管理员,0=成员 ',
   `group_id` int DEFAULT '0' COMMENT '群组id',
   `user_id` int DEFAULT '0' COMMENT '用户id',
   PRIMARY KEY (`id`) USING BTREE,
@@ -458,7 +458,6 @@ CREATE TABLE `contacts` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `friend_status` tinyint DEFAULT '1' COMMENT '2 是好友 ， 1 审核中',
   `friend_id` int DEFAULT '0' COMMENT '好友id',
   `user_id` int DEFAULT '0' COMMENT '好友id',
   `friend_remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '用户备注名',
@@ -553,7 +552,7 @@ CREATE TABLE `group_member` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `not_disturb` tinyint(1) DEFAULT '1' COMMENT '是否开启群免打扰:1=开启,0=关闭',
-  `isGroupLeader` tinyint(1) DEFAULT '1' COMMENT '是否管理员:1=管理员,0=成员 ',
+  `is_group_leader` tinyint(1) DEFAULT '1' COMMENT '是否管理员:1=管理员,0=成员 ',
   `group_id` int DEFAULT '0' COMMENT '群组id',
   `user_id` int DEFAULT '0' COMMENT '用户id',
   `visit_card` varchar(100) DEFAULT NULL COMMENT '群名片',
@@ -567,7 +566,7 @@ CREATE TABLE `group_member` (
 
 /*Data for the table `group_member` */
 
-insert  into `group_member`(`id`,`created_at`,`updated_at`,`deleted_at`,`not_disturb`,`isGroupLeader`,`group_id`,`user_id`,`visit_card`,`is_top`) values (12,NULL,NULL,NULL,0,1,1111,12,NULL,0),(13,NULL,NULL,NULL,1,0,1111,13,NULL,0),(14,NULL,NULL,NULL,1,0,1111,15,NULL,0);
+insert  into `group_member`(`id`,`created_at`,`updated_at`,`deleted_at`,`not_disturb`,`is_group_leader`,`group_id`,`user_id`,`visit_card`,`is_top`) values (12,NULL,NULL,NULL,0,1,1111,12,NULL,0),(13,NULL,NULL,NULL,1,0,1111,13,NULL,0),(14,NULL,NULL,NULL,1,0,1111,15,NULL,0);
 
 /*Table structure for table `group_notice` */
 

@@ -15,6 +15,9 @@ func InitMessageRouter(Router *gin.RouterGroup) {
 		UserRouter.POST("create", v1.TalkCreate)
 		UserRouter.POST("update-unread-num", v1.UpdateUnreadNum)
 		UserRouter.GET("find-chat-records", v1.ChatRecords)
-        UserRouter.POST("send-image",v1.SendImage)
+		UserRouter.POST("send-image", v1.SendImage)
+		UserRouter.POST("topping", v1.Topping)
+		UserRouter.POST("delete", v1.TalkDelete)
+
 	}
 }

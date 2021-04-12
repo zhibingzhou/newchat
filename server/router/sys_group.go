@@ -15,5 +15,10 @@ func InitGroupRouter(Router *gin.RouterGroup) {
 		Group.GET("notices", v1.GroupNotices)
 		Group.POST("edit", v1.GroupEdit)
 		Group.POST("edit-notice", v1.EditNotice)
+		Group.GET("invite-friends", v1.InviteFriends)
+		Group.POST("create", v1.GroupCreate)
+		Group.POST("invite", v1.GroupInvite)
+		
+
 	}
 }

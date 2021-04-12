@@ -29,6 +29,7 @@ type Group_list struct {
 	Group_name    string `json:"group_name"  gorm:"comment:群名称"`
 }
 
+
 //群成员列表
 func Redis_GetGroupbyId(group_id int) (err error, user_idlist []UserId) {
 
@@ -42,7 +43,7 @@ func Redis_GetGroupbyId(group_id int) (err error, user_idlist []UserId) {
 
 		rejson, _ := json.Marshal(user_idlist)
 
-		err = global.GVA_REDIS.Set(redisKey, string(rejson), time.Hour*1).Err()
+		err = global.GVA_REDIS.Set(redisKey, string(rejson), time.Second * 5).Err()
 		if err != nil {
 			return err, user_idlist
 		}

@@ -34,6 +34,11 @@ func CreatTalk(send_id int, received_id, source, msg_type, msg string) (err erro
 		return err, rep
 	}
 	if isource == 1 {
+		err, _ = TalkCreate(send_id, ireceived_id, isource)
+		if err != nil {
+			return err, rep
+		}
+		TalkCreate(ireceived_id, send_id, isource)
 		err = tx.Table("messages_list").Where(" user_id = ? and friend_id = ? and type = ?", received_id, send_id, isource).Update(map[string]interface{}{
 			"msg_text": msg,
 			"type":     isource,
@@ -45,11 +50,12 @@ func CreatTalk(send_id int, received_id, source, msg_type, msg string) (err erro
 			"status":   1,
 		}).Error
 	} else {
+		TalkCreate(send_id, ireceived_id, isource)
 		err = tx.Table("messages_list").Debug().Where(" group_id = ? and type = ?", received_id, isource).Update(map[string]interface{}{
 			"msg_text": msg,
 			"type":     isource,
 			"status":   1,
-			"user_id" : send_id,
+			"user_id":  send_id,
 		}).Error
 	}
 
@@ -105,7 +111,7 @@ func SendToClient(event string, request response.WebsocketMessage) {
 	switch event {
 	case "event_img":
 		systemId, _ := global.GVA_REDIS.HGet(global.UserIdSystem, fmt.Sprintf("%d", request.Messagedata.Send_user)).Result()
-		onlineStatus := model.RedisGetUserOnline(fmt.Sprintf("%d", request.Messagedata.Send_user))
+		onlineStatus := model.RedisGetUserOnline(request.Messagedata.Send_user)
 		if systemId != "" && onlineStatus {
 			requestbyte, _ := json.Marshal(request)
 			fmt.Println(string(requestbyte))

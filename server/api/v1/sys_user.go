@@ -19,7 +19,31 @@ import (
 )
 
 // @Tags Base
-// @Summary 用户登录
+// @Summary 用户注册
+// @Produce  application/json
+// @Param data body request.Login true "用户名, 密码, 验证码"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
+// @Router /base/login [post]
+func UserRegister(c *gin.Context) {
+	var L request.RequestUserRegister
+	_ = c.ShouldBindJSON(&L)
+	if err := utils.Verify(L, utils.RegisterVerify); err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	//**添加对验证码的检测**//
+	user := &model.SysUser{Mobile: L.Mobile, Nickname: L.Nickname, Password: L.Password}
+	err, userReturn := service.Register(*user)
+	if err != nil {
+		global.GVA_LOG.Error("注册失败", zap.Any("err", err))
+		response.FailWithDetailed(response.SysUserResponse{User: userReturn}, "注册失败", c)
+	} else {
+		response.OkWithDetailed(response.SysUserResponse{User: userReturn}, "注册成功", c)
+	}
+}
+
+// @Tags Base
+// @Summary websocket 注册
 // @Produce  application/json
 // @Param data body request.Login true "用户名, 密码, 验证码"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
@@ -144,28 +168,28 @@ func tokenNext(c *gin.Context, user model.SysUser) {
 	}
 }
 
-// @Tags SysUser
-// @Summary 用户注册账号
-// @Produce  application/json
-// @Param data body model.SysUser true "用户名, 昵称, 密码, 角色ID"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"注册成功"}"
-// @Router /user/register [post]
-func Register(c *gin.Context) {
-	var R request.Register
-	_ = c.ShouldBindJSON(&R)
-	if err := utils.Verify(R, utils.RegisterVerify); err != nil {
-		response.FailWithMessage(err.Error(), c)
-		return
-	}
-	user := &model.SysUser{Mobile: R.Mobile, Nickname: R.Nickname, Password: R.Password, Avatar: R.Avatar}
-	err, userReturn := service.Register(*user)
-	if err != nil {
-		global.GVA_LOG.Error("注册失败", zap.Any("err", err))
-		response.FailWithDetailed(response.SysUserResponse{User: userReturn}, "注册失败", c)
-	} else {
-		response.OkWithDetailed(response.SysUserResponse{User: userReturn}, "注册成功", c)
-	}
-}
+// // @Tags SysUser
+// // @Summary 用户注册账号
+// // @Produce  application/json
+// // @Param data body model.SysUser true "用户名, 昵称, 密码, 角色ID"
+// // @Success 200 {string} string "{"success":true,"data":{},"msg":"注册成功"}"
+// // @Router /user/register [post]
+// func Register(c *gin.Context) {
+// 	var R request.Register
+// 	_ = c.ShouldBindJSON(&R)
+// 	if err := utils.Verify(R, utils.RegisterVerify); err != nil {
+// 		response.FailWithMessage(err.Error(), c)
+// 		return
+// 	}
+// 	user := &model.SysUser{Mobile: R.Mobile, Nickname: R.Nickname, Password: R.Password, Avatar: R.Avatar}
+// 	err, userReturn := service.Register(*user)
+// 	if err != nil {
+// 		global.GVA_LOG.Error("注册失败", zap.Any("err", err))
+// 		response.FailWithDetailed(response.SysUserResponse{User: userReturn}, "注册失败", c)
+// 	} else {
+// 		response.OkWithDetailed(response.SysUserResponse{User: userReturn}, "注册成功", c)
+// 	}
+// }
 
 // @Tags AutoCode
 // @Summary 用户设置
@@ -436,4 +460,15 @@ func getUserAuthorityId(c *gin.Context) string {
 		waitUse := claims.(*request.CustomClaims)
 		return waitUse.Mobile
 	}
+}
+
+func getUserInfobytoken(c *gin.Context) *request.CustomClaims {
+	if claims, exists := c.Get("claims"); !exists {
+		global.GVA_LOG.Error("从Gin的Context中获取从jwt解析出来的用户ID失败, 请检查路由是否使用jwt中间件")
+		return nil
+	} else {
+		waitUse := claims.(*request.CustomClaims)
+		return waitUse
+	}
+	return nil
 }

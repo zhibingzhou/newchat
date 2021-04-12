@@ -609,8 +609,9 @@ export default {
     // 会话列表置顶
     topChatItem(item) {
       ServeTopTalkList({
-        list_id: item.id,
-        type: item.is_top == 0 ? 1 : 2,
+        type: item.type,
+        is_top: item.is_top == 0 ? 1 : 2,
+        receive_id: item.type == 1 ? item.friend_id : item.group_id,
       }).then((res) => {
         if (res.code == 200) {
           this.$store.commit({

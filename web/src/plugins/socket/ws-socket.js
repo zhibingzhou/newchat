@@ -1,6 +1,5 @@
 
 import {
-    getToken,
     setClientId,
 } from '@/utils/auth';
 // 引入消息处理类

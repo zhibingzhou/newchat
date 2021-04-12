@@ -636,12 +636,12 @@ export default {
               friend_id,
             }).then((res) => {
               if (res.code == 200) {
-                this.$delete(
-                  this.friends.items,
-                  this.friends.items.findIndex((item) => {
-                    return item.id == friend_id;
-                  })
-                );
+                // this.$delete(
+                //   this.friends.items,
+                //   this.friends.items.findIndex((item) => {
+                //     return item.id == friend_id;
+                //   })
+                // );
 
                 this.$message({
                   message: `好友 【${name}】已删除 ...`,

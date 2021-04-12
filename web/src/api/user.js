@@ -15,7 +15,7 @@ export const Captcha = (data) => {
 
 // @Summary websocket 注册
 export const RegisterWebsocket = (data) => {
-  return post('/auth/register', data);
+  return post('/auth/register_websocket', data);
 }
 
 //注册服务接口

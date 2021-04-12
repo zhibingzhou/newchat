@@ -386,7 +386,7 @@ export default {
       }
 
       ServeUpdateGroupCard({
-        group_id: this.groupId,
+        group_id: Number(this.groupId),
         visit_card: this.editRemarkText,
       }).then((res) => {
         if (res.code == 200) {

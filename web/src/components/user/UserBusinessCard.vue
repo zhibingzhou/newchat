@@ -215,7 +215,7 @@ export default {
     // 获取用户信息
     findUserDetail() {
       ServeSearchUser({
-        user_id: this.user_id,
+        user_id: Number(this.user_id),
       }).then((res) => {
         if (res.code == 200) {
           let data = res.data;

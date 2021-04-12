@@ -276,7 +276,7 @@ export default {
     //好友邀请提交
     inviteSubmit() {
       ServeInviteGroup({
-        group_id: this.from.groupId,
+        group_id: Number(this.from.groupId),
         uids: this.getIds().join(","),
       }).then((res) => {
         if (res.code == 200) {

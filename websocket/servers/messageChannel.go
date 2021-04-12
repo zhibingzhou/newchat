@@ -144,7 +144,7 @@ func (d DRequest) Run() DResult {
 		result.Status = 100
 		return result
 	}
-	result.Status = 200
+	result.Status = 100
 	result.DataResponse.Send_user = eventalk.Send_user
 	result.DataResponse.Source_type, _ = strconv.Atoi(eventalk.Source_type)
 	result.Event = eventalk.Msg_type
@@ -152,6 +152,7 @@ func (d DRequest) Run() DResult {
 	var reponseweb ReponseFromWeb
 	_ = json.Unmarshal(rep, &reponseweb)
 	if reponseweb.Code == 200 {
+		result.Status = 200
 		result.DataResponse.Data = reponseweb.Data.Messagedata.Data
 		result.Receivedlist = reponseweb.Data.Receive_list
 	}

@@ -38,7 +38,7 @@ func Init() {
 	servers.StartWebSocket()
 
 	//启动线程，分类信息
-	servers.MessageChannel = servers.NewChannel_Pool(1)
+	servers.MessageChannel = servers.NewChannel_Pool(5)
 	//开启监视任务
 	servers.MessageChannel.NewChannel_PoolGo()
 	//处理任务

@@ -16,6 +16,8 @@ var UserIdSystem = "user_System"
 
 var UserStatus = "user_Online"
 
+var UserCheck = "user_Check"
+
 func InitRedis() *redis.Client {
 
 	client := redis.NewClient(&redis.Options{

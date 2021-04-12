@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gorilla/websocket"
-	log "github.com/sirupsen/logrus"
 	"websocket/api"
 	"websocket/define/retcode"
 	"websocket/pkg/redis"
 	"websocket/tools/util"
+
+	"github.com/gorilla/websocket"
+	log "github.com/sirupsen/logrus"
 )
 
 const (

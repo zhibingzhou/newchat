@@ -4,10 +4,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/websocket"
-	log "github.com/sirupsen/logrus"
+	"websocket/pkg/redis"
 	"websocket/pkg/setting"
 	"websocket/tools/util"
+
+	"github.com/gorilla/websocket"
+	log "github.com/sirupsen/logrus"
 )
 
 //channel通道
@@ -247,8 +249,14 @@ func PingTimer() {
 				if err := conn.Socket.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(time.Second)); err != nil {
 					Manager.DisConnect <- conn
 					log.Errorf("发送心跳失败: %s 总连接数：%d", clientId, Manager.Count())
+					continue
+				}
+				check, _ := redis.RedisDB.HGet(redis.UserCheck, conn.UserId).Result()
+				if check != "1" {
+					redis.RedisDB.HSet(redis.UserStatus, conn.UserId, "0")
 				}
 			}
+			redis.RedisDB.Del(redis.UserCheck)
 		}
 
 	}()

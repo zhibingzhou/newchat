@@ -2,6 +2,7 @@ package servers
 
 import (
 	"time"
+	"websocket/pkg/redis"
 
 	"github.com/gorilla/websocket"
 )
@@ -48,8 +49,16 @@ func (c *Client) Read() {
 			}
 			if string(message) != "PING" {
 				MessageChannel.Request <- DRequest{Message: message}
+			} else {
+				userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, c.UserId).Result()
+				if userstatus != "1" {
+					redis.RedisDB.HSet(redis.UserStatus, c.UserId, "1")
+				}
+				check, _ := redis.RedisDB.HGet(redis.UserCheck, c.UserId).Result()
+				if check != "1" {
+					redis.RedisDB.HSet(redis.UserCheck, c.UserId, "1")
+				}
 			}
-
 		}
 	}()
 }

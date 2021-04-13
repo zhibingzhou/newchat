@@ -22,6 +22,7 @@ func Group_List(c *gin.Context) {
 
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err, rep := service.Group_List(uid)
@@ -45,6 +46,7 @@ func GroupDetail(c *gin.Context) {
 	group_id := c.Query("group_id")
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err, rep := service.GroupDetail(group_id, uid)
@@ -64,11 +66,12 @@ func GroupDetail(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
 // @Router /base/login [post]
 func GroupMembers(c *gin.Context) {
-	// uid := getUserID(c)
+	uid := getUserID(c)
 	group_id := c.Query("group_id")
-	// if uid == 0 {
-	// 	response.FailWithMessage("获取Uid失败", c)
-	// }
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+		return
+	}
 
 	err, rep := service.GroupMembers(group_id)
 	if err != nil {
@@ -87,11 +90,12 @@ func GroupMembers(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
 // @Router /base/login [post]
 func GroupNotices(c *gin.Context) {
-	// uid := getUserID(c)
+	uid := getUserID(c)
 	group_id := c.Query("group_id")
-	// if uid == 0 {
-	// 	response.FailWithMessage("获取Uid失败", c)
-	// }
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+		return
+	}
 
 	err, rep := service.GroupNotices(group_id)
 	if err != nil {
@@ -116,6 +120,7 @@ func GroupEdit(c *gin.Context) {
 
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err := service.GroupEdit(uid, editjson)
@@ -141,6 +146,7 @@ func EditNotice(c *gin.Context) {
 
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err := service.EditNotice(uid, editjson)
@@ -165,6 +171,7 @@ func InviteFriends(c *gin.Context) {
 
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err, rep := service.InviteFriends(uid, group_id)
@@ -189,6 +196,7 @@ func GroupCreate(c *gin.Context) {
 	_ = c.ShouldBindJSON(&group_create)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err := service.GroupCreate(uid, group_create)
@@ -200,7 +208,6 @@ func GroupCreate(c *gin.Context) {
 	response.OkWithMessage("创建群组成功！", c)
 
 }
-
 
 // @Tags Base
 // @Summary 邀请
@@ -214,6 +221,7 @@ func GroupInvite(c *gin.Context) {
 	_ = c.ShouldBindJSON(&group_invite)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err := service.GroupInvite(uid, group_invite)
@@ -226,3 +234,56 @@ func GroupInvite(c *gin.Context) {
 
 }
 
+func GroupSecede(c *gin.Context) {
+	uid := getUserID(c)
+	var group_secede request.RequestGroupSecede
+	_ = c.ShouldBindJSON(&group_secede)
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+		return
+	}
+
+	err := service.GroupSecede(uid, group_secede.Group_id)
+	if err != nil {
+		global.GVA_LOG.Error("退群失败!", zap.Any("err", err))
+		response.FailWithMessage("退群失败", c)
+		return
+	}
+	response.OkWithMessage("退群成功！", c)
+}
+
+func SetGroupCard(c *gin.Context) {
+	uid := getUserID(c)
+	var group_SetCard request.RequestGroupSetCard
+	_ = c.ShouldBindJSON(&group_SetCard)
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+		return
+	}
+
+	err := service.SetGroupCard(uid, group_SetCard.Group_id, group_SetCard.Visit_card)
+	if err != nil {
+		global.GVA_LOG.Error("设置群昵称失败!", zap.Any("err", err))
+		response.FailWithMessage("设置群昵称失败", c)
+		return
+	}
+	response.OkWithMessage("设置群昵称成功！", c)
+}
+
+func RemoveMembers(c *gin.Context) {
+	uid := getUserID(c)
+	var group_remove request.RequestGroupRemove
+	_ = c.ShouldBindJSON(&group_remove)
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+		return
+	}
+
+	err := service.RemoveMembers(uid, group_remove.Group_id, group_remove.Members_ids)
+	if err != nil {
+		global.GVA_LOG.Error("移除群聊失败!", zap.Any("err", err))
+		response.FailWithMessage("移除群聊失败", c)
+		return
+	}
+	response.OkWithMessage("移除群聊成功！", c)
+}

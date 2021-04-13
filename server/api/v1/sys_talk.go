@@ -26,6 +26,7 @@ func Talk_List(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	err, rep := service.FindTalk_List(uid)
 	if err != nil {
@@ -47,6 +48,7 @@ func TalkRecords(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	record_id := c.Query("record_id")
@@ -75,6 +77,7 @@ func NotDisturb(c *gin.Context) {
 	_ = c.ShouldBindJSON(&dis)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	err := service.NotDisturb(uid, dis)
 	if err != nil {
@@ -98,13 +101,13 @@ func TalkCreate(c *gin.Context) {
 	_ = c.ShouldBindJSON(&dis)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
-	received, _ := strconv.Atoi(dis.Receive_id)
 
-	err, rep := service.TalkCreate(uid, received, dis.Type)
+	err, rep := service.TalkCreate(uid, dis.Receive_id, dis.Type)
 	if err != nil {
-		global.GVA_LOG.Error("修改失败!", zap.Any("err", err))
-		response.FailWithMessage("修改失败", c)
+		global.GVA_LOG.Error("创建房间失败!", zap.Any("err", err))
+		response.FailWithMessage("创建房间失败", c)
 		return
 	}
 	response.OkWithData(response.ResponseCreateTalk{
@@ -125,6 +128,7 @@ func UpdateUnreadNum(c *gin.Context) {
 	_ = c.ShouldBindJSON(&dis)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	msg_type, err := strconv.Atoi(dis.Type)
 	if err != nil {
@@ -154,6 +158,7 @@ func SendImage(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	//record_id := c.Query("record_id")
@@ -211,12 +216,38 @@ func SendImage(c *gin.Context) {
 
 }
 
+// @Tags Base
+// @Summary 信息详情
+// @Produce  application/json
+// @Param data body request.Login true "用户名, 密码, 验证码"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"登陆成功"}"
+// @Router /base/login [post]
+func SendEmoticon(c *gin.Context) {
+	uid := getUserID(c)
+	if uid == 0 {
+		response.FailWithMessage("获取Uid失败", c)
+		return
+	}
+	var send_emoticon request.RequestSendEmoticon
+	_ = c.ShouldBindJSON(&send_emoticon)
+
+	err := service.SendEmoticon(uid, send_emoticon.Emoticon_id, send_emoticon.Receive_id, send_emoticon.Source)
+	if err != nil {
+		response.FailWithMessage("获取Uid失败", c)
+		return
+	}
+
+	response.Ok(c)
+
+}
+
 //会话置顶
 func Topping(c *gin.Context) {
 	uid := getUserID(c)
 	var topping request.RequestTopping
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	_ = c.ShouldBindJSON(&topping)
 
@@ -254,6 +285,7 @@ func ChatRecords(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	//record_id := c.Query("record_id")

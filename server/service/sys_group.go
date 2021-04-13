@@ -235,3 +235,32 @@ func GroupInvite(uid int, rep request.RequestGroupInvite) (err error) {
 	tx.Commit()
 	return err
 }
+
+func GroupSecede(uid, group_secede int) (err error) {
+	if group_secede == 0 {
+		return errors.New("群id 不能为空！！")
+	}
+	err = global.GVA_DB.Unscoped().Delete(&model.Group_member{}, "group_id = ? and user_id = ?", group_secede, uid).Error
+	return err
+}
+
+func SetGroupCard(uid, group_id int, card string) (err error) {
+	if group_id == 0 || card == "" {
+		return errors.New("信息不能为空！！")
+	}
+	err = global.GVA_DB.Table("group_member").Where("group_id = ? and user_id = ?", group_id, uid).Update(map[string]interface{}{"visit_card": card}).Error
+	return err
+}
+
+func RemoveMembers(uid, group_id int, group_id_iist []int) (err error) {
+	if group_id == 0 || len(group_id_iist) <= 0 {
+		return errors.New("信息不能为空！！")
+	}
+	var g model.Group_list
+	err = global.GVA_DB.Table("group_list").Where("id = ?", group_id).Scan(&g).Error
+	if g.Manager_id != uid {
+		return errors.New("不是管理员不能移除！！")
+	}
+	err = global.GVA_DB.Unscoped().Delete(&model.Group_member{}, "group_id = ? and user_id in (?)", group_id, group_id_iist).Error
+	return err
+}

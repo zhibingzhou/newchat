@@ -21,6 +21,7 @@ func Apply_unread_num(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	err, rep := service.Apply_unread_num(uid)
 	if err != nil {
@@ -44,6 +45,7 @@ func Apply_records(c *gin.Context) {
 	var pageIndex = 1
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	page_size := c.Request.FormValue("page_size")
@@ -79,6 +81,7 @@ func Contacts_List(c *gin.Context) {
 
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err, rep := service.Contacts_List(uid)
@@ -102,6 +105,7 @@ func Contacts_Search(c *gin.Context) {
 	mobile := c.Query("mobile")
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err, rep := service.Contacts_Search(mobile)
@@ -127,6 +131,7 @@ func Contacts_Add(c *gin.Context) {
 
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err := service.Contacts_Add(uid, contacts_add.Friend_id, contacts_add.Remarks)
@@ -192,6 +197,7 @@ func Contacts_Delete(c *gin.Context) {
 
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	_ = c.ShouldBindJSON(&concacts_delete)
 
@@ -217,6 +223,7 @@ func Edit_Remark(c *gin.Context) {
 
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	_ = c.ShouldBindJSON(&concacts_edit)
 

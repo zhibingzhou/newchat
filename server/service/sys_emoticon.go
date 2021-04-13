@@ -61,14 +61,9 @@ func SetUserEmoticon(id, status int) (err error) {
 //@param: id int
 //@return: err error, user *model.SysUser
 
-func UploadEmoticon(id int, url string) (err error, emoticon model.Emoticon) {
+func UploadEmoticon(emoticon model.Emoticon) (error, model.Emoticon) {
 
-	emoticon = model.Emoticon{
-		User_id: id,
-		Src:     url,
-		Status:  1,
-	}
-	err = global.GVA_DB.Table("emoticon").Create(&emoticon).Error
+	err := global.GVA_DB.Table("emoticon").Create(&emoticon).Error
 
 	return err, emoticon
 }

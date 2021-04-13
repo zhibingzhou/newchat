@@ -15,7 +15,6 @@ import (
 func EvenTalk(c *gin.Context) {
 	var requesteventalk request.RequestEvenTalk
 	_ = c.ShouldBindJSON(&requesteventalk)
-	fmt.Println(requesteventalk)
 	send_id := requesteventalk.Send_user
 	received_id := requesteventalk.Receive_user //
 	source := requesteventalk.Source_type       //是否群聊
@@ -36,3 +35,19 @@ func EvenTalk(c *gin.Context) {
 	}
 	response.OkWithData(res, c)
 }
+
+
+//
+func Login_Event(c *gin.Context) {
+	var requesteventalk request.UpdateUserStatus
+	_ = c.ShouldBindJSON(&requesteventalk)
+	fmt.Println(requesteventalk)
+	err ,res := service.GetFriendIdList(requesteventalk.User_id)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+	response.OkWithData(res, c)
+}
+

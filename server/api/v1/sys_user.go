@@ -203,6 +203,7 @@ func Setting(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	if err, columns := service.FindUserById(uid); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
@@ -230,6 +231,7 @@ func UserDetail(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	if err, columns := service.FindUserById(uid); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
@@ -258,8 +260,9 @@ func Search_user(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
-	var R model.UserId
+	var R request.RequestSearchUser
 	_ = c.ShouldBindJSON(&R)
 
 	if err, columns := service.SearchUserById(uid, R.User_id); err != nil {
@@ -283,6 +286,7 @@ func ChangePassword(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	if err := utils.Verify(user, utils.ChangePasswordVerify); err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -310,6 +314,7 @@ func EditUserDetail(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	ruser := map[string]interface{}{
@@ -472,3 +477,4 @@ func getUserInfobytoken(c *gin.Context) *request.CustomClaims {
 	}
 	return nil
 }
+

@@ -22,6 +22,20 @@ type RequestGroupCreate struct {
 }
 
 type RequestGroupInvite struct {
-	Group_id string `json:"group_id"`
+	Group_id int    `json:"group_id"`
 	Uids     string `json:"uids"`
+}
+
+type RequestGroupSecede struct {
+	Group_id int `json:"group_id"`
+}
+
+type RequestGroupSetCard struct {
+	Group_id   int    `json:"group_id"`
+	Visit_card string `json:"visit_card"`
+}
+
+type RequestGroupRemove struct {
+	Group_id    int   `json:"group_id"`
+	Members_ids []int `json:"members_ids"`
 }

@@ -150,7 +150,7 @@ func FindUserByUuid(uuid string) (err error, user *model.SysUser) {
 //@param: id int
 //@return: err error, user *model.SysUser
 
-func SearchUserById(user_id, friend_id int) (err error, user *response.ResponseSearchUser) {
+func SearchUserById(user_id , friend_id int) (err error, user *response.ResponseSearchUser) {
 	u := response.ResponseSearchUser{}
 	var c model.Contacts
 	var a model.ApplyRecords
@@ -162,12 +162,12 @@ func SearchUserById(user_id, friend_id int) (err error, user *response.ResponseS
 	if !errors.Is(global.GVA_DB.Debug().Table("contacts").Where("user_id = ? and friend_id = ? ", user_id, friend_id).Scan(&c).Error, gorm.ErrRecordNotFound) {
 		u.Friend_status = 2
 		u.Nickname_remark = c.Friend_remark
-	}else {
+	} else {
 		//不是好友
-        u.Friend_status = 1
+		u.Friend_status = 1
 		//查找是否有已经审请中的记录 , 有审请记录 apply=1
-		if !errors.Is(global.GVA_DB.Debug().Table("apply_records").Where("user_id = ? and friend_id = ? and status = 0 ", user_id, friend_id).Scan(&a).Error, gorm.ErrRecordNotFound){
-          u.Friend_apply = 1 
+		if !errors.Is(global.GVA_DB.Debug().Table("apply_records").Where("user_id = ? and friend_id = ? and status = 0 ", user_id, friend_id).Scan(&a).Error, gorm.ErrRecordNotFound) {
+			u.Friend_apply = 1
 		}
 	}
 

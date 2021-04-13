@@ -12,3 +12,11 @@ type RequestEvenTalk struct {
 	Source_type  string `json:"source_type"` //群聊或者私聊
 }
 
+
+
+
+type UpdateUserStatus struct {
+	Event   string `json:"event"`
+	User_id int    `json:"user_id"`
+	Status  int   `json:"status"`
+}

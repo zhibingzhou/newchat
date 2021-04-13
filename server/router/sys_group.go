@@ -18,7 +18,9 @@ func InitGroupRouter(Router *gin.RouterGroup) {
 		Group.GET("invite-friends", v1.InviteFriends)
 		Group.POST("create", v1.GroupCreate)
 		Group.POST("invite", v1.GroupInvite)
-		
+		Group.POST("secede", v1.GroupSecede)
+		Group.POST("set-group-card", v1.SetGroupCard)
+		Group.POST("remove-members", v1.RemoveMembers)
 
 	}
 }

@@ -6,8 +6,8 @@ type RequestNotDistraub struct {
 }
 
 type RequestCreate struct {
-	Receive_id string `json:"receive_id"`
-	Type       int    `json:"type"`
+	Receive_id int `json:"receive_id"`
+	Type       int `json:"type"`
 }
 
 type RequestUpdateNoread struct {
@@ -23,4 +23,10 @@ type RequestTopping struct {
 
 type RequestTalkDelte struct {
 	List_id int `json:"list_id"`
+}
+
+type RequestSendEmoticon struct {
+	Emoticon_id int `json:"emoticon_id"`
+	Receive_id  int `json:"receive_id"`
+	Source      int `json:"source"`
 }

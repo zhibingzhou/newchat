@@ -7,8 +7,10 @@ import (
 	"newchat/model/request"
 	"newchat/model/response"
 	"sort"
+	"strconv"
 
 	"github.com/jinzhu/gorm"
+	"go.uber.org/zap"
 )
 
 //@author: [SliverHorn](https://github.com/SliverHorn)
@@ -20,7 +22,7 @@ import (
 func FindTalk_List(id int) (err error, messages []response.ResponseMessages_list) {
 
 	var groupmessage []response.ResponseMessages_list
-	err = global.GVA_DB.Debug().Raw(" SELECT messages_list.id , messages_list.`updated_at`,messages_list.`type`,messages_list.`online`,messages_list.`msg_text`,contacts.`is_top`,contacts.`not_disturb`,contacts.`friend_remark` AS remark_name ,sys_user.`avatar`,sys_user.`nickname` AS NAME ,sys_user.`id` AS friend_id FROM messages_list,sys_user,contacts WHERE messages_list.user_id = ? AND messages_list.`group_id` = 0 AND contacts.`user_id`= ? AND contacts.`friend_id` = messages_list.`friend_id` AND sys_user.id = messages_list.`friend_id`    AND STATUS = 1 ORDER BY messages_list.`created_at` DESC ", id, id).Scan(&messages).Error
+	err = global.GVA_DB.Debug().Raw(" SELECT messages_list.id , messages_list.`updated_at`,messages_list.`type`,messages_list.`online`,messages_list.`msg_text`,contacts.`is_top`,contacts.`not_disturb`,contacts.`friend_remark` AS remark_name ,sys_user.`avatar`,sys_user.`nickname` AS NAME ,sys_user.`id` AS friend_id FROM messages_list,sys_user,contacts WHERE messages_list.user_id = ? AND messages_list.`group_id` = 0 AND contacts.`user_id`= ? AND contacts.`friend_id` = messages_list.`friend_id` AND sys_user.id = messages_list.`friend_id` AND STATUS = 1 ORDER BY messages_list.`created_at` DESC ", id, id).Scan(&messages).Error
 
 	err = global.GVA_DB.Debug().Raw("SELECT messages_list.id , messages_list.`updated_at`,messages_list.`type`,messages_list.`online`,messages_list.`msg_text`,group_member.`is_top`,group_member.`not_disturb`,group_list.`avatar`,group_list.`group_name` AS name,messages_list.group_id FROM messages_list,group_list,group_member WHERE  group_list.id = messages_list.`group_id` AND group_member.`user_id` = ? and group_member.group_id = messages_list.group_id and group_member.talk_remove = 0 and status = 1 ORDER BY messages_list.`created_at` DESC ", id).Scan(&groupmessage).Error
 
@@ -45,9 +47,9 @@ func TalkRecords(record_id, source, receive_id string, uid int) (err error, reco
 	switch source {
 	case "1":
 		if record_id != "0" {
-			err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE  ( user_id = ? AND receive_id = ? ) OR ( user_id = ? AND receive_id = ? )  AND user_id = sys_user.`id`  AND talk_list.`source` = 1 and talk_list.`id` < ? ORDER BY created_at DESC limit 30 ", uid, receive_id, receive_id, uid, record_id).Scan(&records.Rows).Error
+			err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list LEFT JOIN sys_user  ON ( sys_user.`id`= talk_list.`user_id`) WHERE ( user_id = ? AND receive_id = ? ) OR ( user_id = ? AND receive_id = ? ) AND talk_list.`source` = 1 and talk_list.`id` < ? ORDER BY created_at DESC limit 30 ", uid, receive_id, receive_id, uid, record_id).Scan(&records.Rows).Error
 		} else {
-			err = global.GVA_DB.Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list,sys_user WHERE  ( user_id = ? AND receive_id = ? ) OR ( user_id = ? AND receive_id = ? )  AND user_id = sys_user.`id`  AND talk_list.`source` = 1  ORDER BY created_at DESC limit 30 ", uid, receive_id, receive_id, uid).Scan(&records.Rows).Error
+			err = global.GVA_DB.Debug().Raw(" SELECT talk_list.`id`, source,msg_type,user_id,receive_id,is_revoke,content,sys_user.`avatar`,sys_user.`nickname`,talk_list.`created_at` FROM talk_list LEFT JOIN sys_user  ON ( sys_user.`id`= talk_list.`user_id`) WHERE ( user_id = ? AND receive_id = ? ) OR ( user_id = ? AND receive_id = ? ) AND talk_list.`source` = 1  ORDER BY created_at DESC LIMIT 30  ", uid, receive_id, receive_id, uid).Scan(&records.Rows).Error
 		}
 		break
 	case "2":
@@ -278,6 +280,43 @@ func ChatRecords(source, msg_type, receive_id string, uid int) (err error, recor
 	records.Limit = 30
 	records.Record_id = records.Rows[len(records.Rows)-1].Id
 	return err, records
+}
+
+func SendEmoticon(uid, emoticon_id, receive_id, source int) (err error) {
+
+	err, res := CreatTalk(uid, strconv.Itoa(receive_id), strconv.Itoa(source), "2", "")
+	if err != nil {
+		return err
+	}
+	var en model.Emoticon
+	err = global.GVA_DB.Table("emoticon").Where("id = ?", emoticon_id).Scan(&en).Error
+	if err != nil {
+		return err
+	}
+
+	file := model.File{
+		Record_id:     res.ID,
+		User_id:       res.User_id,
+		File_source:   res.Source,
+		File_size:     en.Size,
+		Original_name: en.Name,
+		File_suffix:   en.File_suffix,
+		Save_dir:      en.Save_dir,
+		File_url:      en.Src,
+		File_type:     1,
+	}
+
+	err = SendImage(file)
+
+	err, data := GetTalk_listById(res.ID)
+	if err != nil {
+		global.GVA_LOG.Error("获取聊天数据失败!", zap.Any("err", err))
+		return err
+	}
+
+	go SendToClient("event_img", data)
+
+	return err
 }
 
 //@author: [SliverHorn](https://github.com/SliverHorn)

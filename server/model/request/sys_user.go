@@ -44,3 +44,7 @@ type RequestUserRegister struct {
 	Platform string `json:"platform"`
 	Sms_code string `json:"sms_code"`
 }
+
+type RequestSearchUser struct {
+	User_id int `json:"user_id"`
+}

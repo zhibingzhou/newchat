@@ -3,10 +3,12 @@ package v1
 import (
 	"fmt"
 	"newchat/global"
+	"newchat/model"
 	"newchat/model/request"
 	"newchat/model/response"
 	"newchat/service"
 	"newchat/utils"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -24,6 +26,7 @@ func UserEmoticon(c *gin.Context) {
 
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err, rep := service.UserEmoticon(uid)
@@ -47,6 +50,7 @@ func SystemEmoticon(c *gin.Context) {
 
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err, rep := service.SystemEmoticon()
@@ -98,6 +102,9 @@ func UploadEmoticon(c *gin.Context) {
 		response.FailWithMessage("无此用户", c)
 	}
 
+	width := c.PostForm("width")
+	height := c.PostForm("height")
+
 	files, err := c.FormFile("emoticon")
 	if err != nil {
 		global.GVA_LOG.Error("上传失败!", zap.Any("err", err))
@@ -107,13 +114,24 @@ func UploadEmoticon(c *gin.Context) {
 	// 上传文件至指定目录
 	guid := uuid.New().String()
 
-	singleFile := "uploads/file/img/" + guid + utils.GetExt(files.Filename)
+	widthandheight := "_" + width + "x" + height
+	singleFile := "uploads/file/img/" + guid + widthandheight + utils.GetExt(files.Filename)
 	_ = c.SaveUploadedFile(files, singleFile)
 
 	weburl := global.GVA_CONFIG.System.Url
 	url := fmt.Sprintf("%s/%s", weburl, singleFile)
 
-	err, rep := service.UploadEmoticon(uid, url)
+	file := model.Emoticon{
+		User_id:     uid,
+		Size:        int(files.Size),
+		Name:        files.Filename,
+		File_suffix: strings.Replace(utils.GetExt(files.Filename), ".", "", 1),
+		Save_dir:    singleFile,
+		Src:         url,
+		Status:      1,
+	}
+
+	err, rep := service.UploadEmoticon(file)
 	if err != nil {
 		global.GVA_LOG.Error("上传失败!", zap.Any("err", err))
 		response.FailWithMessage("上传失败", c)

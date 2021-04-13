@@ -26,6 +26,7 @@ func EditArticleClass(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 
 	err, rep := service.EditArticleClass(uid, article.Class_name)
@@ -71,6 +72,7 @@ func ArticleClass(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	err, rep := service.ArticleClass(uid)
 	if err != nil {
@@ -82,7 +84,6 @@ func ArticleClass(c *gin.Context) {
 
 }
 
-
 // @Tags Base
 // @Summary 新增类型
 // @Produce  application/json
@@ -93,6 +94,7 @@ func ArticleTags(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	err, rep := service.ArticleTags(uid)
 	if err != nil {
@@ -120,6 +122,7 @@ func ArticleList(c *gin.Context) {
 	uid := getUserID(c)
 	if uid == 0 {
 		response.FailWithMessage("获取Uid失败", c)
+		return
 	}
 	err, rep := service.ArticleList(uid, page, keyword, find_type, cid)
 	if err != nil && err != gorm.ErrRecordNotFound {

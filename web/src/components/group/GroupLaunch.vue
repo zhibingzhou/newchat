@@ -35,7 +35,7 @@
                 >
                   <ul class="friend-items no-select">
                     <li
-                      v-for="(item, index) in search"
+                      v-for="(item) in search"
                       :key="item.id"
                       @click="triggerContacts(item)"
                     >
@@ -88,7 +88,7 @@
                   <div class="selectd-items">
                     <div
                       class="selectd-item no-select"
-                      v-for="(item, index) in selected"
+                      v-for="(item) in selected"
                       :key="item.id"
                     >
                       <el-avatar :size="25" :src="item.avatar" />

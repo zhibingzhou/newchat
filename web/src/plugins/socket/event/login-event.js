@@ -17,6 +17,7 @@ class LoginEvent extends AppMessageEvent {
     super();
 
     this.resource = resource;
+    
   }
 
   handle() {

@@ -526,6 +526,7 @@ export default {
     // 跳转聊天页面
     toTalk(type, index_name) {
       let receive_id = index_name.split("_")[1];
+      receive_id = Number(receive_id);
       ServeCreateTalkList({
         type,
         receive_id,

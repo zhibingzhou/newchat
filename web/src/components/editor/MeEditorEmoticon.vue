@@ -167,8 +167,8 @@ export default {
     },
 
     //加载用户表情包
-     loadUserEmoji() {
-       ServeFindUserEmoticon().then((res) => {
+    loadUserEmoji() {
+      ServeFindUserEmoticon().then((res) => {
         if (res.code == 200) {
           this.emojiItem = this.emojiItem.slice(0, 2);
 
@@ -225,22 +225,65 @@ export default {
       if (e.target.files.length == 0) {
         return false;
       }
+      let datawidth = "",
+        dataheight = "";
+      var file = e.target.files[0];
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function () {
+        //让页面中的img标签的src指向读取的路径
+        var img = new Image();
+        img.src = reader.result;
+        if (img.complete) {
+          datawidth = img.width.toString();
+          dataheight = img.height.toString();
 
-      let file = e.target.files[0];
-      let fileData = new FormData();
-      fileData.append("emoticon", file);
-      ServeUploadEmoticon(fileData)
-        .then((res) => {
-          if (res.code == 200) {
-            this.emojiItem[1].list.push(res.data);
-          }
-        })
-        .catch((err) => {
-          this.$notify.error({
-            message: "网络异常请稍后再试...",
-            duration: 3000,
+          let fileData = new FormData();
+          fileData.append("emoticon", file);
+          fileData.append("width", datawidth);
+          fileData.append("height", dataheight);
+
+          ServeUploadEmoticon(fileData).then((res) => {
+            if (res.code == 200) {
+            } else {
+              this.$notify({
+                title: "消息提示",
+                message: "网络异常，请稍后再试...",
+                position: "bottom-right",
+                type: "warning",
+              });
+              return
+            }
           });
-        });
+        } else {
+          img.onload = function () {
+            datawidth = img.width.toString();
+            dataheight = img.height.toString();
+            let fileData = new FormData();
+            fileData.append("emoticon", file);
+            fileData.append("width", datawidth);
+            fileData.append("height", dataheight);
+            ServeUploadEmoticon(fileData).then((res) => {
+              if (res.code == 200) {
+              } else {
+                this.$notify({
+                  title: "消息提示",
+                  message: "网络异常，请稍后再试...",
+                  position: "bottom-right",
+                  type: "warning",
+                });
+                return 
+              }
+            });
+          };
+        }
+      };
+      this.$notify({
+        title: "消息提示",
+        message: "成功",
+        type: "success",
+      });
+      location.reload();
     },
   },
 };

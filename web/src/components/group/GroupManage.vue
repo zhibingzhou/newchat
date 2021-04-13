@@ -120,7 +120,7 @@
                   >
                     <div class="members">
                       <div
-                        v-for="(member, i) in filterMembers"
+                        v-for="(member) in filterMembers"
                         class="member no-select"
                         :class="{
                           selectd: member.is_delete && batchDelMember,
@@ -622,7 +622,7 @@ export default {
       })
         .then(() => {
           ServeRemoveMembersGroup({
-            group_id: this.groupId,
+            group_id: Number(this.groupId),
             members_ids: ids,
           }).then((res) => {
             if (res.code == 200) {

@@ -4,6 +4,7 @@ import {
 } from '@/utils/auth';
 // 引入消息处理类
 import TalkEvent from '@/plugins/socket/event/talk-event';
+import LoginEvent from './event/login-event';
 
 class WsSocket {
 
@@ -195,7 +196,11 @@ class WsSocket {
                 let data = JSON.parse(result.data);
                 (new TalkEvent(data)).handle();
                 break;
+            case "login_event":
+                let data_login = JSON.parse(result.data);
+                (new LoginEvent(data_login)).handle();
 
+                break;
             default:
                 console.warn(`WsSocket 消息事件[${result.event}]未绑定...`)
                 break;

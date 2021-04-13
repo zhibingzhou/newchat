@@ -127,7 +127,7 @@
 
           <el-row
             class="row-items"
-            v-for="(member, i) in searchs"
+            v-for="(member) in searchs"
             :key="member.user_id"
             @click.native="openUserDetail(member.user_id)"
           >

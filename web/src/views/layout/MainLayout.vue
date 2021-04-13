@@ -68,7 +68,7 @@
               placement="right"
               :visible-arrow="false"
             >
-              <a target="_blank" href="https://github.com/gzydong/LumenIM">
+              <a target="_blank" href="https://github.com/zhibingzhou/newchat.git">
                 <div class="menu-items" :class="{ active: idx == 3 }">
                   <i class="iconfont icon-github"></i>
                 </div>

@@ -4,16 +4,16 @@
       <el-header height="60px" class="header">
         <p>消息管理器</p>
         <p class="title">
-          <span>{{ findSource == 1 ? "好友" : "群" }}【{{ title }}】</span>
+          <span>{{ findSource == 1 ? '好友' : '群' }}【{{ title }}】</span>
         </p>
         <p class="tools">
           <i
             class="iconfont"
+            style="transform: scale(0.85)"
             :class="fullscreen ? 'icon-tuichuquanping' : 'icon-quanping'"
             @click="fullscreen = !fullscreen"
-            style="transform: scale(0.85)"
-          ></i>
-          <i class="el-icon-close" @click="$emit('close')"></i>
+          />
+          <i class="el-icon-close" @click="$emit('close')" />
         </p>
       </el-header>
 
@@ -22,14 +22,14 @@
           class="iconfont pointer"
           :class="{ 'icon-shouqi2': broadside, 'icon-zhankai': !broadside }"
           @click="triggerBroadside"
-        ></i>
+        />
         <div class="search-box no-select">
-          <i class="el-icon-search"></i>
+          <i class="el-icon-search" />
           <input
-            type="text"
-            placeholder="关键字搜索"
             v-model="search.keyword"
+            type="text"
             maxlength="30"
+            placeholder="关键字搜索"
             @keyup.enter="searchText($event)"
           />
         </div>
@@ -56,15 +56,16 @@
               </div>
             </el-header>
             <el-main class="no-padding">
-              <el-scrollbar :native="false" tag="section" class="full-height">
+              <el-scrollbar class="full-height" tag="section" :native="false">
                 <div
-                  v-for="(item, i) in contacts[contacts.show]"
+                  v-for="item in contacts[contacts.show]"
                   class="contacts-item pointer"
-                  @click="triggerMenuItem(item)"
                   :class="{
                     selected:
                       findSource == item.type && findReceiveId == item.id,
                   }"
+                  :key="item.id"
+                  @click="triggerMenuItem(item)"
                 >
                   <div class="avatar">
                     <el-avatar :size="20" :src="item.avatar">
@@ -85,28 +86,28 @@
               <span
                 :class="{ active: records.msgType == 0 }"
                 @click="triggerLoadType(0)"
-                >全部</span
-              >
+                >全部
+              </span>
               <span
                 :class="{ active: records.msgType == 5 }"
                 @click="triggerLoadType(5)"
-                >代码块</span
-              >
+                >代码块
+              </span>
               <span
                 :class="{ active: records.msgType == 2 }"
                 @click="triggerLoadType(2)"
-                >文件</span
-              >
+                >文件
+              </span>
               <span
                 :class="{ active: records.msgType == 4 }"
                 @click="triggerLoadType(4)"
-                >会话记录</span
-              >
+                >会话记录
+              </span>
             </el-header>
 
             <el-main
-              class="history-record animated fadeIn"
               v-if="records.isEmpty"
+              class="history-record animated fadeIn"
             >
               <div class="empty-records">
                 <img src="~@/assets/image/chat-search-no-message.png" />
@@ -114,18 +115,18 @@
               </div>
             </el-main>
 
-            <el-main class="history-record" v-else>
-              <el-scrollbar :native="false" tag="section" class="full-height">
+            <el-main v-else class="history-record">
+              <el-scrollbar class="full-height" tag="section" :native="false">
                 <div
-                  class="message-group"
-                  v-for="(record, i) in records.items"
+                  v-for="record in records.items"
                   :key="record.id"
+                  class="message-group"
                 >
                   <div class="left-box">
                     <el-avatar
                       shape="square"
-                      :size="30"
                       fit="contain"
+                      :size="30"
                       :src="record.avatar"
                     />
                   </div>
@@ -200,12 +201,12 @@
                 </div>
 
                 <!-- 数据加载栏 -->
-                <div class="load-button blue" v-show="records.loadStatus == 1">
-                  <i class="el-icon-loading"></i>
+                <div v-show="records.loadStatus == 1" class="load-button blue">
+                  <i class="el-icon-loading" />
                   <span>加载数据中...</span>
                 </div>
-                <div class="load-button" v-show="records.loadStatus == 0">
-                  <i class="el-icon-arrow-up"></i>
+                <div v-show="records.loadStatus == 0" class="load-button">
+                  <i class="el-icon-arrow-up" />
                   <span @click="loadChatRecord">加载更多...</span>
                 </div>
               </el-scrollbar>
@@ -228,7 +229,7 @@ import {
 import { formateSize, download, imgZoom } from "@/utils/functions";
 
 export default {
-  name: "TalkSearchRecord",
+  name: 'TalkSearchRecord',
   props: {
     receiveId: {
       type: [Number, String],
@@ -240,27 +241,28 @@ export default {
     },
     titleName: {
       type: String,
-      default: "",
+      default: '',
     },
   },
   data() {
     return {
       fullscreen: false,
+
       // 侧边栏相关信息
       broadside: false,
       contacts: {
-        show: "friends",
+        show: 'friends',
         friends: [],
         groups: [],
       },
 
       uid: this.$store.state.user.uid,
-      title: "",
-      findType: 0, //查询的方式 0:所有 1:图片 2:文件
-      findSource: 0, //查询的聊天类型 1:私聊 2:群聊
-      findReceiveId: 0, //接收者ID(用户ID或群ID)
+      title: '',
+      findType: 0, // 查询的方式 0:所有 1:图片 2:文件
+      findSource: 0, // 查询的聊天类型 1:私聊 2:群聊
+      findReceiveId: 0, // 接收者ID(用户ID或群ID)
 
-      //用户聊天记录
+      // 用户聊天记录
       records: {
         recordId: 0,
         msgType: 0,
@@ -272,25 +274,25 @@ export default {
       showBox: 0,
 
       search: {
-        keyword: "", //关键字查询
-        date: "", //时间查询
-        page: 1, //当前分页
-        totalPage: 50, //总分页
-        items: [], //数据列表
+        keyword: '', // 关键字查询
+        date: '', // 时间查询
+        page: 1, // 当前分页
+        totalPage: 50, // 总分页
+        items: [], // 数据列表
         isShowDate: false,
       },
-    };
+    }
   },
   mounted() {
-    this.title = this.titleName;
-    this.findSource = this.source;
-    this.findReceiveId = this.receiveId;
+    this.title = this.titleName
+    this.findSource = this.source
+    this.findReceiveId = this.receiveId
 
-    this.loadChatRecord(0);
+    this.loadChatRecord(0)
   },
   created() {
-    this.loadFriends();
-    this.loadGroups();
+    this.loadFriends()
+    this.loadGroups()
   },
   methods: {
     formatDate: function (time) {
@@ -302,133 +304,122 @@ export default {
       }
     },
 
-    //格式化文件大小
-    renderSize: formateSize,
-
-    //下载文件
-    download: download,
-
-    //获取图片信息
+    // 获取图片信息
     getImgStyle(url) {
-      return imgZoom(url, 200);
+      return imgZoom(url, 200)
     },
 
-    //获取会话记录消息名称
+    // 获取会话记录消息名称
     getForwardTitle(item) {
-      let arr = [...new Set(item.map((v) => v.nickname))];
-      return arr.join("、") + "的会话记录";
+      let arr = [...new Set(item.map(v => v.nickname))]
+      return arr.join('、') + '的会话记录'
     },
 
-    //获取好友列表
+    // 获取好友列表
     loadFriends() {
-      ServeGetContacts().then((res) => {
+      ServeGetContacts().then(res => {
         if (res.code == 200) {
-          this.contacts.friends = [];
-          for (let friend of res.data) {
-            this.contacts.friends.push({
-              id: friend.id,
+          this.contacts.friends = res.data.map(item => {
+            return {
+              id: item.id,
               type: 1,
-              name: friend.friend_remark
-                ? friend.friend_remark
-                : friend.nickname,
-              avatar: friend.avatar,
-            });
-          }
+              avatar: item.avatar,
+              name: item.friend_remark ? item.friend_remark : item.nickname,
+            }
+          })
         }
-      });
+      })
     },
 
-    //获取群聊列表
+    // 获取群聊列表
     loadGroups() {
-      ServeGetGroups().then((res) => {
+      ServeGetGroups().then(res => {
         if (res.code == 200) {
-          this.contacts.groups = [];
-          for (let group of res.data) {
-            this.contacts.groups.push({
-              id: group.id,
+          this.contacts.groups = res.data.map(item => {
+            return {
+              id: item.id,
               type: 2,
-              name: group.group_name,
-              avatar: group.avatar,
-            });
-          }
+              name: item.group_name,
+              avatar: item.avatar,
+            }
+          })
         }
-      });
+      })
     },
 
-    //左侧联系人菜单点击事件
-    triggerMenuItem(itemInfo) {
-      this.title = itemInfo.name;
-      this.findSource = itemInfo.type;
-      this.findReceiveId = itemInfo.id;
-      this.showBox = 0;
+    // 左侧联系人菜单点击事件
+    triggerMenuItem(item) {
+      this.title = item.name
+      this.findSource = item.type
+      this.findReceiveId = item.id
+      this.showBox = 0
 
-      this.triggerLoadType(0);
+      this.triggerLoadType(0)
     },
 
-    //加载历史记录
+    // 加载历史记录
     loadChatRecord() {
       let data = {
         record_id: this.records.recordId,
         receive_id: this.findReceiveId,
         msg_type: this.records.msgType,
         source: this.findSource,
-      };
+      }
 
-      if (this.records.loadStatus == 1) return;
+      if (this.records.loadStatus == 1) return
 
-      this.records.loadStatus = 1;
+      this.records.loadStatus = 1
       ServeFindTalkRecords(data)
-        .then((res) => {
-          if (res.code != 200) return;
+        .then(res => {
+          if (res.code != 200) return
 
-          let records = data.record_id == 0 ? [] : this.records.items;
+          let records = data.record_id == 0 ? [] : this.records.items
 
-          records.push(...res.data.rows);
+          records.push(...res.data.rows)
 
-          this.records.items = records;
+          this.records.items = records
           this.records.loadStatus =
-            res.data.rows.length < res.data.limit ? 2 : 0;
+            res.data.rows.length < res.data.limit ? 2 : 0
 
           if (this.records.items.length == 0) {
-            this.records.isEmpty = true;
+            this.records.isEmpty = true
           } else {
             this.records.recordId = this.records.items[
               this.records.items.length - 1
-            ].id;
+            ].id
           }
-          console.log(records)
         })
-        .catch((err) => {
-          this.records.loadStatus = 0;
-        });
+        .catch(() => {
+          this.records.loadStatus = 0
+        })
     },
 
     triggerLoadType(type) {
-      this.records.recordId = 0;
-      this.records.msgType = type;
-      this.records.isEmpty = false;
-      this.records.items = [];
+      this.records.recordId = 0
+      this.records.msgType = type
+      this.records.isEmpty = false
+      this.records.items = []
 
-      this.loadChatRecord();
+      this.loadChatRecord()
     },
 
-    searchText(e) {
-      if (this.search.keyword == "") {
-        this.showBox = 0;
-        return false;
+    searchText() {
+      if (this.search.keyword == '') {
+        this.showBox = 0
+        return false
       }
 
       this.$notify.info({
-        title: "消息",
-        message: "查询功能正在开发中...",
-      });
+        title: '消息',
+        message: '查询功能正在开发中...',
+      })
     },
 
     triggerBroadside() {
-      this.broadside = !this.broadside;
+      this.broadside = !this.broadside
     },
   },
-};
+}
 </script>
 <style lang="less" scoped>
 /deep/.el-scrollbar__wrap {
@@ -438,6 +429,7 @@ export default {
 .lum-dialog-mask {
   z-index: 1;
 }
+
 .lum-dialog-box {
   width: 100%;
   height: 600px;
@@ -495,7 +487,7 @@ export default {
   }
 
   .broadside {
-    @border:1px solid #f9f9f9;
+    @border: 1px solid #f9f9f9;
     border-right: @border;
     user-select: none;
     transition: 3s ease;
@@ -631,5 +623,5 @@ export default {
   }
 }
 
-@import "~@/assets/css/talk/talk-records.less";
+@import '~@/assets/css/talk/talk-records.less';
 </style>

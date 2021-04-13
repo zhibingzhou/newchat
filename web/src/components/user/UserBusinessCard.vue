@@ -94,7 +94,7 @@
           type="primary"
           size="small"
           icon="el-icon-s-promotion"
-          v-else="userInfo.friendStatus == 2"
+          v-else-if="userInfo.friendStatus == 2"
           @click="sendMessage(userInfo)"
           >发消息
         </el-button>
@@ -280,7 +280,7 @@ export default {
       let userInfo = this.userInfo;
       ServeCreateTalkList({
         type: 1,
-        receive_id: this.user_id,
+        receive_id: Number(this.user_id),
       }).then((res) => {
         if (res.code !== 200) return;
 

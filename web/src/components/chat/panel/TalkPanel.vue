@@ -1,66 +1,19 @@
 <template>
   <div>
     <el-container class="ov-hidden full-height">
-      <!-- 头部信息 -->
-      <el-header class="header-tools">
-        <div class="title">
-          <p class="badge" :class="{ friend: params.source == 1 }">
-            {{ params.source == 1 ? "好友" : "群组" }}
-          </p>
-          <p class="pointer">
-            <span
-              v-if="params.source == 1"
-              @click="catFriendDetail(params.receiveId)"
-              >{{ params.nickname }}</span
-            >
-            <span v-else @click="group.panel = !group.panel">{{
-              params.nickname
-            }}</span>
-          </p>
-          <p class="num" v-show="groupNum && params.source == 2">
-            ({{ groupNum }}人)
-          </p>
-        </div>
-        <div class="online">
-          <p class="online-text" :class="{ color: isOnline }">
-            <span class="online-status" v-show="isOnline"></span>
-            <span>{{ isOnline ? "在线" : "离线" }}</span>
-          </p>
-          <!--  -->
-          <p class="event-keyboard" v-show="keyEvent.isShow">
-            对方正在输入 ...
-          </p>
-        </div>
-        <div class="means">
-          <el-tooltip content="历史消息" placement="top">
-            <p>
-              <i class="el-icon-time" @click="findChatRecord = true"></i>
-            </p>
-          </el-tooltip>
-          <el-tooltip content="群公告" placement="top">
-            <p v-show="params.source == 2">
-              <i
-                class="iconfont icon-gonggao2"
-                @click="group.notice = true"
-              ></i>
-            </p>
-          </el-tooltip>
-          <el-tooltip content="群设置" placement="top">
-            <p v-show="params.source == 2">
-              <i
-                class="el-icon-setting"
-                @click="group.panel = !group.panel"
-              ></i>
-            </p>
-          </el-tooltip>
-        </div>
-      </el-header>
+      <PanelHeader
+        ref="panelHeader"
+        :data="params"
+        :online="isOnline"
+        :keyboard="inputEvent"
+        @event="handleHeaderEvent"
+      />
 
       <!-- 主体信息 -->
-      <el-main class="no-padding ov-hidden" style="position: relative">
+      <el-main class="main-box no-padding">
         <div
-          class="talks-container lum-scrollbar"
           id="lumenChatPanel"
+          class="talks-container lum-scrollbar"
           @scroll="talkPanelScroll($event)"
         >
           <!-- 数据加载状态栏 -->
@@ -85,7 +38,7 @@
               <invite-message @cat="catFriendDetail" :invite="item.invite" />
             </div>
 
-            <!-- 消息测回消息 -->
+            <!-- 撤回消息 -->
             <div v-else-if="item.is_revoke == 1" class="message-box">
               <revoke-message :item="item" />
             </div>
@@ -99,7 +52,7 @@
                 'checkbox-border': multiSelect.isOpen === true,
               }"
             >
-              <aside class="checkbox-column" v-show="multiSelect.isOpen">
+              <aside v-show="multiSelect.isOpen" class="checkbox-column">
                 <i
                   class="el-icon-success"
                   :class="{ selected: verifyMultiSelect(item.id) }"
@@ -108,9 +61,8 @@
               </aside>
               <aside class="avatar-column">
                 <el-avatar
-                  shape="square"
-                  :size="30"
                   class="pointer"
+                  :size="30"
                   :src="item.avatar"
                   @click.native="catFriendDetail(item.user_id)"
                 />
@@ -118,19 +70,36 @@
               <main class="main-column">
                 <div class="talk-title">
                   <span
-                    class="nickname"
-                    v-show="item.float == 'left'"
-                    v-text="item.nickname"
-                  ></span>
-                  <span v-show="item.friend_remarks"
-                    >({{ item.friend_remarks }})</span
+                    v-show="
+                      item.source == 1 ||
+                      (item.source == 2 && item.float == 'right')
+                    "
+                    class="time"
                   >
-                  <span class="time"  v-show="item.float == 'left'">{{
-                    parseTime(formatDate(item.created_at), "{m}月{d}日 {h}:{i}")
-                  }}</span>
+                    <i class="el-icon-time" />
+                    {{
+                      parseTime(
+                        formatDate(item.created_at),
+                        "{m}月{d}日 {h}:{i}"
+                      )
+                    }}
+                  </span>
                 </div>
 
                 <div class="talk-content">
+                  <span
+                    v-show="item.source == 2 && item.float == 'left'"
+                    class="nickname"
+                  >
+                    {{ item.nickname || item.friend_remarks }} |
+                    {{
+                      parseTime(
+                        formatDate(item.created_at),
+                        "{m}月{d}日 {h}:{i}"
+                      )
+                    }}
+                  </span>
+
                   <!-- 文本消息 -->
                   <text-message
                     v-if="item.msg_type == 1"
@@ -142,7 +111,6 @@
                   />
 
                   <!-- 图片消息 -->
-                  <!-- :src="item.file.file_url" -->
                   <image-message
                     v-else-if="item.msg_type == 2 && item.file.file_type == 1"
                     :src="item.file.file_url"
@@ -193,6 +161,7 @@
                     未知消息类型[{{ item.msg_type }}]
                   </div>
 
+                  <!-- 消息引用(预留) -->
                   <!-- <reply-message /> -->
                 </div>
               </main>
@@ -200,8 +169,8 @@
 
             <!-- 消息时间 -->
             <div
-              class="datetime no-select"
               v-show="compareTime(idx, formatDate(item.created_at))"
+              class="datetime no-select"
               v-text="sendTime(formatDate(item.created_at))"
             />
           </div>
@@ -210,60 +179,43 @@
         <!-- 置底按钮 -->
         <transition name="el-fade-in-linear">
           <div
-            class="tips-board pointer"
             v-show="tipsBoard"
+            class="tips-board pointer"
             @click="talkPanelScrollBottom"
           >
-            <svg-mention-down class="svg" />
+            <SvgMentionDown class="svg" />
             <span>回到底部</span>
           </div>
         </transition>
 
-        <!-- 对话气泡 -->
-        <!-- <div
+        <!-- 新消息气泡 -->
+        <div
+          v-show="tipsBoard && unreadMessage.num"
           class="talk-bubble pointer no-select"
-          v-show="tipsBoard"
           @click="talkPanelScrollBottom"
         >
-          <i class="el-icon-chat-dot-round"></i>
-          <span>新消息</span>
-          <span>@按手机看那三剑客反数据那就开始发你拿手机看</span>
-        </div> -->
+          <i class="el-icon-chat-dot-round" />
+          <span>新消息({{ unreadMessage.num }}条)</span>
+          <span>
+            &nbsp;#{{ unreadMessage.nickname }}#
+            {{ unreadMessage.content }}
+          </span>
+        </div>
       </el-main>
 
       <!-- 页脚信息 -->
       <el-footer class="footer-box" height="160">
-        <template v-if="!multiSelect.isOpen">
-          <me-editor
-            ref="talkEditor"
+        <template v-if="multiSelect.isOpen === false">
+          <MeEditor
             @send="submitSendMesage"
-            @keyboard-event="keyboardEvent"
+            @keyboard-event="onKeyboardEvent"
           />
         </template>
         <template v-else>
-          <div class="multi-select">
-            <div class="multi-title" v-show="multiSelect.items.length > 0">
-              <span>已选中：{{ multiSelect.items.length }} 条消息</span>
-            </div>
-            <div class="multi-btn-group">
-              <div class="multi-icon" @click="handleMultiMode(2)">
-                <i class="el-icon-position"></i>
-              </div>
-              <p>合并转发</p>
-            </div>
-            <div class="multi-btn-group">
-              <div class="multi-icon" @click="handleMultiMode(3)">
-                <i class="el-icon-delete"></i>
-              </div>
-              <p>批量删除</p>
-            </div>
-            <div class="multi-btn-group">
-              <div class="multi-icon" @click="closeMultiSelect">
-                <i class="el-icon-close"></i>
-              </div>
-              <p>关闭</p>
-            </div>
-          </div>
+          <PanelToolbar
+            v-model="multiSelect.items.length"
+            @event="handleMultiMode"
+          />
         </template>
       </el-footer>
 
@@ -273,9 +225,9 @@
         :class="{ show: group.panel }"
         v-outside="hideChatGroup"
       >
-        <group-panel
+        <GroupPanel
           v-if="params.source == 2"
-          :group-id="params.receiveId"
+          :group-id="params.receive_id"
           @close="hideChatGroup"
           @send-group="hideChatGroup"
           @quit-group="quitGroupSuccess"
@@ -287,32 +239,32 @@
 
     <!-- 消息管理器 -->
     <transition name="el-fade-in-linear">
-      <talk-search-record
+      <TalkSearchRecord
         v-if="findChatRecord"
-        @close="findChatRecord = false"
         :source="params.source"
-        :receive-id="params.receiveId"
+        :receive-id="params.receive_id"
         :titleName="params.nickname"
+        @close="findChatRecord = false"
       />
     </transition>
 
-    <!-- 选择联系人窗口 -->
+    <!-- 选择联系人 -->
     <transition name="el-fade-in-linear">
-      <user-contacts
+      <UserContacts
         v-if="selectContacts.isShow"
         @close="selectContacts.isShow = false"
         @confirm="confirmSelectContacts"
       />
     </transition>
 
-    <!-- 查看好友用户信息 -->
-    <user-business-card ref="userBusinessCard" />
+    <!-- 好友用户信息 -->
+    <UserBusinessCard ref="userBusinessCard" />
 
     <!-- 群公告组件 -->
     <transition name="el-fade-in-linear">
-      <group-notice
+      <GroupNotice
         v-if="group.notice"
-        :group-id="params.receiveId"
+        :group-id="params.receive_id"
         @close="group.notice = false"
       />
     </transition>
@@ -326,7 +278,12 @@ import UserContacts from "@/components/chat/UserContacts";
 import GroupPanel from "@/components/group/GroupPanel";
 import GroupNotice from "@/components/group/GroupNotice";
 import MeEditor from "@/components/editor/MeEditor";
+import PanelHeader from "./PanelHeader";
+import PanelToolbar from "./PanelToolbar";
+import SocketInstance from "@/socket-instance";
 import { SvgMentionDown } from "@/core/icons";
+import { formateTime, parseTime, copyTextToClipboard } from "@/utils/functions";
+import { findTalkIndex } from "@/utils/talk";
 import { formatTimeToStr } from "@/utils/data";
 import {
   ServeTalkRecords,
@@ -334,9 +291,6 @@ import {
   ServeRemoveRecords,
   ServeRevokeRecords,
 } from "@/api/chat";
-import { ServeCollectEmoticon } from "@/api/emoticon";
-import { formateTime, parseTime, copyTextToClipboard } from "@/utils/functions";
-import { findTalkIndex } from "@/utils/talk";
 
 export default {
   name: "TalkEditorPanel",
@@ -348,21 +302,25 @@ export default {
     UserBusinessCard,
     GroupNotice,
     SvgMentionDown,
+    PanelToolbar,
+    PanelHeader,
   },
   props: {
-    //对话相关参数
+    // 对话相关参数
     params: {
       type: Object,
-      default: {
-        //消息来源（1：好友私信 2:群聊）
-        source: 0,
-        //消息接收者ID（好友ID或者群聊ID）
-        receiveId: 0,
-        nickname: "",
+      default: function () {
+        return {
+          // 消息来源（1：好友私信 2:群聊）
+          source: 0,
+          // 消息接收者ID（好友ID或者群聊ID）
+          receive_id: 0,
+          nickname: "",
+        };
       },
     },
 
-    //用户是否在线
+    // 用户是否在线
     isOnline: {
       type: Boolean,
       default: false,
@@ -370,46 +328,37 @@ export default {
   },
   data() {
     return {
-      groupNum: 0,
-
-      //查看聊天记录信息
-      forwardRecordBox: {
-        isShow: false,
-        records_id: 0,
-      },
-
-      //记录加载相关参数
+      // 记录加载相关参数
       loadRecord: {
         status: 0,
         minRecord: 0,
-        scrollHeight: 0,
       },
 
-      //多选相关操作
+      // 多选相关操作
       multiSelect: {
         isOpen: false,
         items: [],
         mode: 0,
       },
 
-      //选择联系人窗口
+      // 选择联系人窗口
       selectContacts: {
         isShow: false,
       },
 
-      //群box
+      // 群组Box
       group: {
         panel: false,
         notice: false,
       },
 
-      //键盘输入事件
-      keyEvent: {
+      // 键盘输入事件
+      keyboardEvent: {
         isShow: false,
         time: 0,
       },
 
-      //聊天记录管理器数据
+      // 聊天记录管理器数据
       findChatRecord: false,
 
       // 置底按钮是否显示
@@ -418,19 +367,18 @@ export default {
   },
   computed: {
     ...mapState({
+      unreadMessage: (state) => state.talks.unreadMessage,
       inputEvent: (state) => state.notify.inputEvent,
-      scroll: (state) => state.notify.scroll,
       uid: (state) => state.user.uid,
+      records: (state) => state.dialogue.records,
+      index_name: (state) => state.dialogue.index_name,
     }),
-    records() {
-      return this.$root.message.records;
-    },
   },
   watch: {
     // 监听面板传递参数
-    params(val) {
+    params() {
       this.loadRecord.minRecord = 0;
-      this.$root.message.records = [];
+      this.tipsBoard = false;
       this.multiSelect = {
         isOpen: false,
         items: [],
@@ -438,17 +386,6 @@ export default {
       };
 
       this.loadChatRecords();
-      this.tipsBoard = false;
-    },
-    scroll(n, o) {
-      this.$nextTick(() => this.talkPanelScrollBottom());
-    },
-    //监听好友键盘事件
-    inputEvent(n, o) {
-      this.keyEvent.isShow = true;
-      setTimeout(() => {
-        this.keyEvent.isShow = false;
-      }, 2000);
     },
   },
   mounted() {
@@ -458,38 +395,60 @@ export default {
     parseTime,
     sendTime: formateTime,
 
-    //发送消息方法
-    sendSocket(message) {
-      this.$root.socket.send(message);
+    formatDate: function (time) {
+      if (time != null && time != "") {
+        var date = new Date(time);
+        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
+      } else {
+        return "";
+      }
     },
 
-    //回车键发送消息回调事件
+    // 处理 Header 组件事件
+    handleHeaderEvent(event_name) {
+      switch (event_name) {
+        case "history":
+          this.findChatRecord = true;
+          break;
+        case "notice":
+          this.group.notice = true;
+          break;
+        case "setting":
+          this.group.panel = true;
+          break;
+      }
+    },
+
+    // 回车键发送消息回调事件
     submitSendMesage(content) {
-      //调用父类Websocket组件发送消息
-      this.$root.socket.send({
-        msg_type: "event_talk",
+      // 调用组件发送消息
+      SocketInstance.emit("event_talk", {
         // 发送消息的用户ID
         send_user: this.uid,
         // 接受者消息ID(用户ID或群ID)
-        receive_user: this.params.receiveId,
-        // 聊天类型  1:私聊 2:群聊信息显示用户昵称
+        receive_user: this.params.receive_id,
+        // 聊天类型[1:私聊;2:群聊信息显示用户昵称;]
         source_type: this.params.source,
         // 消息文本
         text_message: content,
       });
-    },
 
-    //推送编辑事件消息
-    keyboardEvent(text) {
-      this.$store.commit({
-        type: "UPDATE_TALK_ITEM",
-        key: findTalkIndex(this.$root.message.index_name),
+      this.$store.commit("UPDATE_TALK_ITEM", {
+        index: findTalkIndex(this.index_name),
         item: {
           draft_text: "",
         },
       });
+    },
 
-    
+    // 推送编辑事件消息
+    onKeyboardEvent(text) {
+      this.$store.commit("UPDATE_TALK_ITEM", {
+        index: findTalkIndex(this.index_name),
+        item: {
+          draft_text: text,
+        },
+      });
 
       // 判断是否推送键盘输入事件消息
       if (!this.$store.state.settings.keyboardEventNotify) {
@@ -498,97 +457,96 @@ export default {
 
       let time = new Date().getTime();
 
-      //判断当前对话是否属于私聊信息
+      // 判断当前对话是否属于私聊信息
       if (this.params.source == 2 || !this.isOnline) return;
 
-      //判断在两秒内是否已推送事件
-      if (this.keyEvent.time != 0 && time - this.keyEvent.time < 2000) {
+      // 判断在两秒内是否已推送事件
+      if (this.keyboardEvent.time != 0 && time - this.keyboardEvent.time < 2000)
         return;
-      }
 
-      this.keyEvent.time = new Date().getTime();
+      this.keyboardEvent.time = time;
 
-      //调用父类Websocket组件发送消息
-      this.sendSocket({
-        event: "event_keyboard",
-        data: {
-          send_user: this.uid,
-          receive_user: this.params.receiveId,
-        },
+      // 调用父类Websocket组件发送消息
+      SocketInstance.emit("event_keyboard", {
+        send_user: this.uid,
+        receive_user: this.params.receive_id,
       });
     },
 
-    //加载用户聊天详情信息
+    // 加载用户聊天详情信息
     loadChatRecords() {
-      let data = {
+      const user_id = this.uid;
+      const data = {
         record_id: this.loadRecord.minRecord,
-        receive_id: this.params.receiveId,
+        receive_id: this.params.receive_id,
         source: this.params.source,
       };
 
       this.loadRecord.status = 0;
 
+      let el = document.getElementById("lumenChatPanel");
+      let scrollHeight = el.scrollHeight;
+
       ServeTalkRecords(data)
         .then((res) => {
-          //防止点击切换过快消息返回延迟，导致信息错误
+          // 防止点击切换过快消息返回延迟，导致信息错误
           if (
             res.code != 200 ||
-            (data.receive_id != this.params.receiveId &&
+            (data.receive_id != this.params.receive_id &&
               data.source != this.params.source)
           ) {
             return;
           }
 
-          let records = data.record_id == 0 ? [] : this.$root.message.records;
-
-          records.unshift(...res.data.rows.reverse());
-
-          this.loadRecord.minRecord =
-            res.data.rows.length == res.data.limit ? res.data.record_id : 0;
-
-          let user_id = this.uid;
-
-          this.$root.message.records = records.map((item) => {
-            item.float =
-              item.user_id == 0
-                ? "center"
-                : item.user_id == user_id
-                ? "right"
-                : "left";
+          const records = res.data.rows.map((item) => {
+            item.float = "center";
+            if (item.user_id > 0) {
+              item.float = item.user_id == user_id ? "right" : "left";
+            }
 
             return item;
           });
 
-          this.loadRecord.status =
-            res.data.rows.length >= res.data.limit ? 1 : 2;
+          // 判断是否是初次加载
+          if (data.record_id == 0) {
+            this.$store.commit("SET_DIALOGUE", []);
+          }
 
-          //滚动条处理
-          let el = document.getElementById("lumenChatPanel");
-          this.$nextTick(function () {
+          this.$store.commit("UNSHIFT_DIALOGUE", records.reverse());
+
+          this.loadRecord.status = records.length >= res.data.limit ? 1 : 2;
+          this.loadRecord.minRecord =
+            records.length == res.data.limit ? res.data.record_id : 0;
+
+          this.$nextTick(() => {
             if (data.record_id == 0) {
-              //首页加载数据滚动条置底
               el.scrollTop = el.scrollHeight;
             } else {
-              //加载数据完成之后将滚动条重置到加载之前的位置
-              el.scrollTop = el.scrollHeight - this.loadRecord.scrollHeight;
+              el.scrollTop = el.scrollHeight - scrollHeight;
             }
           });
-          console.log(records);
         })
-        .catch((e) => {
+        .catch(() => {
           this.loadRecord.status = 1;
         });
     },
 
-    //多选处理方式
-    handleMultiMode(type) {
+
+    // 多选处理方式
+    handleMultiMode(value) {
+      if (value == "close") {
+        this.closeMultiSelect();
+        return false;
+      }
+
       if (this.multiSelect.items.length <= 1) {
         return false;
       }
 
-      this.multiSelect.mode = type;
-      if (type == 1) {
-        //逐条转发
+      if (value == "forward") {
+        this.multiSelect.mode = 1;
+        this.selectContacts.isShow = true;
+        // 逐条转发
         if (this.verifyMultiSelectType(4)) {
           this.$notify({
             title: "消息转发",
@@ -596,10 +554,10 @@ export default {
           });
           return false;
         }
-
+      } else if (value == "merge_forward") {
+        this.multiSelect.mode = 2;
         this.selectContacts.isShow = true;
-      } else if (type == 2) {
-        //合并转发
+        // 合并转发
         if (this.verifyMultiSelectType(4)) {
           this.$notify({
             title: "消息转发",
@@ -607,14 +565,14 @@ export default {
           });
           return false;
         }
+      } else if (value == "delete") {
+        this.multiSelect.mode = 3;
 
-        this.selectContacts.isShow = true;
-      } else {
-        //批量删除
+        // 批量删除
         let ids = this.multiSelect.items;
         ServeRemoveRecords({
           source: this.params.source,
-          receive_id: this.params.receiveId,
+          receive_id: this.params.receive_id,
           record_id: ids.join(","),
         }).then((res) => {
           if (res.code == 200) {
@@ -624,10 +582,10 @@ export default {
       }
     },
 
-    //确认消息转发联系人事件
+    // 确认消息转发联系人事件
     confirmSelectContacts(arr) {
-      let user_ids = [],
-        group_ids = [];
+      let user_ids = [];
+      let group_ids = [];
       arr.forEach((item) => {
         if (item.type == 1) {
           user_ids.push(item.id);
@@ -640,7 +598,7 @@ export default {
       ServeForwardRecords({
         forward_mode: this.multiSelect.mode,
         source: this.params.source,
-        receive_id: this.params.receiveId,
+        receive_id: this.params.receive_id,
         records_ids: this.multiSelect.items,
         receive_user_ids: user_ids,
         receive_group_ids: group_ids,
@@ -656,12 +614,12 @@ export default {
       });
     },
 
-    //处理消息时间是否显示
+    // 处理消息时间是否显示
     compareTime(index, datetime) {
       if (datetime == undefined) {
         return false;
       }
-      if (this.$root.message.records[index].is_revoke == 1) {
+      if (this.records[index].is_revoke == 1) {
         return false;
       }
 
@@ -669,17 +627,18 @@ export default {
       let time = Math.floor(Date.parse(datetime) / 1000);
       let currTime = Math.floor(new Date().getTime() / 1000);
 
-      //当前时间5分钟内时间不显示
+      // 当前时间5分钟内时间不显示
       if (currTime - time < 300) return false;
 
-      //判断是否是最后一条消息,最后一条消息默认显示时间
-      if (index == this.$root.message.records.length - 1) {
+      // 判断是否是最后一条消息,最后一条消息默认显示时间
+      if (index == this.records.length - 1) {
         return true;
       }
 
-      let nextDate = this.formatDate(
-        this.$root.message.records[index + 1].created_at
-      ).replace(/-/g, "/");
+      let nextDate = formatDate(this.records[index + 1].created_at).replace(
+        /-/g,
+        "/"
+      );
 
       return !(
         parseTime(new Date(datetime), "{y}-{m}-{d} {h}:{i}") ==
@@ -687,77 +646,74 @@ export default {
       );
     },
 
-    //查看好友用户信息
+    // 查看好友用户信息
     catFriendDetail(value) {
       this.$refs.userBusinessCard.open(value);
     },
 
-    //撤回消息
-    revokeRecords(idx, item) {
+    // 撤回消息
+    revokeRecords(index, item) {
       ServeRevokeRecords({
         record_id: item.id,
       }).then((res) => {
         if (res.code == 200) {
-          this.$root.message.records[idx].is_revoke = 1;
+          this.$store.commit("UPDATE_DIALOGUE", {
+            index,
+            item: { is_revoke: 1 },
+          });
         }
       });
     },
 
-    //删除消息
-    removeRecords(idx, item) {
-      let user_id = this.uid;
+    // 删除消息
+    removeRecords(index, item) {
       let receive_id = item.receive_id;
-      if (item.source == 1 && item.user_id != user_id) {
+      if (item.source == 1 && item.user_id != this.uid) {
         receive_id = item.user_id;
       }
 
       ServeRemoveRecords({
         source: item.source,
         receive_id: receive_id,
-        record_id: item.id,
+        record_id: item.id.toString(),
       }).then((res) => {
         if (res.code == 200) {
-          this.$delete(this.$root.message.records, idx);
+          this.$store.commit("DELETE_DIALOGUE", index);
         }
       });
     },
 
-    //转发消息
+    // 转发消息
     forwardRecords(idx, item) {
-      alert("单条记录转发开发中...");
+      this.$notify({
+        title: "温馨提示",
+        message: "单条记录转发开发中...",
+      });
     },
 
-    //从列表中删除记录
+    // 从列表中删除记录
     delRecords(arr) {
-      arr.forEach((record_id) => {
-        let i = this.$root.message.records.findIndex(
-          (item) => item.id == record_id
-        );
-        if (i >= 0) {
-          this.$delete(this.$root.message.records, i);
-        }
-      });
-
+      this.$store.commit("BATCH_DELETE_DIALOGUE", arr);
       return this;
     },
 
-    //开启多选模式
+    // 开启多选模式
     openMultiSelect() {
       this.multiSelect.isOpen = true;
     },
 
-    //关闭多选模式
+    // 关闭多选模式
     closeMultiSelect() {
       this.multiSelect.isOpen = false;
       this.multiSelect.items = [];
     },
 
-    //判断记录是否选中
+    // 判断记录是否选中
     verifyMultiSelect(records_id) {
       return this.multiSelect.items.indexOf(records_id) >= 0;
     },
 
-    //触发多选事件
+    // 触发多选事件
     triggerMultiSelect(records_id) {
       let i = this.multiSelect.items.indexOf(records_id);
       if (i >= 0) {
@@ -774,17 +730,14 @@ export default {
       }
     },
 
-    //验证是否存在选择的指定类型的消息
+    // 验证是否存在选择的指定类型的消息
     verifyMultiSelectType(type) {
-      for (let o of this.$root.message.records) {
-        if (this.verifyMultiSelect(o.id) && o.msg_type == type) {
-          return true;
-        }
-      }
-      return false;
+      return this.records.some((item) => {
+        return this.verifyMultiSelect(item.id) && item.msg_type == type;
+      });
     },
 
-    //消息点击右键触发自定义菜单
+    // 消息点击右键触发自定义菜单
     onCopy(idx, item, event) {
       let menus = [];
       let content = "";
@@ -806,7 +759,7 @@ export default {
       if (item.user_id == this.uid) {
         let time =
           new Date().getTime() -
-          Date.parse(this.formatDate(item.created_at).replace(/-/g, "/"));
+          Date.parse(formatDate(item.created_at).replace(/-/g, "/"));
         if (Math.floor(time / 1000 / 60) < 2) {
           menus.push({
             label: "撤回",
@@ -860,27 +813,9 @@ export default {
           icon: "el-icon-picture",
           customClass: "cus-contextmenu-item",
           onClick: () => {
-            ServeCollectEmoticon({
+            this.$store.commit("SAVE_USER_EMOTICON", {
               record_id: item.id,
-            })
-              .then((res) => {
-                if (res.code == 200) {
-                  this.$notify({
-                    title: "收藏提示",
-                    message: "表情包收藏成功...",
-                    type: "success",
-                  });
-
-                  this.$refs.talkEditor.reloadEmoticon();
-                }
-              })
-              .catch((err) => {
-                this.$notify({
-                  title: "收藏提示",
-                  message: "表情包收藏失败...",
-                  type: "warning",
-                });
-              });
+            });
           },
         });
       }
@@ -896,52 +831,42 @@ export default {
       this.closeMultiSelect();
       event.preventDefault();
     },
+
     hideChatGroup() {
       this.group.panel = false;
     },
 
-    //修改群聊免打扰状态
+    // 修改群聊免打扰状态
     disturbChange(detail) {
-      let key = this.$store.state.talks.items.findIndex(
-        (item) => item.index_name == `2_${this.params.receiveId}`
-      );
-      if (key == -1) return false;
-      this.$store.commit({
-        type: "UPDATE_TALK_ITEM",
-        key: key,
+      this.$store.commit("UPDATE_TALK_ITEM", {
+        index: findTalkIndex(`2_${this.params.receive_id}`),
         item: {
           not_disturb: parseInt(detail.status),
         },
       });
     },
 
-    //退出群聊回调事件
+    // 退出群聊回调事件
     quitGroupSuccess() {
       this.$emit("close-talk");
     },
 
-    //同步群信息
+    // 同步群信息
     syncGroupInfo(groupInfo) {
-      this.groupNum = groupInfo.members_num;
+      this.$refs.panelHeader.setGroupNum(groupInfo.members_num);
     },
 
     // 对话面板滚动事件
     talkPanelScroll(e) {
       if (e.target.scrollTop == 0 && this.loadRecord.status == 1) {
         this.loadChatRecords();
+        return;
       }
 
-      this.tipsBoard = !(
-        Math.ceil(e.target.scrollTop) + e.target.clientHeight >=
-        e.target.scrollHeight
-      );
-    },
-    formatDate: function (time) {
-      if (time != null && time != "") {
-        var date = new Date(time);
-        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
-      } else {
-        return "";
+      const height = e.target.scrollTop + e.target.clientHeight + 5;
+      this.tipsBoard = height < e.target.scrollHeight;
+      if (this.tipsBoard == false && this.unreadMessage.num > 0) {
+        this.$store.commit("CLEAR_TLAK_UNREAD_MESSAGE");
       }
     },
 
@@ -954,159 +879,15 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-.header-tools {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgb(245, 245, 245);
-
-  > div {
-    width: 100%/3;
-  }
-
-  .title {
-    display: flex;
-    align-items: center;
-    transition: 0.5s ease;
-
-    .badge {
-      background: rgb(81 139 254);
-      height: 18px;
-      line-height: 18px;
-      padding: 1px 3px;
-      font-size: 10px;
-      color: white;
-      border-radius: 3px;
-      margin-right: 8px;
-
-      &.friend {
-        background: #f97348;
-      }
-    }
-
-    .num {
-      margin-left: 5px;
-    }
-  }
-
-  .online {
-    position: relative;
-    text-align: center;
-
-    .online-text {
-      color: #cccccc;
-      font-weight: 200;
-
-      &.color {
-        color: #1890ff;
-      }
-
-      .online-status {
-        position: relative;
-        top: -1px;
-        display: inline-block;
-        width: 6px;
-        height: 6px;
-        vertical-align: middle;
-        border-radius: 50%;
-        position: relative;
-        background-color: #1890ff;
-        margin-right: 5px;
-
-        &:after {
-          position: absolute;
-          top: -1px;
-          left: -1px;
-          width: 100%;
-          height: 100%;
-          border: 1px solid #1890ff;
-          border-radius: 50%;
-          -webkit-animation: antStatusProcessing 1.2s ease-in-out infinite;
-          animation: antStatusProcessing 1.2s ease-in-out infinite;
-          content: "";
-        }
-      }
-    }
-
-    .event-keyboard {
-      height: 20px;
-      line-height: 18px;
-      font-size: 10px;
-      animation: inputfade 600ms infinite;
-      -webkit-animation: inputfade 600ms infinite;
-    }
-  }
-
-  .means {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-
-    p {
-      cursor: pointer;
-      margin: 0 8px;
-      font-size: 20px;
-      color: #828f95;
-      &:active i {
-        font-size: 26px;
-        transform: scale(1.3);
-        transition: ease 0.5s;
-      }
-    }
-  }
+.main-box {
+  position: relative;
 }
 
 /* 面板页脚 */
 .footer-box {
   height: 160px !important;
   padding: 0;
-
-  .multi-select {
-    height: 110px;
-    text-align: center;
-    position: relative;
-    padding-top: 50px;
-    border-top: 1px solid rgb(245, 245, 245);
-
-    .multi-title {
-      position: absolute;
-      top: 15px;
-      left: 0px;
-      right: 0px;
-      margin: 0px auto;
-      color: #878484;
-      font-weight: 300;
-      font-size: 14px;
-      width: 150px;
-    }
-
-    .multi-btn-group {
-      display: inline-block;
-      width: 70px;
-      height: 70px;
-      margin-right: 15px;
-
-      p {
-        font-size: 12px;
-        margin-top: 8px;
-        cursor: pointer;
-      }
-    }
-
-    .multi-icon {
-      width: 45px;
-      height: 45px;
-      line-height: 45px;
-      background-color: #f5f5f5;
-      border-radius: 50%;
-      cursor: pointer;
-      margin: 0 auto;
-
-      &:hover {
-        background-color: #ccc;
-      }
-    }
-  }
+  border-top: 1px solid #f5f5f5;
 }
 
 /* 侧边栏css */
@@ -1159,21 +940,26 @@ export default {
 
 .talk-bubble {
   position: absolute;
-  left: 10px;
-  bottom: 10px;
-  width: 300px;
+  left: 0px;
+  bottom: 20px;
+  max-width: 300px;
   height: 40px;
   line-height: 40px;
-  border-radius: 8px;
+  border-radius: 0 20px 20px 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: white;
-  padding: 0 10px;
+  padding: 0 15px 0 30px;
   font-size: 13px;
-  background: linear-gradient(to right, #87cfef, #0fb0f5);
-  animation: talkbubble 1s ease-in-out infinite;
-  // display: none;
+  background: #409eff;
+
+  i {
+    font-size: 22px;
+    position: absolute;
+    left: 5px;
+    top: 9px;
+  }
 }
 
 .talks-container {
@@ -1263,7 +1049,7 @@ export default {
         font-size: 10px;
         user-select: none;
         color: #a7a0a0;
-        opacity: 1;
+        opacity: 0;
         transition: 0.5s ease;
 
         &.show {
@@ -1281,6 +1067,13 @@ export default {
         align-items: flex-start;
         box-sizing: border-box;
         width: 100%;
+
+        .nickname {
+          font-size: 12px;
+          color: #a7a0a0;
+          margin: -4px 0 4px -8px;
+          transform: scale(0.9);
+        }
       }
 
       &:hover {
@@ -1288,13 +1081,6 @@ export default {
           opacity: 1;
         }
       }
-        //  .nickname {
-        //   font-size: 12px;
-        //   color: #a7a0a0;
-        //   margin: -4px 0 4px -8px;
-        //   transform: scale(0.9);
-        // }
-
     }
 
     &.direction-rt {
@@ -1321,77 +1107,6 @@ export default {
         border-color: #409eff;
       }
     }
-  }
-}
-
-@keyframes talkbubble {
-  from {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.01);
-  }
-
-  to {
-    transform: scale(1);
-  }
-}
-
-/* css 动画 */
-@keyframes inputfade {
-  from {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.4;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@-webkit-keyframes inputfade {
-  from {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.4;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@-webkit-keyframes antStatusProcessing {
-  0% {
-    -webkit-transform: scale(0.8);
-    transform: scale(0.8);
-    opacity: 0.5;
-  }
-
-  to {
-    -webkit-transform: scale(2.4);
-    transform: scale(2.4);
-    opacity: 0;
-  }
-}
-
-@keyframes antStatusProcessing {
-  0% {
-    -webkit-transform: scale(0.8);
-    transform: scale(0.8);
-    opacity: 0.5;
-  }
-
-  to {
-    -webkit-transform: scale(2.4);
-    transform: scale(2.4);
-    opacity: 0;
   }
 }
 </style>

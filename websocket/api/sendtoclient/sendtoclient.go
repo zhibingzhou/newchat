@@ -16,9 +16,10 @@ type inputData struct {
 	Rep string `json:"rep"`
 }
 
+//服务器图片发消息，websocket 接收
 func (c *Controller) Run(w http.ResponseWriter, r *http.Request) {
-	var inputData servers.ReponseFromWebData
-	var rep servers.DResult
+	var inputData servers.ReponseFromTalkEvent
+	var rep servers.DResultTalkEvent
 
 	if err := json.NewDecoder(r.Body).Decode(&inputData); err != nil {
 		w.WriteHeader(http.StatusBadRequest)

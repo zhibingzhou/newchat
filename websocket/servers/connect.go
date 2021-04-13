@@ -73,7 +73,7 @@ func (c *Controller) Run(w http.ResponseWriter, r *http.Request) {
 	redis.RedisDB.HSet(redis.UserIdClient, uid, clientId)
 	redis.RedisDB.HSet(redis.UserIdSystem, uid, systemId)
 	redis.RedisDB.HSet(redis.UserStatus, uid, "1")
-
+	SendUserStatus(uid, 1)
 	if err = api.ConnRender(conn, renderData{ClientId: clientId}); err != nil {
 		_ = conn.Close()
 		return

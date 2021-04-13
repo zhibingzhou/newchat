@@ -1,10 +1,11 @@
 package servers
 
 import (
+	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
-	"websocket/pkg/redis"
 	"websocket/pkg/setting"
 	"websocket/tools/util"
 
@@ -251,13 +252,29 @@ func PingTimer() {
 					log.Errorf("发送心跳失败: %s 总连接数：%d", clientId, Manager.Count())
 					continue
 				}
-				check, _ := redis.RedisDB.HGet(redis.UserCheck, conn.UserId).Result()
-				if check != "1" {
-					redis.RedisDB.HSet(redis.UserStatus, conn.UserId, "0")
-				}
+				// check, _ := redis.RedisDB.HGet(redis.UserCheck, conn.UserId).Result()
+				// userStatus, _ := redis.RedisDB.HGet(redis.UserStatus, conn.UserId).Result()
+				// if check != "1" {
+				// 	if userStatus != "0" {
+				// 		//下线通知
+				// 		redis.RedisDB.HSet(redis.UserStatus, conn.UserId, "0")
+				// 		SendUserStatus(conn.UserId, 0)
+				// 	}
+				// }
 			}
-			redis.RedisDB.Del(redis.UserCheck)
+			// redis.RedisDB.Del(redis.UserCheck)
 		}
 
 	}()
+}
+
+func SendUserStatus(userid string, status int) {
+	user_id, _ := strconv.Atoi(userid)
+	userstatus := UpdateUserStatus{
+		User_id: user_id,
+		Event:   "login_event",
+		Status:  status,
+	}
+	message, _ := json.Marshal(userstatus)
+	MessageChannel.Request <- DRequest{Message: message}
 }

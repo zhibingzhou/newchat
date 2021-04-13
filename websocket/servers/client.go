@@ -51,12 +51,14 @@ func (c *Client) Read() {
 				MessageChannel.Request <- DRequest{Message: message}
 			} else {
 				userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, c.UserId).Result()
+				//更新在线状态，上线通知
 				if userstatus != "1" {
 					redis.RedisDB.HSet(redis.UserStatus, c.UserId, "1")
-				}
-				check, _ := redis.RedisDB.HGet(redis.UserCheck, c.UserId).Result()
-				if check != "1" {
-					redis.RedisDB.HSet(redis.UserCheck, c.UserId, "1")
+					SendUserStatus(c.UserId, 1)
+					// check, _ := redis.RedisDB.HGet(redis.UserCheck, c.UserId).Result()
+					// if check != "1" {
+					// 	redis.RedisDB.HSet(redis.UserCheck, c.UserId, "1")
+					// }
 				}
 			}
 		}

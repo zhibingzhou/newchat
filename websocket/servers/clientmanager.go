@@ -7,11 +7,12 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"websocket/define/retcode"
 	"websocket/pkg/redis"
 	"websocket/pkg/setting"
 	"websocket/tools/util"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // 连接管理
@@ -83,6 +84,10 @@ func (manager *ClientManager) EventDisconnect(client *Client) {
 	redis.RedisDB.HDel(redis.UserIdClient, redis.UserIdClient)
 	redis.RedisDB.HDel(redis.UserIdSystem, client.UserId)
 	redis.RedisDB.HSet(redis.UserStatus, client.UserId, "0")
+
+	//下线通知
+	SendUserStatus(client.UserId, 0)
+
 	// aaa, _ := redis.RedisDB.HMGet(redis.UserStatus, abc...).Result()
 	// fmt.Println(aaa)
 

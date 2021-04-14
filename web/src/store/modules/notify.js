@@ -41,6 +41,7 @@ const notify = {
     },
     //用户入群通知
     incrEnterGroup(state, value = null) {
+      console.log("im ehreds ", value)
       if (value === null) {
         state.enterGroup++;
       } else {

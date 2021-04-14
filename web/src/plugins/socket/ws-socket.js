@@ -3,8 +3,10 @@ import {
     setClientId,
 } from '@/utils/auth';
 // 引入消息处理类
+import KeyboardEvent from '@/plugins/socket/event/keyboard-event';
 import TalkEvent from '@/plugins/socket/event/talk-event';
 import LoginEvent from './event/login-event';
+import GroupJoinEvent from './event/group-join-event';
 
 class WsSocket {
 
@@ -199,8 +201,12 @@ class WsSocket {
             case "login_event":
                 let data_login = JSON.parse(result.data);
                 (new LoginEvent(data_login)).handle();
-
-                break;
+            case "event_keyboard":
+                let data_keybaord = JSON.parse(result.data);
+                (new KeyboardEvent(data_keybaord)).handle();
+            case "join_group":
+                let group_join = JSON.parse(result.data);
+                (new GroupJoinEvent(group_join)).handle();
             default:
                 console.warn(`WsSocket 消息事件[${result.event}]未绑定...`)
                 break;

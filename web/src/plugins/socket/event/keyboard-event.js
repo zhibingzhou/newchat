@@ -24,6 +24,7 @@ class KeyboardEvent extends AppMessageEvent {
     if (this.isShow()) {
       this.vm.$store.commit('incrInputEvent');
     }
+   
   }
 
   isShow() {

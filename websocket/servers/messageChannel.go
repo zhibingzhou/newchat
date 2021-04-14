@@ -55,9 +55,27 @@ type ReponseLoginEvents struct {
 
 type ReponseLoginEvent struct {
 	User_id      int    `json:"user_id"`
-	Status       int   `json:"status"`
+	Status       int    `json:"status"`
 	Receivedlist []int  `json:"received"`
 	Event        string `json:"event"`
+}
+
+type KeyBoardEvent struct {
+	Send_user    int    `json:"send_user"`
+	Event        string `json:"event"`
+	Receive_user string `json:"receive_user"`
+}
+
+type ReponseGroupJoin struct {
+	Code int       `json:"code"`
+	Data GroupList `json:"data"`
+	Msg  string    `json:"msg"`
+}
+
+type GroupList struct {
+	Send_user    int    `json:"send_user"`
+	Event        string `json:"event"`
+	Receivedlist []int  `json:"received"`
 }
 
 func NewChannel_Pool(count int) *Channel_Pool {
@@ -184,7 +202,7 @@ func (d DRequest) Run() DResult {
 
 	var evenlogin UpdateUserStatus
 	err = json.Unmarshal(d.Message, &evenlogin)
-	if evenlogin.Event != "" {
+	if evenlogin.Event != "" && evenlogin.User_id != 0 {
 		var reponselogin ReponseLoginEvents
 		if err != nil || evenlogin.Event == "" {
 			reponselogin.Code = 100
@@ -207,6 +225,18 @@ func (d DRequest) Run() DResult {
 
 	}
 
+	var evenKeyboard KeyBoard
+
+	err = json.Unmarshal(d.Message, &evenKeyboard)
+	if evenKeyboard.Event != "" {
+		var reponsekeyboard KeyBoardEvent
+		reponsekeyboard.Send_user = evenKeyboard.Data.Send_user
+		reponsekeyboard.Event = evenKeyboard.Event
+		reponsekeyboard.Receive_user = evenKeyboard.Data.Receive_user
+		dresult.Result = reponsekeyboard
+		return dresult
+	}
+
 	return dresult
 }
 
@@ -218,21 +248,18 @@ func MessageGetResult() {
 
 			select {
 			case rep := <-MessageChannel.Result:
-				eventalk, ok := rep.Result.(DResultTalkEvent)
-				if ok {
+				switch eventalk := rep.Result.(type) {
+				case DResultTalkEvent:
 					if eventalk.Status == 200 {
 						SendMessage(eventalk)
 					}
-				} else {
-					eventalk, ok := rep.Result.(ReponseLoginEvents)
-					if ok {
-						if eventalk.Code == 200 {
-							SendStatus(eventalk.Data.Receivedlist, eventalk.Data.Status, eventalk.Data.User_id, eventalk.Data.Event)
-						}
+				case ReponseLoginEvents:
+					if eventalk.Code == 200 {
+						SendStatus(eventalk.Data.Receivedlist, eventalk.Data.Status, eventalk.Data.User_id, eventalk.Data.Event)
 					}
-
+				case KeyBoardEvent:
+					SendKeyboardEvent(eventalk)
 				}
-
 			}
 
 		}
@@ -278,7 +305,7 @@ func SendMessage(rep DResultTalkEvent) {
 
 }
 
-func SendStatus(user_list []int, status , user_id int, event string) {
+func SendStatus(user_list []int, status, user_id int, event string) {
 
 	if len(user_list) > 0 { //组
 		for _, value := range user_list {
@@ -298,4 +325,32 @@ func SendStatus(user_list []int, status , user_id int, event string) {
 		}
 	}
 
+}
+
+func SendKeyboardEvent(v KeyBoardEvent) {
+	userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, v.Receive_user).Result()
+	fmt.Println(userstatus, v)
+	if userstatus == "1" {
+		client, _ := redis.RedisDB.HGet(redis.UserIdClient, v.Receive_user).Result()
+		if client != "" {
+			evenTalk, _ := json.Marshal(v)
+			result := string(evenTalk)
+			SendMessage2Client(client, "0", 200, v.Event, &result)
+		}
+	}
+}
+
+func SendGroupJoinOn(rep GroupList) {
+	if len(rep.Receivedlist) > 0 { //组
+		for _, value := range rep.Receivedlist {
+			userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, fmt.Sprintf("%d", value)).Result()
+			if userstatus == "1" {
+				client, _ := redis.RedisDB.HGet(redis.UserIdClient, fmt.Sprintf("%d", value)).Result()
+				if client != "" {
+					result := string(`{"msg":"join_group"}`)
+					SendMessage2Client(client, "0", 200, rep.Event, &result)
+				}
+			}
+		}
+	}
 }

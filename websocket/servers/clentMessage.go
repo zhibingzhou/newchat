@@ -3,11 +3,11 @@ package servers
 import "time"
 
 type RequestEvenTalk struct {
-	Send_user    int `json:"send_user"`
-	Receive_user string  `json:"receive_user"`
-	Text_message string  `json:"text_message"`
-	Msg_type     string  `json:"msg_type"`
-	Source_type  string  `json:"source_type"`
+	Send_user    int    `json:"send_user"`
+	Receive_user string `json:"receive_user"`
+	Text_message string `json:"text_message"`
+	Msg_type     string `json:"msg_type"`
+	Source_type  string `json:"source_type"`
 }
 
 type ResponseEvenTalk struct {
@@ -63,12 +63,22 @@ type Invite struct {
 
 //更新用户状态
 type UserStatus struct {
-	User_id int  `json:"user_id"`
+	User_id int `json:"user_id"`
 	Status  int `json:"status"`
 }
 
 type UpdateUserStatus struct {
 	Event   string `json:"event"`
 	User_id int    `json:"user_id"`
-	Status  int   `json:"status"`
+	Status  int    `json:"status"`
+}
+
+type KeyBoard struct {
+	Event string       `json:"event"`
+	Data  KeyBoardData `json:"data"`
+}
+
+type KeyBoardData struct {
+	Send_user    int `json:"send_user"`
+	Receive_user string `json:"receive_user"`
 }

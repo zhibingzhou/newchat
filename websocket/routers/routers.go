@@ -7,6 +7,7 @@ import (
 	"websocket/api/bind2group"
 	"websocket/api/closeclient"
 	"websocket/api/getonlinelist"
+	"websocket/api/groupjoin"
 	"websocket/api/register"
 	"websocket/api/send2client"
 	"websocket/api/send2clients"
@@ -24,6 +25,7 @@ func Init() {
 	getGroupListHandler := &getonlinelist.Controller{}
 	closeClientHandler := &closeclient.Controller{}
 	websendtoclientHandler := &sendtoclient.Controller{}
+	groupjoin := &groupjoin.Controller{}
 
 	http.HandleFunc("/abc", home)
 	http.HandleFunc("/api/register", registerHandler.Run)
@@ -34,6 +36,7 @@ func Init() {
 	http.HandleFunc("/api/get_online_list", AccessTokenMiddleware(getGroupListHandler.Run))
 	http.HandleFunc("/api/close_client", AccessTokenMiddleware(closeClientHandler.Run))
 	http.HandleFunc("/send_message", WebTokenMiddleware(websendtoclientHandler.Run))
+	http.HandleFunc("/join_group", WebTokenMiddleware(groupjoin.Run))
 
 	servers.StartWebSocket()
 

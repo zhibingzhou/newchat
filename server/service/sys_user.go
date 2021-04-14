@@ -150,7 +150,7 @@ func FindUserByUuid(uuid string) (err error, user *model.SysUser) {
 //@param: id int
 //@return: err error, user *model.SysUser
 
-func SearchUserById(user_id , friend_id int) (err error, user *response.ResponseSearchUser) {
+func SearchUserById(user_id, friend_id int) (err error, user *response.ResponseSearchUser) {
 	u := response.ResponseSearchUser{}
 	var c model.Contacts
 	var a model.ApplyRecords
@@ -168,6 +168,10 @@ func SearchUserById(user_id , friend_id int) (err error, user *response.Response
 		//查找是否有已经审请中的记录 , 有审请记录 apply=1
 		if !errors.Is(global.GVA_DB.Debug().Table("apply_records").Where("user_id = ? and friend_id = ? and status = 0 ", user_id, friend_id).Scan(&a).Error, gorm.ErrRecordNotFound) {
 			u.Friend_apply = 1
+		}
+		if user_id == friend_id {
+			u.Friend_status = 0
+			u.Friend_apply = 0
 		}
 	}
 

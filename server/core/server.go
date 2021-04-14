@@ -17,7 +17,7 @@ func RunWindowsServer() {
 		// 初始化redis服务
 		initialize.Redis()
 	}
-	initialize.InitWkMode()
+	//initialize.InitWkMode()
 	Router := initialize.Routers()
 	Router.Static("/form-generator", "./resource/page")
 

@@ -126,3 +126,20 @@ func SendToClient(event string, request response.WebsocketMessage) {
 	}
 	//	HttpPostjson()
 }
+
+func SendToGroupJoin(request response.GroupListJoin) {
+
+	systemId, _ := global.GVA_REDIS.HGet(global.UserIdSystem, fmt.Sprintf("%d", request.Send_user)).Result()
+	onlineStatus := model.RedisGetUserOnline(request.Send_user)
+	if systemId != "" && onlineStatus {
+		requestbyte, _ := json.Marshal(request)
+		fmt.Println(string(requestbyte))
+		url := global.GVA_CONFIG.Websocket.Url + "/join_group?" + fmt.Sprintf("UserId=%d", request.Send_user)
+		status, msg := utils.HttpPostjson(url, requestbyte, map[string]string{
+			"SystemId": systemId,
+		})
+		if status != 200 {
+			global.GVA_LOG.Error(msg, zap.Any("err", errors.New(msg)))
+		}
+	}
+}

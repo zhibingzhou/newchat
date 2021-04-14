@@ -8,7 +8,6 @@ type ResponseEvenTalk struct {
 	Source_type  string `json:"source_type"`
 }
 
-
 //返回参数
 type WebsocketMessage struct {
 	Messagedata  WebsocketImage `json:"messagedata"`
@@ -21,4 +20,10 @@ type WebsocketImage struct {
 	Receive_user int                `json:"receive_user"`
 	Send_user    int                `json:"send_user"`
 	Data         ResponseTalkRecord `json:"data"`
+}
+
+type GroupListJoin struct {
+	Send_user    int    `json:"send_user"`
+	Event        string `json:"event"`
+	Receivedlist []int  `json:"received"`
 }

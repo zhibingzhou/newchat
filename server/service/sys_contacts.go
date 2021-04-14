@@ -140,20 +140,23 @@ func AcceptInvitation(apply_id int, remarks, nickname string) (err error) {
 	err = tx.Table("contacts").Create(&contacts_one).Error
 	if err != nil {
 		tx.Rollback()
+		return err
 	}
 
 	err = tx.Table("contacts").Create(&contacts_two).Error
 	if err != nil {
 		tx.Rollback()
+		return err
 	}
 
 	err = tx.Table("apply_records").Where("id = ?", apply_id).Update("status", 1).Error
 
 	if err != nil {
 		tx.Rollback()
+		return err
 	}
 
-	tx.Commit()
+	err = tx.Commit().Error
 
 	return err
 }
@@ -167,12 +170,14 @@ func Contacts_Delete(user_id, friend_id int) (err error) {
 	err = tx.Table("contacts").Unscoped().Delete(&model.Contacts{}, "user_id = ? and friend_id = ?", user_id, friend_id).Error
 	if err != nil {
 		tx.Rollback()
+		return err
 	}
 	err = tx.Table("contacts").Unscoped().Delete(&model.Contacts{}, "user_id = ? and friend_id = ?", friend_id, user_id).Error
 	if err != nil {
 		tx.Rollback()
+		return err
 	}
-	tx.Commit()
+	err = tx.Commit().Error
 
 	return err
 }
@@ -204,20 +209,23 @@ func TalkDelete(id int) (err error) {
 	err = tx.Table("messages_list").Where("id = ?", id).Scan(&mes).Error
 	if err != nil {
 		tx.Rollback()
+		return err
 	}
 	if mes.Type == 1 {
 		err = tx.Debug().Table("messages_list").Unscoped().Delete(&model.Messages_list{}, "id = ?", id).Error
 		if err != nil {
 			tx.Rollback()
+			return err
 		}
 	}
 	if mes.Type == 2 {
 		err = tx.Table("group_member").Where("group_id = ? and user_id = ?", mes.Group_id, id).Update(map[string]interface{}{"talk_remove": 1}).Error
 		if err != nil {
 			tx.Rollback()
+			return err
 		}
 	}
-	tx.Commit()
+	err = tx.Commit().Error
 	return err
 }
 

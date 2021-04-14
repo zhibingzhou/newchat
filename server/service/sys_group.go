@@ -173,6 +173,7 @@ func GroupCreate(uid int, rep request.RequestGroupCreate) (err error) {
 	err = tx.Table("group_list").Create(&groups).Error
 	if err != nil {
 		tx.Rollback()
+		return err
 	}
 
 	group := model.Group_member{
@@ -184,6 +185,7 @@ func GroupCreate(uid int, rep request.RequestGroupCreate) (err error) {
 	err = tx.Table("group_member").Create(&group).Error
 	if err != nil {
 		tx.Rollback()
+		return err
 	}
 
 	for _, value := range uids {
@@ -196,11 +198,12 @@ func GroupCreate(uid int, rep request.RequestGroupCreate) (err error) {
 		tx.Table("group_member").Create(&group)
 		if err != nil {
 			tx.Rollback()
+			return err
 		}
 
 	}
 
-	tx.Commit()
+	err = tx.Commit().Error
 	return err
 }
 
@@ -216,6 +219,7 @@ func GroupInvite(uid int, rep request.RequestGroupInvite) (err error) {
 	err = tx.Table("group_list").Where("id = ?", rep.Group_id).Scan(&groups).Error
 	if err != nil {
 		tx.Rollback()
+		return err
 	}
 
 	for _, value := range uids {
@@ -228,11 +232,26 @@ func GroupInvite(uid int, rep request.RequestGroupInvite) (err error) {
 		tx.Table("group_member").Create(&group)
 		if err != nil {
 			tx.Rollback()
+			return err
 		}
 
 	}
 
-	tx.Commit()
+	repjoin := response.GroupListJoin{
+		Send_user: uid,
+		Event: "join_group",
+	}
+	err, user_list := model.Redis_GetGroupbyId(rep.Group_id)
+	if err != nil {
+		return err
+	}
+	for key, _ := range user_list {
+		repjoin.Receivedlist = append(repjoin.Receivedlist, user_list[key].User_id)
+	}
+	
+	go SendToGroupJoin(repjoin)
+
+	err = tx.Commit().Error
 	return err
 }
 

@@ -3,6 +3,7 @@ package servers
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"strconv"
 
 	"websocket/pkg/redis"
@@ -248,18 +249,25 @@ func MessageGetResult() {
 
 			select {
 			case rep := <-MessageChannel.Result:
-				switch eventalk := rep.Result.(type) {
-				case DResultTalkEvent:
-					if eventalk.Status == 200 {
-						SendMessage(eventalk)
-					}
-				case ReponseLoginEvents:
-					if eventalk.Code == 200 {
-						SendStatus(eventalk.Data.Receivedlist, eventalk.Data.Status, eventalk.Data.User_id, eventalk.Data.Event)
-					}
-				case KeyBoardEvent:
-					SendKeyboardEvent(eventalk)
-				}
+
+				//反射
+				getValue := reflect.ValueOf(rep)
+				methodvalue := getValue.MethodByName("EventDo")
+				methodvalue.Call(make([]reflect.Value, 0))
+
+				//类型断言
+				// switch eventalk := rep.Result.(type) {
+				// case DResultTalkEvent:
+				// 	if eventalk.Status == 200 {
+				// 		SendMessage(eventalk)
+				// 	}
+				// case ReponseLoginEvents:
+				// 	if eventalk.Code == 200 {
+				// 		SendStatus(eventalk.Data.Receivedlist, eventalk.Data.Status, eventalk.Data.User_id, eventalk.Data.Event)
+				// 	}
+				// case KeyBoardEvent:
+				// 	SendKeyboardEvent(eventalk)
+				// }
 			}
 
 		}
@@ -268,6 +276,48 @@ func MessageGetResult() {
 }
 
 func SendMessage(rep DResultTalkEvent) {
+	switch rep.DataResponse.Source_type {
+	case 1:
+		userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, fmt.Sprintf("%d", rep.DataResponse.Receive_user)).Result()
+		if userstatus == "1" {
+			client, _ := redis.RedisDB.HGet(redis.UserIdClient, fmt.Sprintf("%d", rep.DataResponse.Receive_user)).Result()
+			if client != "" {
+				evenTalk, _ := json.Marshal(rep.DataResponse)
+				result := string(evenTalk)
+				SendMessage2Client(client, "0", 200, rep.Event, &result)
+			}
+		}
+
+		client, _ := redis.RedisDB.HGet(redis.UserIdClient, fmt.Sprintf("%d", rep.DataResponse.Send_user)).Result()
+		if client != "" {
+			evenTalk, _ := json.Marshal(rep.DataResponse)
+			result := string(evenTalk)
+			SendMessage2Client(client, "0", 200, rep.Event, &result)
+		}
+
+	case 2:
+		if len(rep.Receivedlist) > 0 { //组
+			for _, value := range rep.Receivedlist {
+				userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, fmt.Sprintf("%d", value)).Result()
+				if userstatus == "1" {
+					client, _ := redis.RedisDB.HGet(redis.UserIdClient, fmt.Sprintf("%d", value)).Result()
+					if client != "" {
+						evenTalk, _ := json.Marshal(rep.DataResponse)
+						result := string(evenTalk)
+						SendMessage2Client(client, "0", 200, rep.Event, &result)
+					}
+				}
+			}
+		}
+	}
+
+}
+
+func (rep DResultTalkEvent) EventDo() {
+	if rep.Status != 200 {
+		return
+	}
+	//消息事件
 	switch rep.DataResponse.Source_type {
 	case 1:
 		userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, fmt.Sprintf("%d", rep.DataResponse.Receive_user)).Result()
@@ -327,7 +377,46 @@ func SendStatus(user_list []int, status, user_id int, event string) {
 
 }
 
+func (rep ReponseLoginEvents) EventDo() {
+	if rep.Code != 200 {
+		return
+	}
+	// 修改状态事件
+	if len(rep.Data.Receivedlist) > 0 { //组
+		for _, value := range rep.Data.Receivedlist {
+			userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, fmt.Sprintf("%d", value)).Result()
+			if userstatus == "1" {
+				client, _ := redis.RedisDB.HGet(redis.UserIdClient, fmt.Sprintf("%d", value)).Result()
+				if client != "" {
+					data := UserStatus{
+						Status:  rep.Data.Status,
+						User_id: rep.Data.User_id,
+					}
+					evenTalk, _ := json.Marshal(data)
+					result := string(evenTalk)
+					SendMessage2Client(client, "0", 200, rep.Data.Event, &result)
+				}
+			}
+		}
+	}
+
+}
+
 func SendKeyboardEvent(v KeyBoardEvent) {
+	userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, v.Receive_user).Result()
+	fmt.Println(userstatus, v)
+	if userstatus == "1" {
+		client, _ := redis.RedisDB.HGet(redis.UserIdClient, v.Receive_user).Result()
+		if client != "" {
+			evenTalk, _ := json.Marshal(v)
+			result := string(evenTalk)
+			SendMessage2Client(client, "0", 200, v.Event, &result)
+		}
+	}
+}
+
+func (v KeyBoardEvent) EventDo() {
+	//键盘敲击事件
 	userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, v.Receive_user).Result()
 	fmt.Println(userstatus, v)
 	if userstatus == "1" {
@@ -354,3 +443,4 @@ func SendGroupJoinOn(rep GroupList) {
 		}
 	}
 }
+

@@ -251,7 +251,7 @@ func MessageGetResult() {
 			case rep := <-MessageChannel.Result:
 
 				//反射
-				getValue := reflect.ValueOf(rep)
+				getValue := reflect.ValueOf(rep.Result)
 				methodvalue := getValue.MethodByName("EventDo")
 				methodvalue.Call(make([]reflect.Value, 0))
 

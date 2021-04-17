@@ -18,15 +18,18 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/google/uuid v1.2.0
 	github.com/googollee/go-socket.io v1.4.4
+	github.com/gookit/color v1.3.6
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mojocn/base64Captcha v1.3.1
 	github.com/pkg/errors v0.8.1
 	github.com/qiniu/api.v7/v7 v7.8.2
 	github.com/satori/go.uuid v1.2.0
 	github.com/shirou/gopsutil v3.21.1+incompatible
+	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0
@@ -35,5 +38,6 @@ require (
 	github.com/unrolled/secure v1.0.8
 	github.com/zhibingzhou/go_public v0.0.0-20201225024050-22e0daa20d38
 	go.uber.org/zap v1.16.0
+	gorm.io/driver/mysql v1.0.1
 	gorm.io/gorm v1.20.7
 )

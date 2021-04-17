@@ -45,10 +45,10 @@ var initdbCmd = &cobra.Command{
 		Mysql.Init()
 		switch frame {
 		case "gin":
-			if global.GVA_CONFIG.System.DbType == "mysql" {
-				Mysql.AutoMigrateTables()
-				Mysql.InitData()
-			}
+			// if global.GVA_CONFIG.System.DbType == "mysql" {
+			// 	Mysql.AutoMigrateTables()
+			// 	Mysql.InitData()
+			// }
 		case "gf":
 			color.Info.Println("gf功能开发中")
 		}

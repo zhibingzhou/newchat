@@ -201,12 +201,15 @@ class WsSocket {
             case "login_event":
                 let data_login = JSON.parse(result.data);
                 (new LoginEvent(data_login)).handle();
+                break;
             case "event_keyboard":
                 let data_keybaord = JSON.parse(result.data);
                 (new KeyboardEvent(data_keybaord)).handle();
+                break;
             case "join_group":
                 let group_join = JSON.parse(result.data);
                 (new GroupJoinEvent(group_join)).handle();
+                break;
             default:
                 console.warn(`WsSocket 消息事件[${result.event}]未绑定...`)
                 break;

@@ -429,7 +429,7 @@ func (v KeyBoardEvent) EventDo() {
 	}
 }
 
-func SendGroupJoinOn(rep GroupList) {
+func (rep GroupList) EventDo() {
 	if len(rep.Receivedlist) > 0 { //组
 		for _, value := range rep.Receivedlist {
 			userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, fmt.Sprintf("%d", value)).Result()
@@ -443,4 +443,3 @@ func SendGroupJoinOn(rep GroupList) {
 		}
 	}
 }
-

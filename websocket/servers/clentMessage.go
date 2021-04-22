@@ -79,6 +79,6 @@ type KeyBoard struct {
 }
 
 type KeyBoardData struct {
-	Send_user    int `json:"send_user"`
+	Send_user    int    `json:"send_user"`
 	Receive_user string `json:"receive_user"`
 }

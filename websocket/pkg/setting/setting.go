@@ -25,9 +25,19 @@ type redis struct {
 	DBName int
 }
 
+type rabbitMq struct {
+	Admin   string `mapstructure:"admin" json:"admin" yaml:"admin"`
+	Pwd     string `mapstructure:"pwd" json:"pwd" yaml:"pwd"`
+	Port    int    `mapstructure:"port" json:"port" yaml:"port"`
+	Ip      string `mapstructure:"ip" json:"ip" yaml:"ip"`
+	Verhost string `mapstructure:"verhost" json:"verhost" yaml:"verhost"`
+}
+
 var CommonSetting = &commonConf{}
 
 var CommonRedis = &redis{}
+
+var CommonRabbitMq = &rabbitMq{}
 
 type etcdConf struct {
 	Endpoints []string
@@ -57,6 +67,7 @@ func Setup() {
 	mapTo("common", CommonSetting)
 	mapTo("etcd", EtcdSetting)
 	mapTo("redis", CommonRedis)
+	mapTo("rabbitMq", CommonRabbitMq)
 	fmt.Println(CommonRedis)
 	GlobalSetting = &global{
 		LocalHost:  getIntranetIp(),

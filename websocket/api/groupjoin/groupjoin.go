@@ -19,7 +19,7 @@ func (c *Controller) Run(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	servers.SendGroupJoinOn(inputData)
+	inputData.EventDo()
 	api.Render(w, retcode.SUCCESS, "success", map[string]string{})
 	return
 }

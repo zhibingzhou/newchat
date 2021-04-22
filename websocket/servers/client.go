@@ -48,7 +48,10 @@ func (c *Client) Read() {
 				}
 			}
 			if string(message) != "PING" {
-				MessageChannel.Request <- DRequest{Message: message}
+				//chan  方法
+				// MessageChannel.Request <- DRequest{Message: message}
+				//rabitmq 方法
+				ChannelAll.ChannelReceiveMessage <- message
 			} else {
 				userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, c.UserId).Result()
 				//更新在线状态，上线通知

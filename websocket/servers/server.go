@@ -276,5 +276,9 @@ func SendUserStatus(userid string, status int) {
 		Status:  status,
 	}
 	message, _ := json.Marshal(userstatus)
+	if true {
+		ChannelAll.ChannelReceiveMessage <- message
+		return
+	}
 	MessageChannel.Request <- DRequest{Message: message}
 }

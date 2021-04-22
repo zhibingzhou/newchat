@@ -40,12 +40,20 @@ func Init() {
 
 	servers.StartWebSocket()
 
-	//启动线程，分类信息
-	servers.MessageChannel = servers.NewChannel_Pool(5)
-	//开启监视任务
-	servers.MessageChannel.NewChannel_PoolGo()
-	//处理任务
-	servers.MessageGetResult()
+	if false { //使用channel 处理任务
+		//启动线程，分类信息
+		servers.MessageChannel = servers.NewChannel_Pool(5)
+		//开启监视任务
+		servers.MessageChannel.NewChannel_PoolGo()
+		//处理任务
+		servers.MessageGetResult()
+	} else { // 使用rabbitmq 处理任务
+		//监听消息
+		servers.ChannelAll = servers.NewChannelMessage()
+		servers.ChannelListenMessage()
+		//启动rabbitmq 监听消息
+		servers.InitRabbitService()
+	}
 
 	go servers.WriteMessage()
 }

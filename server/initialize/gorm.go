@@ -73,7 +73,7 @@ func GormMysql() *gorm.DB {
 	db, err := gorm.Open("mysql", dsn)
 	db.SingularTable(true)
 	if err != nil {
-		global.GVA_LOG.Error("MySQL启动异常", zap.Any("err", err))
+		global.GVA_LOG.Error("MySQL启动异常 "+dsn, zap.Any("err", err))
 		os.Exit(0)
 	} else {
 		global.GVA_DB = db

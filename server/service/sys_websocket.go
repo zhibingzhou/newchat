@@ -133,6 +133,13 @@ func SendToGroupJoin(request response.GroupListJoin) {
 	onlineStatus := model.RedisGetUserOnline(request.Send_user)
 	if systemId != "" && onlineStatus {
 		requestbyte, _ := json.Marshal(request)
+
+		//使用rabbitmq
+		if true {
+			RabbitAdminService["join_group"].DirectPulish(requestbyte)
+			return
+		}
+
 		fmt.Println(string(requestbyte))
 		url := global.GVA_CONFIG.Websocket.Url + "/join_group?" + fmt.Sprintf("UserId=%d", request.Send_user)
 		status, msg := utils.HttpPostjson(url, requestbyte, map[string]string{

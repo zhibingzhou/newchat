@@ -2,10 +2,12 @@ package core
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"newchat/global"
 	"newchat/initialize"
+	"newchat/service"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type server interface {
@@ -20,7 +22,7 @@ func RunWindowsServer() {
 	//initialize.InitWkMode()
 	Router := initialize.Routers()
 	//Router.Static("/form-generator", "./resource/page")
-
+	service.InitRabbitService()
 	address := fmt.Sprintf(":%d", global.GVA_CONFIG.System.Addr)
 	s := initServer(address, Router)
 	// 保证文本顺序输出

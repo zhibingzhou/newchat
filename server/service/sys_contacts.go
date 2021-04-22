@@ -229,7 +229,7 @@ func TalkDelete(id int) (err error) {
 	return err
 }
 
-func GetFriendIdList(user_id int) (err error, reponseid response.ReponseLoginEvent) {
+func GetFriendIdList(user_id, status int, event string) (err error, reponseid response.ReponseLoginEvent) {
 
 	var id_list []model.Friend_id
 	err = global.GVA_DB.Table("contacts").Select([]string{"friend_id"}).Where("user_id = ?", user_id).Scan(&id_list).Error
@@ -238,6 +238,8 @@ func GetFriendIdList(user_id int) (err error, reponseid response.ReponseLoginEve
 		reponseid.Receivedlist = append(reponseid.Receivedlist, id_list[key].Friend_id)
 	}
 	reponseid.User_id = user_id
+	reponseid.Event = event
+	reponseid.Status = status
 	return err, reponseid
 
 }

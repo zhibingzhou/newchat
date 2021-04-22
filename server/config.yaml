@@ -89,3 +89,10 @@ websocket:
   bind_to_group: '/api/bind_to_group'
   get_online_list: '/api/get_online_list'
   close_client: '/api/close_client'
+
+rabbitMq:
+  admin: 'konwen'
+  pwd: '123456'
+  port: 5672
+  ip : '127.0.0.1'
+  verhost : 'konwen'

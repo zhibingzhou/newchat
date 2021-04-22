@@ -36,13 +36,12 @@ func EvenTalk(c *gin.Context) {
 	response.OkWithData(res, c)
 }
 
-
 //
 func Login_Event(c *gin.Context) {
 	var requesteventalk request.UpdateUserStatus
 	_ = c.ShouldBindJSON(&requesteventalk)
 	fmt.Println(requesteventalk)
-	err ,res := service.GetFriendIdList(requesteventalk.User_id)
+	err, res := service.GetFriendIdList(requesteventalk.User_id, requesteventalk.Status, "login_event")
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
@@ -50,4 +49,3 @@ func Login_Event(c *gin.Context) {
 	}
 	response.OkWithData(res, c)
 }
-

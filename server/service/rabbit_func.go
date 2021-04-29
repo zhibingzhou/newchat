@@ -41,6 +41,7 @@ func InitRabbitService() {
 	RabbitAdminService["even_talk"] = NewDirect("event_adm", "even_talk")
 	RabbitAdminService["login_event"] = NewDirect("event_adm", "login_event")
 	RabbitAdminService["join_group"] = NewDirect("event_adm", "join_group")
+	RabbitAdminService["event_img"] = NewDirect("event_adm", "event_img")
 	//后台读websocke 信息
 	for _, value := range RabbitWebSocketService {
 		go value.DirectConsume()

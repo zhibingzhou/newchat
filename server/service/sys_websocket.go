@@ -115,6 +115,10 @@ func SendToClient(event string, request response.WebsocketMessage) {
 		if systemId != "" && onlineStatus {
 			requestbyte, _ := json.Marshal(request)
 			fmt.Println(string(requestbyte))
+			if true {
+				RabbitAdminService["event_img"].DirectPulish(requestbyte)
+				return
+			}
 			url := global.GVA_CONFIG.Websocket.Url + "/send_message?" + fmt.Sprintf("UserId=%d", request.Messagedata.Send_user)
 			status, msg := utils.HttpPostjson(url, requestbyte, map[string]string{
 				"SystemId": systemId,

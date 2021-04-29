@@ -30,6 +30,8 @@ func NewDirect(exchange, key string) *RabbitMQ {
 }
 
 func InitRabbitService() {
+
+	//发送者
 	RabbitWebSocketService = make(map[string]*RabbitMQ)
 	RabbitWebSocketService["even_talk"] = NewDirect("event_web", "even_talk")
 	RabbitWebSocketService["login_event"] = NewDirect("event_web", "login_event")
@@ -39,6 +41,7 @@ func InitRabbitService() {
 	RabbitAdminService["even_talk"] = NewDirect("event_adm", "even_talk")
 	RabbitAdminService["login_event"] = NewDirect("event_adm", "login_event")
 	RabbitAdminService["join_group"] = NewDirect("event_adm", "join_group")
+	RabbitAdminService["event_img"] = NewDirect("event_adm", "event_img")
 	RabbitAdminService["event_keyboard"] = NewDirect("event_web_adm", "event_keyboard")
 
 	for _, value := range RabbitAdminService {

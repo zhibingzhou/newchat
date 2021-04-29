@@ -127,6 +127,19 @@ func (r *RabbitMQ) DirectConsume() {
 			var join_group GroupList
 			err = json.Unmarshal(b.Body, &join_group)
 			join_group.EventDo()
+		case "event_img":
+			var inputData ReponseFromTalkEvent
+			var rep DResultTalkEvent
+			err = json.Unmarshal(b.Body, &inputData)
+			rep.Event = inputData.Event
+			rep.Status = 200
+			rep.Receivedlist = inputData.Receive_list
+			rep.DataResponse.Data = inputData.Messagedata.Data
+			rep.DataResponse.Data.File = inputData.Messagedata.Data.File
+			rep.DataResponse.Receive_user = inputData.Messagedata.Receive_user
+			rep.DataResponse.Send_user = inputData.Messagedata.Send_user
+			rep.DataResponse.Source_type = inputData.Messagedata.Source_type
+			rep.EventDo()
 		}
 	}
 	<-forver

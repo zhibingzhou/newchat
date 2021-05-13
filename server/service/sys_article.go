@@ -79,6 +79,7 @@ func ArticleTags(id int) (err error, rep response.ResponseTagsList) {
 func ArticleList(id int, pages, keyword, find_type, cid string) (err error, rep response.ResponseArticleList) {
 
 	page, pagesize := utils.ThreadPage(pages, "0")
+	pagesize = pagesize * (page - 1)
 	rep.Rows = make([]response.ResponseArticle, 0)
 	total := 0
 	rep.Page = page

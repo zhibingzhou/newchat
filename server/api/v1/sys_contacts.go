@@ -53,7 +53,7 @@ func Apply_records(c *gin.Context) {
 	page := c.Request.FormValue("page")
 
 	pageIndex, pageSize = utils.ThreadPage(page, page_size)
-
+	pageSize = pageSize * (pageIndex - 1)
 	err, rep, total, page_total := service.Apply_records(uid, pageIndex, pageSize)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))

@@ -15,4 +15,5 @@ type Server struct {
 	Qiniu     Qiniu     `mapstructure:"qiniu" json:"qiniu" yaml:"qiniu"`
 	Websocket Websocket `mapstructure:"websocket" json:"websocket" yaml:"websocket"`
 	RabbitMq  RabbitMq  `mapstructure:"rabbitMq" json:"rabbitMq" yaml:"rabbitMq"`
+	Tool      Tool      `mapstructure:"tool" json:"tool" yaml:"tool"`
 }

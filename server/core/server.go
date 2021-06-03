@@ -22,7 +22,15 @@ func RunWindowsServer() {
 	//initialize.InitWkMode()
 	Router := initialize.Routers()
 	//Router.Static("/form-generator", "./resource/page")
-	service.InitRabbitService()
+	switch global.GVA_CONFIG.Tool.Tool_name {
+	case "channel":
+
+	case "rabbitmq":
+		service.InitRabbitService()
+	case "kafka":
+		service.InitkafkaService()
+	}
+
 	address := fmt.Sprintf(":%d", global.GVA_CONFIG.System.Addr)
 	s := initServer(address, Router)
 	// 保证文本顺序输出

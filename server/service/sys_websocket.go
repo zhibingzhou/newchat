@@ -115,17 +115,23 @@ func SendToClient(event string, request response.WebsocketMessage) {
 		if systemId != "" && onlineStatus {
 			requestbyte, _ := json.Marshal(request)
 			fmt.Println(string(requestbyte))
-			if true {
+
+			switch global.GVA_CONFIG.Tool.Tool_name {
+			case "channel":
+				url := global.GVA_CONFIG.Websocket.Url + "/send_message?" + fmt.Sprintf("UserId=%d", request.Messagedata.Send_user)
+				status, msg := utils.HttpPostjson(url, requestbyte, map[string]string{
+					"SystemId": systemId,
+				})
+				if status != 200 {
+					global.GVA_LOG.Error(msg, zap.Any("err", errors.New(msg)))
+				}
+			case "rabbitmq":
 				RabbitAdminService["event_img"].DirectPulish(requestbyte)
-				return
+			case "kafka":
+				KafkaSendService["event_img"].KafkaSendMessage(requestbyte)
+
 			}
-			url := global.GVA_CONFIG.Websocket.Url + "/send_message?" + fmt.Sprintf("UserId=%d", request.Messagedata.Send_user)
-			status, msg := utils.HttpPostjson(url, requestbyte, map[string]string{
-				"SystemId": systemId,
-			})
-			if status != 200 {
-				global.GVA_LOG.Error(msg, zap.Any("err", errors.New(msg)))
-			}
+
 		}
 	}
 	//	HttpPostjson()
@@ -138,19 +144,20 @@ func SendToGroupJoin(request response.GroupListJoin) {
 	if systemId != "" && onlineStatus {
 		requestbyte, _ := json.Marshal(request)
 
-		//使用rabbitmq
-		if true {
+		switch global.GVA_CONFIG.Tool.Tool_name {
+		case "channel":
+			url := global.GVA_CONFIG.Websocket.Url + "/join_group?" + fmt.Sprintf("UserId=%d", request.Send_user)
+			status, msg := utils.HttpPostjson(url, requestbyte, map[string]string{
+				"SystemId": systemId,
+			})
+			if status != 200 {
+				global.GVA_LOG.Error(msg, zap.Any("err", errors.New(msg)))
+			}
+		case "rabbitmq":
 			RabbitAdminService["join_group"].DirectPulish(requestbyte)
-			return
+		case "kafka":
+			KafkaSendService["join_group"].KafkaSendMessage(requestbyte)
 		}
 
-		fmt.Println(string(requestbyte))
-		url := global.GVA_CONFIG.Websocket.Url + "/join_group?" + fmt.Sprintf("UserId=%d", request.Send_user)
-		status, msg := utils.HttpPostjson(url, requestbyte, map[string]string{
-			"SystemId": systemId,
-		})
-		if status != 200 {
-			global.GVA_LOG.Error(msg, zap.Any("err", errors.New(msg)))
-		}
 	}
 }

@@ -276,9 +276,15 @@ func SendUserStatus(userid string, status int) {
 		Status:  status,
 	}
 	message, _ := json.Marshal(userstatus)
-	if true {
-		ChannelAll.ChannelReceiveMessage <- message
-		return
+
+	switch setting.CommonTool.ToolName {
+	case "channel":
+		MessageChannel.Request <- DRequest{Message: message}
+	case "rabbitmq":
+		r := RabbitMqSend{Message: message}
+		ChannelAll.ChannelReceiveMessage <- r
+	case "kafka":
+		r := KafkaSend{Message: message}
+		ChannelAll.ChannelReceiveMessage <- r
 	}
-	MessageChannel.Request <- DRequest{Message: message}
 }

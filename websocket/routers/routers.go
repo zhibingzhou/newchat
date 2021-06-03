@@ -13,6 +13,7 @@ import (
 	"websocket/api/send2clients"
 	"websocket/api/send2group"
 	"websocket/api/sendtoclient"
+	"websocket/pkg/setting"
 	"websocket/servers"
 )
 
@@ -40,19 +41,27 @@ func Init() {
 
 	servers.StartWebSocket()
 
-	if false { //使用channel 处理任务
+	switch setting.CommonTool.ToolName {
+	case "channel":
 		//启动线程，分类信息
 		servers.MessageChannel = servers.NewChannel_Pool(5)
 		//开启监视任务
 		servers.MessageChannel.NewChannel_PoolGo()
 		//处理任务
 		servers.MessageGetResult()
-	} else { // 使用rabbitmq 处理任务
+
+	case "rabbitmq":
 		//监听消息
 		servers.ChannelAll = servers.NewChannelMessage()
 		servers.ChannelListenMessage()
 		//启动rabbitmq 监听消息
 		servers.InitRabbitService()
+
+	case "kafka":
+		//监听消息
+		servers.ChannelAll = servers.NewChannelMessage()
+		servers.ChannelListenMessage()
+		servers.InitkafkaService()
 	}
 
 	go servers.WriteMessage()

@@ -33,11 +33,17 @@ type rabbitMq struct {
 	Verhost string `mapstructure:"verhost" json:"verhost" yaml:"verhost"`
 }
 
+type tool struct {
+	ToolName string
+}
+
 var CommonSetting = &commonConf{}
 
 var CommonRedis = &redis{}
 
 var CommonRabbitMq = &rabbitMq{}
+
+var CommonTool = &tool{}
 
 type etcdConf struct {
 	Endpoints []string
@@ -68,6 +74,7 @@ func Setup() {
 	mapTo("etcd", EtcdSetting)
 	mapTo("redis", CommonRedis)
 	mapTo("rabbitMq", CommonRabbitMq)
+	mapTo("tool", CommonTool)
 	fmt.Println(CommonRedis)
 	GlobalSetting = &global{
 		LocalHost:  getIntranetIp(),

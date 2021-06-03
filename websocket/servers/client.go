@@ -3,6 +3,7 @@ package servers
 import (
 	"time"
 	"websocket/pkg/redis"
+	"websocket/pkg/setting"
 
 	"github.com/gorilla/websocket"
 )
@@ -51,7 +52,17 @@ func (c *Client) Read() {
 				//chan  方法
 				// MessageChannel.Request <- DRequest{Message: message}
 				//rabitmq 方法
-				ChannelAll.ChannelReceiveMessage <- message
+				switch setting.CommonTool.ToolName {
+				case "channel":
+					MessageChannel.Request <- DRequest{Message: message}
+				case "rabbitmq":
+					r := RabbitMqSend{Message: message}
+					ChannelAll.ChannelReceiveMessage <- r
+				case "kafka":
+					r := KafkaSend{Message: message}
+					ChannelAll.ChannelReceiveMessage <- r
+				}
+
 			} else {
 				userstatus, _ := redis.RedisDB.HGet(redis.UserStatus, c.UserId).Result()
 				//更新在线状态，上线通知

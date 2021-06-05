@@ -115,8 +115,10 @@ func (r *RabbitMQ) DirectConsume() {
 //处理完发消息给rabbit
 func Rabbit_even_talk(body []byte) response.Response {
 	var talkReponse response.Response
-	var requesteventalk request.RequestEvenTalk
+	requesteventalk := ReponseSyncPool["even_talk"].Get().(*request.RequestEvenTalk)
 	_ = json.Unmarshal(body, &requesteventalk)
+	ReponseSyncPool["even_talk"].Put(requesteventalk)
+
 	send_id := requesteventalk.Send_user
 	received_id := requesteventalk.Receive_user //
 	source := requesteventalk.Source_type       //是否群聊

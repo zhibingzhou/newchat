@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"newchat/model/request"
+	"sync"
 
 	"github.com/Shopify/sarama"
 )
@@ -20,8 +22,17 @@ func Destory() {
 	ServerCon.Close()
 }
 
-var KafkaSendService map[string]TopicAndKey
-var KafkaReceiveService map[string]TopicAndKey
+var (
+	ReponseSyncPool     map[string]*sync.Pool
+	KafkaSendService    map[string]TopicAndKey
+	KafkaReceiveService map[string]TopicAndKey
+)
+
+//复用池子
+func InitPoolOfReponse() {
+	ReponseSyncPool = make(map[string]*sync.Pool)
+	ReponseSyncPool["even_talk"] = &sync.Pool{New: func() interface{} { return new(request.RequestEvenTalk) }}
+}
 
 func InitkafkaService() error {
 
@@ -52,6 +63,9 @@ func InitkafkaService() error {
 	for _, value := range KafkaReceiveService {
 		go value.ListenKafka()
 	}
+
+	//sync.Pool
+	InitPoolOfReponse()
 
 	return err
 

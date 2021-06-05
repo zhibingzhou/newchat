@@ -3,9 +3,23 @@ package servers
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 
 	"github.com/Shopify/sarama"
 )
+
+var (
+	ReponseSyncPool map[string]*sync.Pool
+)
+
+//复用池子
+func InitPoolOfReponse() {
+
+	ReponseSyncPool = make(map[string]*sync.Pool)
+	ReponseSyncPool["event_keyboard"] = &sync.Pool{New: func() interface{} { return new(KeyBoard) }}
+	ReponseSyncPool["even_talk"] = &sync.Pool{New: func() interface{} { return new(ReponseFromWeb) }}
+
+}
 
 func (t TopicAndKey) ListenKafka() error {
 	consumer, err := sarama.NewConsumer([]string{"127.0.0.1:9092"}, nil)
@@ -33,8 +47,9 @@ func (t TopicAndKey) ListenKafka() error {
 
 				switch string(msg.Key) {
 				case "even_talk": //单聊，群聊事件
-					var reponseweb ReponseFromWeb
-					_ = json.Unmarshal(msg.Value, &reponseweb)
+					reponseweb := ReponseSyncPool["even_talk"].Get().(*ReponseFromWeb)
+					_ = json.Unmarshal(msg.Value, reponseweb)
+					ReponseSyncPool["even_talk"].Put(&ReponseFromWeb{})
 					if reponseweb.Code == 200 {
 						var result DResultTalkEvent
 						result.DataResponse.Send_user = reponseweb.Data.Messagedata.Send_user
@@ -51,7 +66,9 @@ func (t TopicAndKey) ListenKafka() error {
 					_ = json.Unmarshal(msg.Value, &reponselogin)
 					reponselogin.EventDo()
 				case "event_keyboard":
-					var evenKeyboard KeyBoard
+					evenKeyboard := ReponseSyncPool["event_keyboard"].Get().(*KeyBoard)
+					_ = json.Unmarshal(msg.Value, evenKeyboard)
+					ReponseSyncPool["event_keyboard"].Put(&KeyBoard{})
 					err = json.Unmarshal(msg.Value, &evenKeyboard)
 					var reponsekeyboard KeyBoardEvent
 					reponsekeyboard.Send_user = evenKeyboard.Data.Send_user

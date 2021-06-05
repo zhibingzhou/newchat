@@ -49,6 +49,9 @@ func InitkafkaService() error {
 	KafkaReceiveService["event_adm"] = NewTopicAndKey("event_adm", "")
 	KafkaReceiveService["event_web_adm"] = NewTopicAndKey("event_web_adm", "")
 
+	
+	//新加的sync.Pool 类型利用
+	InitPoolOfReponse()
 	for _, value := range KafkaReceiveService {
 		go value.ListenKafka()
 	}
